@@ -499,7 +499,7 @@ export default function page() {
                             {/* Main card image */}
                             <div className="relative w-full max-w-[240px] overflow-hidden rounded-3xl sm:max-w-[350px] lg:max-w-[450px]">
                                 <Image
-                                    src="/Images/EEMobile/ee-sim.png"
+                                    src="/Images/ee-sim.png"
                                     alt="Hero Card"
                                     width={600}
                                     height={400}

@@ -17,7 +17,7 @@ type Social = {
 };
 
 const resourceLinks: FooterLink[] = [
-  { id: "zoiko-res-bt", label: "BT Broadband", href: "#" },
+  { id: "zoiko-res-bt", label: "BT Broadband", href: "/bt-broadband" },
   { id: "zoiko-res-ee", label: "EE Mobile", href: "/ee-mobile-plans" },
   { id: "zoiko-res-landlines", label: "Landlines", href: "#" },
   { id: "zoiko-res-reseller", label: "Become a Reseller", href: "#" },
@@ -28,7 +28,7 @@ const companyLinks: FooterLink[] = [
   { id: "zoiko-co-careers", label: "Careers", href: "#" },
   { id: "zoiko-co-partner", label: "Partner Programme", href: "#" },
   { id: "zoiko-co-news", label: "News & Blogs", href: "#" },
-  { id: "zoiko-co-faqs", label: "FAQs", href: "#" },
+  { id: "zoiko-co-faqs", label: "FAQs", href: "/faqs" },
 ];
 
 const legalLinks: FooterLink[] = [
@@ -186,7 +186,7 @@ export default function Footer() {
           </p>
 
           {/* Social Icons */}
-          <div className="mt-2 flex flex-row items-center gap-3.5">
+          <div className="mt-2 flex flex-row items-center flex-wrap gap-3.5">
             {socials.map((social) => (
               <a
                 key={social.id}

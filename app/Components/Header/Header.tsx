@@ -102,7 +102,7 @@ export default function Header() {
           >
             {[
               { href: "/ee-mobile-plans", label: "EE Mobile" },
-              { href: "/broadband", label: "BT-Broadband" },
+              { href: "/bt-broadband", label: "BT-Broadband" },
               { href: "/landlines", label: "Landlines" },
             ].map((item) => (
               <li
