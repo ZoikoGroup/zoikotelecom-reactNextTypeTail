@@ -178,11 +178,11 @@ export default function ResellerApplicationForm() {
 
           <p className="text-center text-[14px] text-[#718096] mt-6">
                 By submitting, you agree to our{" "}
-                <a href="#" className="text-[#C12172] underline cursor-pointer">
+                <a href="/terms-and-conditions" className="text-[#C12172] underline cursor-pointer">
                 Terms & Conditions
                 </a>{" "}
                 and{" "}
-                <a href="#"  className="text-[#C12172] underline cursor-pointer">
+                <a href="/privacy-policy"  className="text-[#C12172] underline cursor-pointer">
                     Privacy Policy
                 </a>
             </p>
