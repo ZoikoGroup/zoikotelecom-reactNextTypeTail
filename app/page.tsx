@@ -1,14 +1,8 @@
 // app/page.tsx  (or components/Home/index.tsx)
 import Image from "next/image";
-import type { StaticImageData } from "next/image";
+import Link from "next/link";
 import { FaArrowRight, FaCheck, FaStar } from "react-icons/fa";
 
-type Service = {
-  icon: string;
-  title: string;
-  description: string;
-  button: string;
-};
 
 type Feature = {
   title: string;
@@ -21,13 +15,14 @@ type Testimonial = {
   role: string;
 };
 
-const services: Service[] = [
+const services = [
   {
     icon: "/Images/Homepage/broadband.png",
     title: "BT Broadband",
     description:
       "Ultra-fast fibre broadband with speeds up to 1Gbps. Unlimited data, 24/7 support.",
     button: "Learn More",
+    btnLink: "/bt-broadband",
   },
   {
     icon: "/Images/Homepage/mobile.png",
@@ -35,6 +30,7 @@ const services: Service[] = [
     description:
       "Premium EE SIM plans with unlimited calls, texts, and high-speed data.",
     button: "View Plans",
+    btnLink: "/ee-mobile-plans",
   },
   {
     icon: "/Images/Homepage/landline.png",
@@ -42,6 +38,7 @@ const services: Service[] = [
     description:
       "Crystal-clear business communications. Easy setup, flexible plans, global reach.",
     button: "Discover",
+    btnLink: "/landlines",
   },
   {
     icon: "/Images/Homepage/business.png",
@@ -49,6 +46,7 @@ const services: Service[] = [
     description:
       "Dedicated internet, cloud hosting, and enterprise-grade infrastructure.",
     button: "Explore",
+    btnLink: "/business-solutions",
   },
   {
     icon: "/Images/Homepage/iot.png",
@@ -56,6 +54,7 @@ const services: Service[] = [
     description:
       "Global M2M connectivity for smart devices. Save up to 20% on IoT SIM cards.",
     button: "Get Started",
+    btnLink: "/iot-services",
   },
   {
     icon: "/Images/Homepage/support.png",
@@ -63,6 +62,7 @@ const services: Service[] = [
     description:
       "Round-the-clock customer service with live chat, phone, and email support.",
     button: "Contact Us",
+    btnLink: "/contact",
   },
 ];
 
@@ -145,18 +145,23 @@ export default function Home() {
  
             {/* CTA Buttons */}
             <div className="mt-8 flex flex-wrap gap-4">
-              <button
+              <Link href="/ee-mobile-plans" passHref>
+                <button
                 type="button"
                 className="rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#C12172] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:px-8 sm:py-3.5 sm:text-base"
               >
                 Explore Services
               </button>
-              <button
-                type="button"
-                className="rounded-full border-2 border-white px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white hover:text-[#C12172] sm:px-8 sm:py-3.5 sm:text-base"
-              >
-                Contact Us
-              </button>
+              </Link>
+              
+              <Link href="/contact" passHref>
+                <button
+                  type="button"
+                  className="rounded-full border-2 border-white px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white hover:text-[#C12172] sm:px-8 sm:py-3.5 sm:text-base"
+                >
+                  Contact Us
+                </button>
+              </Link>
             </div>
  
             {/* Stats — flat, no card, matching screenshot */}
@@ -235,13 +240,14 @@ export default function Home() {
                 <p className="mb-6 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
                   {service.description}
                 </p>
-                <button
+
+                <Link href={service.btnLink} passHref
                   type="button"
                   className="inline-flex items-center gap-2 text-sm font-semibold text-[#C12172] transition-all hover:gap-3 dark:text-pink-400"
                 >
                   {service.button}
                   <FaArrowRight className="text-xs" />
-                </button>
+                </Link>
               </div>
             ))}
           </div>
@@ -286,12 +292,14 @@ export default function Home() {
                 ))}
               </div>
 
+              <Link href="/ee-mobile-plans" passHref>
               <button
                 type="button"
                 className="mt-8 rounded-full bg-[#C12172] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#C12172]/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#a01a60] hover:shadow-xl dark:bg-pink-500 dark:shadow-pink-500/30 dark:hover:bg-pink-600"
               >
                 Get Started Today
               </button>
+              </Link>
             </div>
 
             {/* Right Image */}
@@ -327,18 +335,22 @@ export default function Home() {
                 digital experiences.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-4">
+                <Link href="/ee-mobile-plans" passHref>
                 <button
                   type="button"
                   className="rounded-full bg-white px-8 py-3.5 text-base font-semibold text-[#C12172] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
                 >
                   Get Started
                 </button>
+                </Link>
+                <Link href="/ee-mobile-plans" passHref>
                 <button
                   type="button"
                   className="rounded-full border-2 border-white px-8 py-3.5 text-base font-semibold text-white transition-all duration-300 hover:bg-white hover:text-[#C12172]"
                 >
                   View All Services
                 </button>
+                </Link>
               </div>
             </div>
           </div>

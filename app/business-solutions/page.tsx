@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react'
 import Image from "next/image";
+import Link from "next/link";
 
 const services = [
   {
@@ -16,6 +17,7 @@ const services = [
       "Multi-user management",
     ],
     linkText: "View Business Mobile",
+    linkUrl: "/ee-mobile-plans",
   },
   {
     id: 2,
@@ -30,6 +32,7 @@ const services = [
       "Structured installation",
     ],
     linkText: "View Business Broadband",
+    linkUrl: "/bt-broadband",
   },
   {
     id: 3,
@@ -43,6 +46,7 @@ const services = [
       "Numbering & Porting",
     ],
     linkText: "View Business Voice",
+    linkUrl: "/landlines",
   },
 ];
 const useCases = [
@@ -55,6 +59,7 @@ const useCases = [
       "Structured onboarding for distributed teams",
     ],
     buttonText: "Speak To Business Team",
+    linkUrl: "/contact",
   },
   {
     id: "02",
@@ -65,6 +70,7 @@ const useCases = [
       "Single account oversight and support",
     ],
     buttonText: "Speak To Business Team",
+    linkUrl: "/contact",
   },
   {
     id: "03",
@@ -75,6 +81,7 @@ const useCases = [
       "Managed service transitions with minimal disruption",
     ],
     buttonText: "Speak To Business Team",
+    linkUrl: "/contact",
   },
 ];
 const serviceDeliveryData = [
@@ -368,7 +375,7 @@ export default function page() {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-10">
-          
+          <Link href="/ee-mobile-plans" passHref>
           <button
             className="
               h-14 px-8 rounded-full
@@ -385,7 +392,9 @@ export default function page() {
             </span>
             Request Business Consultation
           </button>
+          </Link>
 
+          <Link href="/contact" passHref>
           <button
             className="
               h-14 px-8 rounded-full
@@ -400,6 +409,7 @@ export default function page() {
           >
             Explore Business Solutions
           </button>
+          </Link>
         </div>
       </div>
 
@@ -625,6 +635,7 @@ export default function page() {
           </ul>
 
           {/* LINK */}
+          <Link href={service.linkUrl} passHref>
           <button
             className="
               mt-8
@@ -652,6 +663,7 @@ export default function page() {
               />
             </svg>
           </button>
+          </Link>
         </div>
       ))}
     </div>
@@ -785,6 +797,7 @@ export default function page() {
           </ul>
 
           {/* BUTTON */}
+          <Link href={item.linkUrl} passHref>
           <button
             className="
               mt-10
@@ -813,6 +826,7 @@ export default function page() {
               />
             </svg>
           </button>
+          </Link>
         </div>
       ))}
     </div>
@@ -1325,7 +1339,7 @@ export default function page() {
 
         {/* BUTTONS */}
         <div className="mt-10 flex flex-col sm:flex-row gap-4">
-
+          <Link href="/#" passHref>
           <button
             className="
               h-14 px-8
@@ -1342,7 +1356,9 @@ export default function page() {
           >
             Access Business Portal
           </button>
+          </Link>
 
+          <Link href="/contact" passHref>
           <button
             className="
               h-14 px-8
@@ -1357,6 +1373,7 @@ export default function page() {
           >
             Request Portal Access
           </button>
+          </Link>
         </div>
 
         {/* FOOTNOTE */}
@@ -1920,6 +1937,7 @@ export default function page() {
               </p>
 
               {/* BUTTON */}
+              <Link href="/contact" passHref>
               <button
                 className="
                   mt-10
@@ -1938,6 +1956,7 @@ export default function page() {
               >
                 Contact Business Support
               </button>
+              </Link>
             </div>
 
             {/* FORM */}
