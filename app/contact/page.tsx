@@ -88,16 +88,31 @@ export default function ContactPage() {
       newErrors.name = "Your Name is required";
     } else if (formData.name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters";
+    } else if (formData.name.trim().length > 150) {
+      newErrors.name = "Name must be under 150 characters";
+    } else {
+      const nameParts = formData.name.trim().split(/\s+/);
+      const first_name = nameParts[0] || "";
+      const last_name = nameParts.slice(1).join(" ") || "";
+      if (first_name.length > 100) {
+        newErrors.name = "First name part must be under 100 characters";
+      } else if (last_name.length > 100) {
+        newErrors.name = "Last name part must be under 100 characters";
+      }
     }
 
     if (!formData.email.trim()) {
       newErrors.email = "Your Email is required";
+    } else if (formData.email.trim().length > 254) {
+      newErrors.email = "Email must be under 254 characters";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
 
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone Number is required";
+    } else if (formData.phone.trim().length > 20) {
+      newErrors.phone = "Phone number must not exceed 20 characters";
     } else if (!/^\+?[\d\s-]{7,15}$/.test(formData.phone.trim())) {
       newErrors.phone = "Please enter a valid phone number (e.g. +44 123 456 7890)";
     }
@@ -110,6 +125,8 @@ export default function ContactPage() {
       newErrors.message = "Your Message is required";
     } else if (formData.message.trim().length < 10) {
       newErrors.message = "Message must be at least 10 characters";
+    } else if (formData.message.trim().length > 2000) {
+      newErrors.message = "Message must not exceed 2000 characters";
     }
 
     setErrors(newErrors);
@@ -127,23 +144,79 @@ export default function ContactPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
+    const nameParts = formData.name.trim().split(/\s+/);
+    const first_name = nameParts[0] || "";
+    const last_name = nameParts.slice(1).join(" ") || ".";
+
+    try {
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+      const response = await fetch(`${baseUrl}/api/contact/contact-us/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          first_name,
+          last_name,
+          email: formData.email,
+          phone: formData.phone.trim(),
+          subject: formData.subject,
+          message: formData.message,
+        }),
       });
-    }, 1800);
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsSubmitted(true);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        const serverErrors: FormErrors = {};
+        if (data.errors) {
+          if (data.errors.first_name) {
+            serverErrors.name = data.errors.first_name.join(" ");
+          }
+          if (data.errors.last_name) {
+            serverErrors.name = (serverErrors.name ? serverErrors.name + " " : "") + data.errors.last_name.join(" ");
+          }
+          if (data.errors.email) {
+            serverErrors.email = data.errors.email.join(" ");
+          }
+          if (data.errors.phone) {
+            serverErrors.phone = data.errors.phone.join(" ");
+          }
+          if (data.errors.subject) {
+            serverErrors.subject = data.errors.subject.join(" ");
+          }
+          if (data.errors.message) {
+            serverErrors.message = data.errors.message.join(" ");
+          }
+        } else {
+          serverErrors.message = data.message || "An unexpected error occurred. Please try again.";
+        }
+        setErrors(serverErrors);
+      }
+    } catch (err) {
+      console.error("Contact form submission error:", err);
+      setErrors({
+        message: "Failed to connect to the server. Please check your connection and try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -243,6 +316,7 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="John Doe"
+                      maxLength={150}
                       className={`w-full rounded-xl border px-4 py-3 text-base text-neutral-900 placeholder-neutral-400 outline-none transition-all focus:ring-1
                         ${errors.name 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-500" 
@@ -265,6 +339,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="john@example.com"
+                      maxLength={254}
                       className={`w-full rounded-xl border px-4 py-3 text-base text-neutral-900 placeholder-neutral-400 outline-none transition-all focus:ring-1
                         ${errors.email 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-500" 
@@ -287,6 +362,7 @@ export default function ContactPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+44 123 456 7890"
+                      maxLength={20}
                       className={`w-full rounded-xl border px-4 py-3 text-base text-neutral-900 placeholder-neutral-400 outline-none transition-all focus:ring-1
                         ${errors.phone 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-500" 
@@ -345,6 +421,7 @@ export default function ContactPage() {
                       onChange={handleChange}
                       placeholder="How can we help you?"
                       rows={4}
+                      maxLength={2000}
                       className={`w-full rounded-xl border px-4 py-3 text-base text-neutral-900 placeholder-neutral-400 outline-none transition-all resize-none focus:ring-1
                         ${errors.message 
                           ? "border-red-500 focus:border-red-500 focus:ring-red-500" 
