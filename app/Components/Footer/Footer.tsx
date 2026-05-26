@@ -20,7 +20,7 @@ const resourceLinks: FooterLink[] = [
   { id: "zoiko-res-bt", label: "BT Broadband", href: "/bt-broadband" },
   { id: "zoiko-res-ee", label: "EE Mobile", href: "/ee-mobile-plans" },
   { id: "zoiko-res-landlines", label: "Landlines", href: "#" },
-  { id: "zoiko-res-reseller", label: "Become a Reseller", href: "#" },
+  { id: "zoiko-res-reseller", label: "Become a Reseller", href: "/become-a-reseller" },
 ];
 
 const companyLinks: FooterLink[] = [
