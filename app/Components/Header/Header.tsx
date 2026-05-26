@@ -18,24 +18,17 @@ const forYouLinks = [
     desc: "Explore latest telecom accessories",
   },
   {
-    href: "/equipment",
+    href: "/phone-equipment",
     title: "Phone & Equipment",
     desc: "Premium devices and equipment",
   },
-];
-
-const usageLinks = [
-  {
+   {
     href: "/landline-business",
     title: "Landline Business",
     desc: "Reliable communication solutions",
   },
-  {
-    href: "/flexible-plans",
-    title: "Flexible Plans",
-    desc: "Custom plans for your business",
-  },
 ];
+
 
 interface DropdownItem {
   href: string;
@@ -170,16 +163,6 @@ export default function Header() {
                 </div>
                 <div className="px-2.5">
                   {forYouLinks.map((item) => (
-                    <DropdownLink key={item.href} item={item} onClick={closeAll} />
-                  ))}
-                </div>
-
-                {/* USAGE & FLEXIBILITY */}
-                <div className="px-[18px] pb-1.5 pt-4 text-[11px] font-bold uppercase tracking-[0.08em] text-[#aaa] dark:text-neutral-500">
-                  Usage &amp; Flexibility
-                </div>
-                <div className="px-2.5">
-                  {usageLinks.map((item) => (
                     <DropdownLink key={item.href} item={item} onClick={closeAll} />
                   ))}
                 </div>

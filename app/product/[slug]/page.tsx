@@ -1,4 +1,5 @@
-import React from 'react'
+
+// import {useState} from 'react'
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -112,7 +113,6 @@ const products = [
     description:
       "Premium business conferencing speaker designed for professional meeting rooms.",
   },
-
   {
     id: 11,
     slug: "wireless-office-headset",
@@ -122,6 +122,71 @@ const products = [
     category: "Wireless Headsets",
     description:
       "Advanced wireless office headset delivering all-day comfort and superior audio clarity.",
+  },
+  {
+    id: 12,
+    slug: "yealink-t31g",
+    title: "Yealink T31G",
+    price: "£17.50 – £59.99",
+    image: "/Images/PhoneEquipment/item1.png",
+    category: "Phone & Equipment",
+    description:
+      "High-quality Polycom compatible PSU for stable and efficient device power delivery.",
+  },
+
+  {
+    id: 13,
+    slug: "yealink-w73p",
+    title: "Yealink W73P",
+    price: "£17.50 – £69.99",
+    image: "/Images/PhoneEquipment/item2.png",
+    category: "Phone & Equipment",
+    description:
+      "Professional DECT cordless phone system with superior audio quality and extended range for business communication.",
+  },
+
+  {
+    id: 14,
+    slug: "cisco-192-ata",
+    title: "Cisco 192 ATA",
+    price: "£17.50 – £79.99",
+    image: "/Images/PhoneEquipment/item3.png",
+    category: "Headsets",
+    description:
+      "Professional mono headset with noise cancellation for clear business communication.",
+  },
+
+  {
+    id: 15,
+    slug: "yealink-w70b",
+    title: "Yealink W70B",
+    price: "£18.99 – £89.99",
+    image: "/Images/PhoneEquipment/item4.png",
+    category: "Phone & Equipment",
+    description:
+      "Dual-ear professional headset built for high-quality office and call center communication.",
+  },
+
+  {
+    id: 16,
+    slug: "cisco-191-ata",
+    title: "Cisco 191 ATA",
+    price: "£109.99",
+    image: "/Images/PhoneEquipment/item3.png",
+    category: "Phone & Equipment",
+    description:
+      "High-quality Polycom compatible PSU for stable and efficient device power delivery.",
+  },
+
+  {
+    id: 17,
+    slug: "yealink-73h",
+    title: "Yealink 73H",
+    price: "£114.99",
+    image: "/Images/PhoneEquipment/item5.png",
+    category: "Phone & Equipment",
+    description:
+      "Professional DECT cordless phone system with superior audio quality and extended range for business communication.",
   },
 ];
 
@@ -142,7 +207,8 @@ if (!product) {
   notFound();
 }
   return (
-    <><section className="bg-[#F7F5FA] dark:bg-[#0F172A] py-14 lg:py-20 transition-colors duration-300">
+    <>
+    <section className="bg-[#F7F5FA] dark:bg-[#0F172A] py-14 lg:py-20 transition-colors duration-300">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
     {/* TOP SECTION */}
@@ -233,7 +299,7 @@ if (!product) {
 
           <span>/</span>
 
-          <span>Accessories</span>
+          <span>{product.category}</span>
 
           <span>/</span>
 
@@ -326,7 +392,7 @@ if (!product) {
               h-14
             "
           >
-            <input type="number" value={1} min={1} className="w-20 text-center font-semibold text-[#1A1831] dark:text-white outline-none" />
+
           </div>
 
           {/* ADD TO CART */}
