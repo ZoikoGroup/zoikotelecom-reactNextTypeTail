@@ -8,6 +8,7 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   type?: string;
   error?: string;
+  requiredStar?: boolean;
 }
 
 export default function FormInput({
@@ -15,6 +16,7 @@ export default function FormInput({
   id,
   type = "text",
   error,
+  requiredStar = false,
   ...props
 }: FormInputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -24,9 +26,9 @@ export default function FormInput({
     <div className="mb-5 w-full">
       <label
         htmlFor={id}
-        className="mb-1.5 block text-[13.5px] font-medium text-[#006366] dark:text-[#2daeb3]"
+        className="mb-1.5 block text-[13.5px] font-semibold text-[#006366] dark:text-[#2daeb3]"
       >
-        {label}
+        {label}{requiredStar && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       <div className="relative">
         <input

@@ -14,7 +14,7 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-[calc(100vh-95px)] items-center justify-center bg-[#fafafa] p-4 dark:bg-neutral-950 sm:p-6 md:p-8 lg:p-12">
-      <div className="mx-auto flex w-full max-w-[1150px] md:h-[680px] flex-col md:flex-row bg-white dark:bg-neutral-900 border border-[#eaeaea] dark:border-neutral-800 rounded-[24px] overflow-hidden shadow-sm">
+      <div className="mx-auto flex w-full max-w-[1150px] min-h-[730px] flex-col md:flex-row bg-white dark:bg-neutral-900 border border-[#eaeaea] dark:border-neutral-800 rounded-[24px] overflow-hidden shadow-sm">
         
         {/* Left Side: Image Panel */}
         <div className="relative hidden w-[43%] overflow-hidden md:block">
@@ -85,6 +85,13 @@ export default function LoginPage() {
           </div>
         </div>
         
+      </div>
+
+      {/* Floating Get in Touch Badge */}
+      <div className="fixed right-0 top-1/2 z-50 flex -translate-y-1/2 select-none">
+        <button className="bg-[#C12172] hover:bg-[#a11a5e] text-white px-3 py-5 rounded-l-2xl font-semibold text-[13px] uppercase tracking-widest transition-colors duration-200 shadow-md [writing-mode:vertical-rl] rotate-180 cursor-pointer">
+          Get in touch
+        </button>
       </div>
     </main>
   );
