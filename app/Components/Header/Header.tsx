@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { FaChevronDown, FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 
+
 const forYouLinks = [
   {
     href: "/business-solutions",
@@ -207,12 +208,14 @@ export default function Header() {
               Contact Us
             </Link>
 
-            <button
+            <Link
+              href="/login"
+              onClick={closeAll}
               className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] text-lg text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[3px] sm:h-[50px] sm:w-[50px] sm:text-[22px]"
               aria-label="User account"
             >
               <FaUserCircle />
-            </button>
+            </Link>
 
             <button
               className="flex h-11 w-11 items-center justify-center rounded-[10px] border-2 border-[#eee] bg-white text-lg text-[#111] transition-colors hover:border-[#C12172] hover:text-[#C12172] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:border-[#e94196] dark:hover:text-[#e94196] lg:hidden"
