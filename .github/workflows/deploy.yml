@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: 🚀 Deploy to Production
 
 on:
   push:
@@ -7,23 +7,32 @@ on:
 
 jobs:
   deploy:
+    name: Deploy via SSH
     runs-on: ubuntu-latest
+
     steps:
-      - name: Deploy via SSH
+      - name: 📦 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
+          request_pty: true
           script_stop: true
           script: |
-                  export NVM_DIR="$HOME/.nvm"
-                  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-                  git config --global --add safe.directory /var/www/html/zoikotelecom-reactNextTypeTail
-                  cd /var/www/html/zoikotelecom-reactNextTypeTail
-                  git fetch origin
-                  git reset --hard origin/main
-                  npm install
-                  npm run build
-                  pm2 restart zoikotelecom
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            export PATH="$NVM_DIR/versions/node/$(nvm current)/bin:$PATH"
+            git config --global --add safe.directory /var/www/html/zoikotelecom-reactNextTypeTail
+            cd /var/www/html/zoikotelecom-reactNextTypeTail
+            git fetch origin
+            git reset --hard origin/main
+            npm install
+            npm run build
+            pm2 restart zoikotelecom
+            echo "✅ Deployment complete!"
