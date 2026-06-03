@@ -172,7 +172,7 @@ export default function Footer() {
           <div className="mb-5">
             <Link href="/">
               <Image
-                src="/images/logo.png"
+                src="/Images/logo.png"
                 alt="Zoiko Telecom"
                 width={180}
                 height={50}
