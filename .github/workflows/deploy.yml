@@ -21,13 +21,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
-          request_pty: true
           script_stop: true
           script: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-            export PATH="$NVM_DIR/versions/node/$(nvm current)/bin:$PATH"
             git config --global --add safe.directory /var/www/html/zoikotelecom-reactNextTypeTail
             cd /var/www/html/zoikotelecom-reactNextTypeTail
             git fetch origin
