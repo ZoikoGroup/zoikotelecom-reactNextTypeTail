@@ -18,11 +18,12 @@ jobs:
           port: 22
           script_stop: true
           script: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            cd /var/www/html/zoikotelecom-reactNextTypeTail
-            git fetch origin
-            git reset --hard origin/main
-            npm install
-            npm run build
-            pm2 restart zoikotelecom
+                  export NVM_DIR="$HOME/.nvm"
+                  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                  git config --global --add safe.directory /var/www/html/zoikotelecom-reactNextTypeTail
+                  cd /var/www/html/zoikotelecom-reactNextTypeTail
+                  git fetch origin
+                  git reset --hard origin/main
+                  npm install
+                  npm run build
+                  pm2 restart zoikotelecom
