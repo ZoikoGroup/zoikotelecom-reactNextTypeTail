@@ -71,7 +71,7 @@ export default function Header() {
           <div className="flex-shrink-0">
             <Link href="/" onClick={closeAll}>
               <Image
-                src="/images/logo.png"
+                src="/Images/logo.png"
                 alt="Zoiko Telecom"
                 width={180}
                 height={50}
