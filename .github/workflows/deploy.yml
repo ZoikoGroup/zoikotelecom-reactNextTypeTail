@@ -24,12 +24,15 @@ jobs:
           request_pty: true
           script_stop: true
           script: |
-                    export NVM_DIR="$HOME/.nvm"
-                    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-                    git config --global --add safe.directory /var/www/html/zoikotelecom-reactNextTypeTail
-                    cd /var/www/html/zoikotelecom-reactNextTypeTail && echo "cd OK"
-                    git fetch origin && echo "fetch OK"
-                    git reset --hard origin/main && echo "reset OK"
-                    npm install && echo "install OK"
-                    npm run build && echo "build OK"
-                    pm2 restart zoikotelecom && echo "pm2 OK"
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            export PATH="$NVM_DIR/versions/node/$(nvm current)/bin:$PATH"
+            git config --global --add safe.directory /var/www/html/zoikotelecom-reactNextTypeTail
+            cd /var/www/html/zoikotelecom-reactNextTypeTail
+            git fetch origin
+            git reset --hard origin/main
+            npm install
+            npm run build
+            pm2 restart zoikotelecom
+            echo "✅ Deployment complete!"
