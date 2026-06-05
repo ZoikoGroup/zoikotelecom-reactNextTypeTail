@@ -223,7 +223,7 @@ export default function Header() {
             <Link
               href="/contact"
               onClick={closeAll}
-              className="hidden whitespace-nowrap rounded-full border-2 border-[#C12172] px-7 py-3 text-base font-semibold text-[#C12172] transition-all duration-300 hover:bg-[#C12172] hover:text-white lg:inline-block"
+              className="hidden whitespace-nowrap rounded-full border-2 border-[#C12172] px-5 py-2 text-base font-semibold text-[#C12172] transition-all duration-300 hover:bg-[#C12172] hover:text-white lg:inline-block"
             >
               Contact Us
             </Link>
@@ -237,9 +237,9 @@ export default function Header() {
               </button>
             ) : (
               <Link href="/login">
-                <button className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px]">
+                <button className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] px-3 py-3 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px]">
                   <FaUserCircle />
-                  Login
+                  
                 </button>
               </Link>
             )}

@@ -12,7 +12,7 @@ export default function page() {
       aria-labelledby="benefits-heading"
       className="w-full bg-[#f2f4f5] py-12 dark:bg-gray-950  dark:text-white"
     >
-      <div className=" max-w-6xl mx-auto px-6 sm:px-10 lg:px-16">
+      <div className=" max-w-6xl mx-auto px-6 sm:px-10 lg:px-14">
         <div className="bg-white rounded-lg border-gray-50 grid grid-cols-1 lg:grid-cols-2 gap-10 dark:bg-gray-950  dark:text-white ">
           {/* LEFT IMAGE */}
           <div className="flex justify-center">
@@ -27,19 +27,16 @@ export default function page() {
           </div>
 
           {/* RIGHT FORM */}
-          <div className="px-2 md:px-4 py-6 ">
-            {/* <div className="flex justify-center">
-            <Image
-              src="/ZBLogo.svg"
+          <div className="px-2 md:px-4 py-12 ">
+             <div className="flex justify-center">
+            <img
+              src="/image/Frame 1707483043.png"
               alt="Customers enjoying reliable broadband connectivity"
-              width={50}
-              height={100}
-              priority
-              className="w-50 h-40"
+              className="w-50 h-30"
             />
-          </div> */}
+          </div> 
             {/* tabs */}
-            <div className="flex items-center gap-4 md:gap-6 mb-2 border-b-2 border-gray-200">
+            <div className="flex items-center gap-5 md:gap-6 mb-8 border-b-2 border-gray-200">
               <button
                 onClick={() => setActiveTab("login")}
                 className={`pb-1 font-semibold text-sm md:text-base ${
