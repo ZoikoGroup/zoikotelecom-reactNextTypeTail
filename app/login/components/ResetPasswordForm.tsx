@@ -81,8 +81,8 @@ export default function ResetPasswordForm({ setActiveTab }: { setActiveTab: (tab
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-[#10446C] text-white py-3 rounded-lg font-semibold
-                     hover:bg-[#0d3555] transition
+          className="w-full bg-[#B21F97] text-white py-3 rounded-lg font-semibold
+                     hover:bg-[#B21F97] transition
                      dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           Send Reset Link

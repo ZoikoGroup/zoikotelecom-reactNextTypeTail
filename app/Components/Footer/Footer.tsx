@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
@@ -16,67 +15,74 @@ type Social = {
   svg: ReactNode;
 };
 
-const resourceLinks: FooterLink[] = [
-  { id: "zoiko-res-bt", label: "BT Broadband", href: "/bt-broadband" },
-  { id: "zoiko-res-ee", label: "EE Mobile", href: "/ee-mobile-plans" },
-  { id: "zoiko-res-landlines", label: "Landlines", href: "/landlines" },
-  { id: "zoiko-res-reseller", label: "Become a Reseller", href: "/become-a-reseller" },
+const servicesLinks: FooterLink[] = [
+  { id: "bt", label: "BT Broadband", href: "/bt-broadband" },
+  { id: "ee", label: "EE Mobile", href: "/ee-mobile-plans" },
+  { id: "iot", label: "IoT Services", href: "#" },
+  { id: "voip", label: "VoIP Solutions", href: "#" },
+  { id: "reseller", label: "Become a Reseller", href: "/become-a-reseller" },
 ];
 
 const companyLinks: FooterLink[] = [
-  { id: "zoiko-co-about", label: "About Us", href: "/about-us" },
-  { id: "zoiko-co-careers", label: "Careers", href: "#" },
-  { id: "zoiko-co-partner", label: "Partner Programme", href: "#" },
-  { id: "zoiko-co-news", label: "News & Blogs", href: "#" },
-  { id: "zoiko-co-faqs", label: "FAQs", href: "/faqs" },
+  { id: "about", label: "About Us", href: "/about-us" },
+  { id: "careers", label: "Careers", href: "#" },
+  { id: "partner", label: "Partner Programme", href: "#" },
+  { id: "newsblogs", label: "News & Blogs", href: "/blogs-news" },
+  { id: "faqs", label: "FAQs", href: "/faqs" },
 ];
 
-const legalLinks: FooterLink[] = [
-  { id: "zoiko-leg-privacy", label: "Privacy and Policy", href: "#" },
-  { id: "zoiko-leg-terms", label: "Terms and Conditions", href: "#" },
-  { id: "zoiko-leg-vulnerability", label: "Vulnerability Policy", href: "#" },
-  { id: "zoiko-leg-slavery", label: "Modern Slavery Policy", href: "#" },
-  { id: "zoiko-leg-esg", label: "ESG Policy", href: "#" },
-  { id: "zoiko-leg-cookies", label: "Cookies Policies", href: "#" },
+const quickLinks: FooterLink[] = [
+  
+  { id: "news", label: "News", href: "/blogs-news" },
+  { id: "blogs", label: "Blogs", href: "/blogs-news" },
+  { id: "partner", label: "Partner Programme", href: "#" },
+  { id: "careers", label: "Careers", href: "#" },
 ];
 
 const socials: Social[] = [
   {
-    id: "zoiko-social-facebook",
+    id: "facebook",
     label: "Facebook",
-    href: "#",
+    href: "https://www.facebook.com/zoikotelecom/",
     svg: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        width="22"
-        height="22"
-      >
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
       </svg>
     ),
   },
   {
-    id: "zoiko-social-twitter",
-    label: "X (Twitter)",
-    href: "#",
+    id: "instagram",
+    label: "Instagram",
+    href: "https://www.instagram.com/zoiko_telecom/",
     svg: (
       <svg
-        xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
-        fill="currentColor"
-        width="22"
-        height="22"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        width="16"
+        height="16"
       >
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        <rect x="2" y="2" width="20" height="20" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="18" cy="6" r="1" fill="currentColor" />
       </svg>
     ),
   },
   {
-    id: "zoiko-social-youtube",
+    id: "twitter",
+    label: "Twitter",
+    href: "https://x.com/zoikotelecom",
+    svg: (
+  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53A4.48 4.48 0 0 0 22.43 1s-4.18 2.64-6.63 2.64A4.48 4.48 0 0 0 8.24 7.7C4.09 7.49 1 4 1 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+  </svg>
+),
+  },
+  {
+    id: "youtube",
     label: "YouTube",
-    href: "#",
+    href: "https://www.youtube.com/@zoikotelecom",
     svg: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -91,67 +97,29 @@ const socials: Social[] = [
           points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"
         />
       </svg>
-    ),
-  },
-  {
-    id: "zoiko-social-linkedin",
-    label: "LinkedIn",
-    href: "#",
-    svg: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        width="22"
-        height="22"
-      >
-        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-        <rect x="2" y="9" width="4" height="12" />
-        <circle cx="4" cy="4" r="2" />
-      </svg>
-    ),
-  },
-  {
-    id: "zoiko-social-instagram",
-    label: "Instagram",
-    href: "#",
-    svg: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        width="22"
-        height="22"
-      >
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-      </svg>
-    ),
+    )
   },
 ];
 
-type FooterColumnProps = {
+function FooterColumn({
+  heading,
+  links,
+}: {
   heading: string;
   links: FooterLink[];
-};
-
-function FooterColumn({ heading, links }: FooterColumnProps) {
+}) {
   return (
-    <div className="flex min-w-[140px] flex-col">
-      <h3 className="mb-5 text-base md:text-lg font-bold tracking-[0.01em] text-white">
+    <div>
+      <h3 className="mb-8 text-[18px] font-semibold text-white">
         {heading}
       </h3>
-      <ul className="flex flex-col gap-3.5">
+
+      <ul className="space-y-5">
         {links.map((link) => (
           <li key={link.id}>
             <Link
               href={link.href}
-              className="inline-block text-sm md:text-base font-normal leading-snug text-white/90 transition-colors hover:text-white hover:underline hover:underline-offset-[3px]"
+              className="text-[16px] text-white/70 transition hover:text-white"
             >
               {link.label}
             </Link>
@@ -164,65 +132,97 @@ function FooterColumn({ heading, links }: FooterColumnProps) {
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#7b2d8b] font-sans text-white dark:bg-neutral-950">
-      {/* Main Row */}
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-10 px-6 py-12 md:py-16 lg:flex-row lg:items-start lg:gap-0">
-        {/* Brand Block */}
-        <div className="flex w-full flex-col items-start lg:w-[280px] lg:shrink-0 lg:pr-5 xl:w-[340px]">
-          <div className="mb-5">
+    <footer className="w-full bg-[#7B2D8B] text-white">
+      <div className="mx-auto max-w-[1120px] px-6 pt-11 pb-4">
+        <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
+          {/* Left Side */}
+          <div className="lg:w-[320px]">
             <Link href="/">
               <Image
-                src="/Images/logo.png"
+                src="/image/Frame 1707483043.png"
                 alt="Zoiko Telecom"
-                width={180}
-                height={50}
-                className="block h-auto w-[180px]"
+                width={282}
+                height={123}
+                className="h-auto w-[220px] lg:w-[282px]"
               />
             </Link>
+
+            <h3 className="mt-7 mb-4 text-[18px] font-semibold text-white">
+              Follow Us :
+            </h3>
+
+            <div className="flex items-center gap-4">
+              {socials.map((social) => (
+                <a
+                  key={social.id}
+                  href={social.href}
+                  aria-label={social.label}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                >
+                  {social.svg}
+                </a>
+              ))}
+            </div>
           </div>
 
-          <p className="m-0 mb-6 max-w-[260px] text-xs md:text-sm font-normal uppercase leading-[1.7] tracking-[0.04em] text-white">
-            Empowering connections with cutting-edge telecom solutions across the UK.
-          </p>
+          {/* Columns */}
+          <div className="grid flex-1 grid-cols-1 gap-10 sm:grid-cols-3 lg:pl-10">
+            <FooterColumn
+              heading="Services"
+              links={servicesLinks}
+            />
 
-          {/* Social Icons */}
-          <div className="mt-2 flex flex-row items-center flex-wrap gap-3.5">
-            {socials.map((social) => (
-              <a
-                key={social.id}
-                href={social.href}
-                aria-label={social.label}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full border-2 border-white/20 bg-white/15 text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/30 dark:border-white/15 dark:bg-white/10 dark:hover:bg-white/20"
-              >
-                {social.svg}
-              </a>
-            ))}
+            <FooterColumn
+              heading="Company"
+              links={companyLinks}
+            />
+
+            <FooterColumn
+              heading="Quick Links"
+              links={quickLinks}
+            />
           </div>
         </div>
 
-        {/* Nav Columns */}
-        <nav
-          aria-label="Footer Navigation"
-          className="grid w-full grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6 lg:flex lg:flex-1 lg:justify-between"
-        >
-          <FooterColumn heading="Resources" links={resourceLinks} />
-          <FooterColumn heading="Company" links={companyLinks} />
-          <FooterColumn heading="Legal" links={legalLinks} />
-        </nav>
-      </div>
+        {/* Policy Row */}
+        <div className="mt-16 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[15px] text-white/60">
+          <Link href="/terms-and-conditions">
+            Terms and Conditions
+          </Link>
 
-      {/* Divider */}
-      <div className="mx-auto h-px w-[calc(100%-48px)] max-w-[1200px] bg-white/25 dark:bg-white/15" />
+          <Link href="/vulnerability-policy">
+            Vulnerability Policy
+          </Link>
 
-      {/* Bottom Bar */}
-      <div className="mx-auto max-w-[1200px] px-6 py-5 text-center md:py-6">
-        <p className="m-0 text-sm leading-6 tracking-[0.01em] text-white/85 md:text-base">
-          © 2026 Zoiko Telecom Ltd registered in England and Wales (No. 15021457) | Information Commissioner&apos;s Office Registration Number: ZB585887 | VAT Registration Number: 465 1110 23 | Authorised Reseller for BT Wholesale | All rights reserved.
-        </p>
+          <Link href="/modern-slavery-policy">
+            Modern Slavery Policy
+          </Link>
+
+          <Link href="/esg-policy">
+            ESG Policy
+          </Link>
+
+          <Link href="#">
+            Zoiko Policies
+          </Link>
+        </div>
+
+        {/* Divider */}
+        <div className="mt-8 h-px w-full bg-white/10" />
+
+        {/* Copyright */}
+        <div className="pt-4 text-center">
+          <p className="text-[14px] leading-8 text-white/60">
+            © 2024 Zoiko Telecom Ltd is Registered in England and Wales
+            (No. 15021457) | Information Commissioner's Office
+            Registration Number ZB585887
+          </p>
+
+          <p className="text-[14px] leading-8 text-white/60">
+            All rights reserved | VAT Registration Number: 465 1110 23
+          </p>
+        </div>
       </div>
     </footer>
   );
 }
-
