@@ -108,6 +108,9 @@ const testimonials: Testimonial[] = [
 
 export default function Home() {
   return (
+<<<<<<< HEAD
+    <>  </>
+=======
     <div className="">
       {/* ─── HERO ───────────────────────────────────────────── */}
       <section className="relative min-h-[520px] overflow-hidden py-10 md:py-16 ">
@@ -402,5 +405,6 @@ export default function Home() {
         </div>
       </section>
     </div>
+>>>>>>> a91dbde70e5a95103e342da29dee198390b71273
   );
 }
