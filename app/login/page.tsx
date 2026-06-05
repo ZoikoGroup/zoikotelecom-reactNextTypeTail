@@ -16,11 +16,14 @@ export default function page() {
         <div className="bg-white rounded-lg border-gray-50 grid grid-cols-1 lg:grid-cols-2 gap-10 dark:bg-gray-950  dark:text-white ">
           {/* LEFT IMAGE */}
           <div className="flex justify-center">
-            <img
-                src="https://zoikotelecom.com/wp-content/uploads/2026/02/Zoiko-Login.webp"
-                alt="Customers enjoying reliable broadband connectivity"
-                className="hidden lg:block w-full max-w-lg rounded-l-lg"
-              />
+            <Image
+              src="/Images/Checkmypost/section-pi.png"
+              alt="Customers enjoying reliable broadband connectivity"
+              width={900}
+              height={700}
+              priority
+              className="hidden lg:block w-full max-w-lg rounded-l-lg"
+            />
           </div>
 
           {/* RIGHT FORM */}
