@@ -49,7 +49,7 @@ export default function DashboardHero() {
   <div className="bg-[#10446C] dark:bg-gray-900 text-white text-center md:text-left py-16 px-6 sm:px-8 lg:px-20 lg:py-20 transition-colors duration-300">
 
     <h2 className="text-2xl sm:text-3xl lg:text-[40px] font-bold leading-relaxed">
-      Welcome back, John
+      Welcome back
     </h2>
 
 
