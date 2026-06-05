@@ -17,7 +17,7 @@ export default function page() {
           {/* LEFT IMAGE */}
           <div className="flex justify-center">
             <Image
-              src="/Images/Checkmypost/section-pic.png"
+              src="/Images/Checkmypost/section-pi.png"
               alt="Customers enjoying reliable broadband connectivity"
               width={900}
               height={700}
