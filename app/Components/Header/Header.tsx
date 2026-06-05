@@ -171,7 +171,7 @@ export default function Header() {
 
             <li className="w-full border-b border-[#f5f5f5] dark:border-neutral-800 lg:w-auto lg:border-0 dark:lg:border-0">
               <Link
-                href="/about"
+                href="/about-us"
                 onClick={closeAll}
                 className="block py-3.5 text-[17px] font-medium text-[#111] transition-colors hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:py-0 lg:text-base"
               >

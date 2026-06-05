@@ -19,12 +19,12 @@ type Social = {
 const resourceLinks: FooterLink[] = [
   { id: "zoiko-res-bt", label: "BT Broadband", href: "/bt-broadband" },
   { id: "zoiko-res-ee", label: "EE Mobile", href: "/ee-mobile-plans" },
-  { id: "zoiko-res-landlines", label: "Landlines", href: "#" },
-  { id: "zoiko-res-reseller", label: "Become a Reseller", href: "#" },
+  { id: "zoiko-res-landlines", label: "Landlines", href: "/landlines" },
+  { id: "zoiko-res-reseller", label: "Become a Reseller", href: "/become-a-reseller" },
 ];
 
 const companyLinks: FooterLink[] = [
-  { id: "zoiko-co-about", label: "About Us", href: "#" },
+  { id: "zoiko-co-about", label: "About Us", href: "/about-us" },
   { id: "zoiko-co-careers", label: "Careers", href: "#" },
   { id: "zoiko-co-partner", label: "Partner Programme", href: "#" },
   { id: "zoiko-co-news", label: "News & Blogs", href: "#" },
