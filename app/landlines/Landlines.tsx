@@ -34,19 +34,19 @@ const testimonials = [
     id: 1,
     text: "Moreover, ideal for my industry. Zoiko Telecom excels in field forcemanagement remotely and ensures seamless interactions on IoT-enabledphysical objects, appliances, and sensors with global 97.94 coverage. Thisdegree helping us is quite wonderful, decreasing distance, cutting fuelcosts, etc. They have a deep understanding of how interconnected devices work.",
     name: " Jahan Hussain",
-    image: "/image/image 5.png",
+    image: "https://s.w.org/images/core/emoji/17.0.2/svg/1f468-200d-1f4bc.svg"
   },
   {
     id: 2,
     text: "Zoiko Telecom is an exceptional choice for connecting global audiences. Their data solutions are named as the best internet providers better than all others, making them true global data specialists for their unlimited data plans. With their value-added globally hosted network, you can trust that your connectivity needs will be met efficiently and effectively.",
     name: "J.A.W. Thomas",
-    image: "/image/testimonial-2.png",
+    image: "https://s.w.org/images/core/emoji/17.0.2/svg/1f468-200d-1f4bc.svg"
   },
   {
     id: 3,
     text: "Completely satisfied, if you're looking for a reliable telecom partner that offers comprehensive cloud-based data storage, business premise security cameras and automation solutions, home internet providers, business phone lines tailored to your needs, and unlimited international calling plans, Zoiko Telecom is your go-to choice. They committed us to my business telecom needs completely.",
     name: "Lollo Milton",
-    image: "/image/testimonial-3.png",
+    image: "	https://s.w.org/images/core/emoji/17.0.2/svg/1f469-200d-1f4bc.svg",
   },
 ];
 const faqData = [
@@ -417,9 +417,9 @@ export default function Landlinefun() {
                     : "max-h-0"
                 }`}
               >
-                <p className="text-[#525252] dark:text-gray-300 text-[14px] sm:text-[16px] leading-[28px] pr-4">
+                <div className="text-[#525252] dark:text-gray-300 text-[14px] sm:text-[16px] leading-[28px] pr-4">
                   {item.answer}
-                </p>
+                </div>
               </div>
 
             </div>
