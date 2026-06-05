@@ -66,7 +66,7 @@ export default function LoginForm({ setActiveTab }: Props) {
   return (
     <section className="w-full dark:bg-gray-950 dark:text-white">
       {/* HEADER */}
-      <header className="mb-6">
+      <header className="mb-9">
         <h3 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
           Welcome back!
         </h3>
@@ -146,8 +146,8 @@ export default function LoginForm({ setActiveTab }: Props) {
         {/* LOGIN BUTTON */}
         <button
           type="submit"
-          className="w-full bg-[#10446C] text-white py-3 rounded-lg font-semibold
-                     hover:bg-[#0d3555] transition
+          className="w-full bg-[#B21F97] text-white py-3 rounded-lg font-semibold
+                     hover:bg-[#B21F97] transition
                      dark:bg-blue-600 dark:hover:bg-blue-700"
         >
             {loading ? "Logging in..." : "Log In"}
@@ -176,34 +176,7 @@ export default function LoginForm({ setActiveTab }: Props) {
             Create Account
           </button>
         </p>
-        
-        {/* OR continue with */}
-        <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 border-t border-gray-300 "></div>
-
-          <span className="text-sm text-gray-500 whitespace-nowrap">
-            Or continue with
-          </span>
-
-          <div className="flex-1 border-t border-gray-300 "></div>
-        </div>
-
-        {/* Login with google */}
-        <button
-          type="button"
-          className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg text-sm 
-                       hover:bg-gray-50 transition
-                       dark:border-gray-700 dark:hover:bg-gray-800"
-        >
-          <Image
-            src="/google-logo.png"
-            alt="Google login"
-            height={60}
-            width={60}
-            className="w-10 h-10 md:w-12 md:h-12 object-contain"
-          />
-          <span>Login with Google</span>
-        </button>
+      
       </footer>
     </section>
   );
