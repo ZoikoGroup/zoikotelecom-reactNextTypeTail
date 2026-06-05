@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaArrowRight, FaCheck, FaStar } from "react-icons/fa";
 
-
 type Feature = {
   title: string;
   description: string;
