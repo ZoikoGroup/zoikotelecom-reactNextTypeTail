@@ -49,11 +49,12 @@ export default function DashboardHero() {
   <div className="bg-[#10446C] dark:bg-gray-900 text-white text-center md:text-left py-16 px-6 sm:px-8 lg:px-20 lg:py-20 transition-colors duration-300">
 
     <h2 className="text-2xl sm:text-3xl lg:text-[40px] font-bold leading-relaxed">
-      Welcome back, John
+      Welcome back
     </h2>
 
+
     <p className="mt-2 text-base md:text-xl text-white/90 dark:text-gray-300">
-      Manage your Zoiko Broadband account with ease
+      Manage your Zoiko Telecom account with ease
     </p>
 
     <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
