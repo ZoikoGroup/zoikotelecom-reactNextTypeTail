@@ -306,12 +306,12 @@ const industries = [
 ];
 
 const services2 = [
-  "Business Mobile",
-  "Business Broadband",
-  "Hosted Voice",
-  "Full Fibre",
-  "Number Porting",
-  "Managed Connectivity",
+  { label: "Business Mobile", value: "business_mobile" },
+  { label: "Business Broadband", value: "business_broadband" },
+  { label: "Hosted Voice", value: "hosted_voice" },
+  { label: "Full Fibre", value: "full_fibre" },
+  { label: "Number Porting", value: "number_porting" },
+  { label: "Managed Connectivity", value: "managed_connectivity" },
 ];
 
 const countries = [
@@ -329,7 +329,92 @@ const countries = [
 export default function page() {
 
   const [selectedService, setSelectedService] = useState("");
+  const [formData, setFormData] = useState({
+  full_name: "",
+  company: "",
+  email: "",
+  phone: "",
+  country: countries[0].name,
+  service_interest: "",
+  notes: "",
+  consent: false,
+});
+
+const [loading, setLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+  const handleChange = (
+  e: React.ChangeEvent<
+    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  >
+) => {
+  const { name, value, type } = e.target;
+
+  setFormData({
+    ...formData,
+    [name]:
+      type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+        : value,
+  });
+};
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  setLoading(true);
+
+  try {
+    const payload = {
+      full_name: formData.full_name,
+      company: formData.company,
+      email: formData.email,
+      phone: formData.phone,
+      country: formData.country,
+      service_interest: formData.service_interest,
+      notes: formData.notes,
+      consent: formData.consent,
+    };
+
+    const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_BASE_URL}/business-solutions/submit/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+  alert("Submitted successfully");
+
+  setFormData({
+    full_name: "",
+    company: "",
+    email: "",
+    phone: "",
+    country: countries[0].name,
+    service_interest: "",
+    notes: "",
+    consent: false,
+  });
+
+  setSelectedCountry(countries[0]);
+
+    } else {
+      alert("Something went wrong");
+      console.log(data);
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Failed to submit");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <>
       {/* Hero section */}
@@ -1962,7 +2047,7 @@ export default function page() {
             {/* FORM */}
             <div>
 
-              <form className="space-y-5">
+              <form onSubmit={handleSubmit} className="  space-y-5">
 
                 {/* ROW */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -1985,6 +2070,10 @@ export default function page() {
                     <input
                       type="text"
                       placeholder="Jane Smith"
+                      name="full_name"
+                       value={formData.full_name}
+                       onChange={handleChange}
+                       required
                       className="
                         w-full h-14
                         rounded-xl
@@ -2015,7 +2104,11 @@ export default function page() {
 
                     <input
                       type="text"
+                        name="company"
+                      value={formData.company}
+                      onChange={handleChange}
                       placeholder="Acme Ltd"
+                      required
                       className="
                         w-full h-14
                         rounded-xl
@@ -2051,6 +2144,10 @@ export default function page() {
                     <input
                       type="email"
                       placeholder="jane@acme.co.uk"
+                       name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
                       className="
                         w-full h-14
                         rounded-xl
@@ -2080,6 +2177,7 @@ export default function page() {
                     </label>
 
                     <div
+                    
                       className="
                         flex items-center
                         overflow-hidden
@@ -2099,6 +2197,10 @@ export default function page() {
 
                           if (country) {
                             setSelectedCountry(country);
+                            setFormData((prev) => ({
+                            ...prev,
+                            country: country.name,
+                          }));
                           }
                         }}
                         className="
@@ -2124,6 +2226,10 @@ export default function page() {
                       {/* PHONE INPUT */}
                       <input
                         type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
                         placeholder="07700 000000"
                         className="
                           flex-1
@@ -2154,8 +2260,11 @@ export default function page() {
                   </label>
 
                   <select
-                    value={selectedService}
-                    onChange={(e) => setSelectedService(e.target.value)}
+                  name="service_interest"
+                  value={formData.service_interest}
+                  onChange={handleChange}
+                  required
+
                     className="
                       w-full h-14
                       rounded-xl
@@ -2170,13 +2279,10 @@ export default function page() {
                     <option value="">Select a service</option>
 
                     {services2.map((service) => (
-                      <option
-                        key={service}
-                        value={service}
-                      >
-                        {service}
-                      </option>
-                    ))}
+                    <option key={service.value} value={service.value}>
+                      {service.label}
+                    </option>
+                  ))}
                   </select>
                 </div>
 
@@ -2197,6 +2303,10 @@ export default function page() {
 
                   <textarea
                     rows={4}
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleChange}
+                    required
                     placeholder="Tell us about your connectivity requirements..."
                     className="
                       w-full
@@ -2215,6 +2325,10 @@ export default function page() {
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
+                    name="consent"
+                    checked={formData.consent}
+                    onChange={handleChange}
+                    required
                     className="
                       mt-1
                       accent-white
@@ -2236,20 +2350,22 @@ export default function page() {
 
                 {/* SUBMIT BUTTON */}
                 <button
-                  type="submit"
-                  className="
-                    w-full h-14
-                    rounded-full
-                    bg-white
-                    text-[#C2185B]
-                    font-bold
-                    shadow-xl
-                    hover:scale-[1.01]
-                    transition-all duration-300
-                  "
-                >
-                  Request Business Consultation
-                </button>
+                type="submit"
+                disabled={loading}
+                className="
+                  w-full h-14
+                  rounded-full
+                  bg-white
+                  text-[#C2185B]
+                  font-bold
+                  shadow-xl
+                  hover:scale-[1.01]
+                  transition-all duration-300
+                  disabled:opacity-50
+                "
+              >
+                {loading ? "Submitting..." : "Request Business Consultation"}
+              </button>
               </form>
             </div>
           </div>
