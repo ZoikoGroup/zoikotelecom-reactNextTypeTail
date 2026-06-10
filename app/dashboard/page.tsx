@@ -1,13 +1,18 @@
 import React from 'react'
-import EditProfile from './sections/EditProfile'
+import DashboardHero from './sections/DashboardHero'
+import DashboardOptions from './sections/DashboardOptions'
+import QuickActions from './sections/QuickActions'
 import ProtectedRoute from '../Components/ProtectedRoute'
+
 
 export default function page() {
   return (
     <>
-      {/* <ProtectedRoute> */}
-      <EditProfile />
-      {/* </ProtectedRoute> */}
+    {/* <ProtectedRoute> */}
+    <DashboardHero/>
+    <DashboardOptions/>
+    <QuickActions/>
+    {/* </ProtectedRoute> */}
     </>
   )
 }
