@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar } from "lucide-react";
-
+import { useState } from "react";
 const services = [
   "EE Mobile - SIM Plans",
   "BT Broadband",
@@ -23,6 +23,100 @@ const countries = [
 ];
 
 export default function ResellerApplicationForm() {
+  const [formData, setFormData] = useState({
+  company_name: "",
+  contact_name: "",
+  position: "",
+  email: "",
+  phone_number: "",
+  company_website: "",
+  company_address: "",
+  city: "",
+  post_code: "",
+  country: "",
+  services: [] as string[],
+  declaration_one: false,
+  declaration_two: false,
+  full_name: "",
+  digital_signature: "",
+  signed_date: "",
+});
+const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value, type } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]:
+      type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+        : value,
+  }));
+};
+const handleServiceChange = (service: string) => {
+  setFormData((prev) => ({
+    ...prev,
+    services: prev.services.includes(service)
+      ? prev.services.filter((s) => s !== service)
+      : [...prev.services, service],
+  }));
+};
+const handleSubmit = async () => {
+  if (
+  !formData.company_name ||
+  !formData.contact_name ||
+  !formData.email ||
+  !formData.phone_number
+) {
+  alert("Please fill all required fields");
+  return;
+}
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/reseller-form/submit/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Application submitted successfully!");
+
+  setFormData({
+    company_name: "",
+    contact_name: "",
+    position: "",
+    email: "",
+    phone_number: "",
+    company_website: "",
+    company_address: "",
+    city: "",
+    post_code: "",
+    country: "",
+    services: [],
+    declaration_one: false,
+    declaration_two: false,
+    full_name: "",
+    digital_signature: "",
+    signed_date: "",
+  });
+
+    } else {
+      console.error(data);
+      alert("Submission failed");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
+  }
+};
   return (
     <section className="w-full flex justify-center px-4 py-8 bg-[#F8F8FB] dark:bg-gray-900">
       <div className="w-full max-w-[800px] bg-white dark:bg-gray-900 border border-[#E2E8F0] dark:border-gray-700 rounded-[24px] p-6 md:p-10">
@@ -34,12 +128,50 @@ export default function ResellerApplicationForm() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          <InputField label="Company Name" required />
-          <InputField label="Contact Name" required />
-          <InputField label="Position" />
-          <InputField label="Email Address" required />
-          <InputField label="Phone Number" required />
-          <InputField label="Company Website" />
+          <InputField
+            label="Company Name"
+            name="company_name"
+            value={formData.company_name}
+            onChange={handleChange}
+            required
+          />
+          <InputField
+            label="Contact Name"
+            name="contact_name"
+            value={formData.contact_name}
+            onChange={handleChange}
+            required
+          />
+
+          <InputField
+            label="Position"
+            name="position"
+            value={formData.position}
+            onChange={handleChange}
+          />
+
+          <InputField
+            label="Email Address"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+
+          <InputField
+            label="Phone Number"
+            name="phone_number"
+            value={formData.phone_number}
+            onChange={handleChange}
+            required
+          />
+
+          <InputField
+            label="Company Website"
+            name="company_website"
+            value={formData.company_website}
+            onChange={handleChange}
+          />
         </div>
 
         {/* Business Address */}
@@ -50,11 +182,31 @@ export default function ResellerApplicationForm() {
         </div>
 
         <div className="space-y-6 mb-10">
-          <InputField label="Company Address" required fullWidth />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField label="City" required />
-            <InputField label="Post Code" required />
+            <InputField
+              label="Company Address"
+              name="company_address"
+              value={formData.company_address}
+              onChange={handleChange}
+              required
+            />
+
+            <InputField
+              label="City"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              required
+            />
+
+            <InputField
+              label="Post Code"
+              name="post_code"
+              value={formData.post_code}
+              onChange={handleChange}
+              required
+            />
           </div>
 
           <div>
@@ -63,15 +215,20 @@ export default function ResellerApplicationForm() {
             </label>
 
             <div className="relative">
-        <select
-             className="w-full h-[51px] rounded-[12px] border-2 border-[#CBD5E0] px-4 text-[#2D3748] dark:bg-gray-900 dark:text-white">
-                    <option>Select Country</option>
-                    {countries.map((country) => (
-                        <option key={country} value={country}>
-                        {country}
-                        </option>
-                    ))}
-        </select>
+             <select
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              className="w-full h-[51px] rounded-[12px] border-2 border-[#CBD5E0] px-4 text-[#2D3748] dark:bg-gray-900 dark:text-white"
+              >
+              <option value="">Select Country</option>
+
+              {countries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
             </div>
           </div>
         </div>
@@ -96,14 +253,15 @@ export default function ResellerApplicationForm() {
                 className="flex items-center gap-3 cursor-pointer"
               >
                 <input
-                  type="checkbox"
-                  className="w-[21px] h-[21px] rounded-[6px] border-2 border-[#CBD5E0] dark:border-gray-500"
-                />
+                type="checkbox"
+                checked={formData.services.includes(service)}
+                onChange={() => handleServiceChange(service)}
+              />
 
                 <span className="text-[16px] font-semibold text-[#2D3748] dark:text-white">
                   {service}
-                </span>
-              </label>
+                </span>                         
+              </label>            
             ))}
           </div>
         </div>
@@ -112,9 +270,11 @@ export default function ResellerApplicationForm() {
         <div className="bg-[#F7F7FA] dark:bg-gray-800 rounded-[16px] p-6 mb-10 space-y-6">
           <label className="flex items-start gap-4 cursor-pointer">
             <input
-              type="checkbox"
-              className="mt-1 w-[21px] h-[21px] rounded-[6px] border-2 border-[#CBD5E0] dark:border-gray-500"
-            />
+                type="checkbox"
+                name="declaration_one"
+                checked={formData.declaration_one}
+                onChange={handleChange}
+              />
 
             <span className="text-[16px] text-[#4A5568] dark:text-gray-300 leading-[28px]">
               I hereby declare that the information provided is true and
@@ -124,9 +284,11 @@ export default function ResellerApplicationForm() {
 
           <label className="flex items-start gap-4 cursor-pointer">
             <input
-              type="checkbox"
-              className="mt-1 w-[21px] h-[21px] rounded-[6px] border-2 border-[#CBD5E0] dark:border-gray-500"
-            />
+                type="checkbox"
+                name="declaration_two"
+                checked={formData.declaration_two}
+                onChange={handleChange}
+              />
 
             <span className="text-[16px] text-[#4A5568] dark:text-gray-300 leading-[28px]">
               I understand that providing false information may result in the
@@ -138,7 +300,13 @@ export default function ResellerApplicationForm() {
 
         {/* Signature */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <InputField label="Full Name" required />
+          <InputField
+            label="Full Name"
+            name="full_name"
+            value={formData.full_name}
+            onChange={handleChange}
+            required
+          />
 
           <div>
             <label className="block text-[14px] font-semibold text-[#2D3748] dark:text-white mb-2">
@@ -146,10 +314,13 @@ export default function ResellerApplicationForm() {
             </label>
 
             <input
-              type="text"
-              placeholder="Type your full name"
-              className="w-full h-[51px] rounded-[12px] border-2 border-[#CBD5E0] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#4A5568] dark:text-white px-4 outline-none"
-            />
+                type="text"
+                name="digital_signature"
+                value={formData.digital_signature}
+                onChange={handleChange}
+                placeholder="Type your full name"
+                className="w-full h-[51px] rounded-[12px] border-2 border-[#CBD5E0] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#4A5568] dark:text-white px-4 outline-none"
+              />
           </div>
 
           <div>
@@ -160,6 +331,9 @@ export default function ResellerApplicationForm() {
             <div className="relative">
               <input
                 type="date"
+                name="signed_date"
+                value={formData.signed_date}
+                onChange={handleChange}
                 className="w-full h-[51px] rounded-[12px] border-2 border-[#CBD5E0] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#4A5568] dark:text-white px-4 outline-none"
               />
 
@@ -172,7 +346,7 @@ export default function ResellerApplicationForm() {
         </div>
 
         <div className="border-t border-[#E2E8F0] dark:border-gray-700 pt-10 text-center">
-          <button className="bg-gradient-to-r from-[#C12172] to-[#7B2CBF] hover:opacity-90 transition-all duration-300 text-white font-semibold text-[18px] px-12 py-4 rounded-full shadow-md">
+          <button  onClick={handleSubmit} className="bg-gradient-to-r from-[#C12172] to-[#7B2CBF] hover:opacity-90 transition-all duration-300 text-white font-semibold text-[18px] px-12 py-4 rounded-full shadow-md">
             Submit Application →
           </button>
 
@@ -188,29 +362,39 @@ export default function ResellerApplicationForm() {
             </p>
         </div>
       </div>
-    </section>
+    </section>     
   );
 }
 
 type InputFieldProps = {
   label: string;
+  name: string;
+  value: string;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => void;
   required?: boolean;
-  fullWidth?: boolean;
 };
 
 function InputField({
   label,
+  name,
+  value,
+  onChange,
   required = false,
 }: InputFieldProps) {
   return (
     <div>
       <label className="block text-[14px] font-semibold text-[#2D3748] dark:text-white mb-2">
-        {label}{" "}
+        {label}
         {required && <span className="text-[#E53E3E]">*</span>}
       </label>
 
       <input
         type="text"
+        name={name}
+        value={value}
+        onChange={onChange}
         className="w-full h-[51px] rounded-[12px] border-2 border-[#CBD5E0] dark:border-gray-600 bg-white dark:bg-gray-800 text-[#4A5568] dark:text-white px-4 outline-none"
       />
     </div>
