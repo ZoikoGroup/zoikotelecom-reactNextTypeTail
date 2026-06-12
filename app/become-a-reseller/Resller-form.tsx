@@ -63,15 +63,99 @@ const handleServiceChange = (service: string) => {
   }));
 };
 const handleSubmit = async () => {
+  if (!formData.company_name) {
+    alert("Please enter your Company Name.");
+    return;
+  }
+
+  if (!formData.contact_name) {
+    alert("Please enter the Contact Name.");
+    return;
+  }
+
+  if (!formData.email) {
+    alert("Please enter your Email Address.");
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    alert("Please enter a valid Email Address.");
+    return;
+  }
+
+  if (!formData.phone_number) {
+    alert("Please enter your Phone Number.");
+    return;
+  }
+
+  const phone = formData.phone_number.replace(/\D/g, "");
+
+  if (phone.length < 7 || phone.length > 15) {
+    alert("Please enter a valid Phone Number.");
+    return;
+  }
+
   if (
-  !formData.company_name ||
-  !formData.contact_name ||
-  !formData.email ||
-  !formData.phone_number
-) {
-  alert("Please fill all required fields");
-  return;
-}
+    formData.company_website &&
+    !/^https?:\/\/.+\..+/.test(formData.company_website)
+  ) {
+    alert(
+      "Please enter a valid Company Website URL (e.g. https://example.com)."
+    );
+    return;
+  }
+
+  if (!formData.company_address) {
+    alert("Please enter your Company Address.");
+    return;
+  }
+
+  if (!formData.city) {
+    alert("Please enter your City.");
+    return;
+  }
+
+  if (!formData.post_code) {
+    alert("Please enter your Post Code.");
+    return;
+  }
+
+  if (!formData.country) {
+    alert("Please select a Country.");
+    return;
+  }
+
+  if (formData.services.length === 0) {
+    alert("Please select at least one Service of Interest.");
+    return;
+  }
+
+  if (!formData.declaration_one || !formData.declaration_two) {
+    alert("Please accept both declarations.");
+    return;
+  }
+
+  if (!formData.full_name) {
+    alert("Please enter your Full Name.");
+    return;
+  }
+
+  if (!/^[a-zA-Z\s]+$/.test(formData.full_name)) {
+    alert("Full Name should contain only letters.");
+    return;
+  }
+
+  if (!formData.digital_signature) {
+    alert("Please enter your Digital Signature.");
+    return;
+  }
+
+  if (!formData.signed_date) {
+    alert("Please select a Date.");
+    return;
+  }
+
+
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/reseller-form/submit/`,
