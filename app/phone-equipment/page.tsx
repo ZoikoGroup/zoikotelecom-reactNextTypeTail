@@ -6,7 +6,7 @@ import { useCart } from "@/app/context/CartContext";
 import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 8;
-const router = useRouter();
+
 interface Product {
   id: number;
   name: string;
@@ -72,6 +72,7 @@ export default function page() {
   const [error, setError] = useState("");
   const [durationFilter, setDurationFilter] = useState("All Options");
   const { addToCart } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProducts = async () => {
