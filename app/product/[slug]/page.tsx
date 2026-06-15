@@ -299,10 +299,10 @@ export default function Page() {
 
             {/* SKU & Category */}
             <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-              <span>
+              {/* <span>
                 <span className="font-semibold text-gray-700 dark:text-gray-300">SKU:</span>{" "}
                 N/A
-              </span>
+              </span> */}
               <span>
                 <span className="font-semibold text-gray-700 dark:text-gray-300">Category:</span>{" "}
                 <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">
@@ -534,15 +534,17 @@ export default function Page() {
                     <p className="text-sm font-bold text-gray-900 dark:text-white mb-3">
                       {relatedDisplayPrice(item)}
                     </p>
+                    <Link href={`/product/${item.slug}`}>
                     <button className="
-                      w-full h-8
+                      w-full md:w-auto px-6 py-3
                       bg-blue-600 hover:bg-blue-700
-                      text-white text-xs font-semibold
+                      text-white text-xs md:text-sm font-semibold
                       rounded-md
                       transition-colors duration-200
                     ">
-                      Select options
+                      Add to cart
                     </button>
+                    </Link>
                   </div>
                 </Link>
               ))}
