@@ -1,0 +1,371 @@
+GET /fibre-packages 200 in 141ms (compile: 106ms, render: 35ms)
+[BT Address Search] Searching Openreach addresses for: BR29RN
+[BT Address Search] No valid cache, fetching from API…
+[BT API] REQUEST [GET] https://api.wholesale.bt.com/common/geographicAddressManagement/v1/geographicAddress?postcode=BR29RN&addressSource=Openreach (tracking: 1d4bfd5b-6e70-4472-9678-ddfed7f23f62)
+[BT API] RESPONSE [GET] /common/geographicAddressManagement/v1/geographicAddress?postcode=BR29RN&addressSource=Openreach → status: 200
+[BT Address Search] ✅ Caching 45 addresses
+ POST /api/BritishTelecom/search-address 200 in 2.2s (compile: 160ms, render: 2.1s)
+[BT API] [POST] /hubco/tmf/productOfferingQualification/v4/productOfferingQualification → request body: {
+  '@type': 'btProductOfferingQualification',
+  instantSyncQualification: true,
+  productOfferingQualificationItem: [
+    {
+      id: '74',
+      action: 'add',
+      product: [Object],
+      '@type': 'btProductOfferingQualificationItem'
+    }
+  ],
+  provideAlternative: true,
+  provideOnlyAvailable: true,
+  provideUnavailabilityReason: false,
+  relatedParty: [
+    {
+      id: 'CUG5025628076',
+      role: 'BtCug',
+      '@type': 'BTRelatedParty',
+      '@referredType': 'Customer'
+    }
+  ]
+}
+[BT API] REQUEST [POST] https://api.wholesale.bt.com/hubco/tmf/productOfferingQualification/v4/productOfferingQualification (tracking: d199e1f6-f5f4-461b-8b83-05ed31309a98)
+[BT API] RESPONSE [POST] /hubco/tmf/productOfferingQualification/v4/productOfferingQualification → status: 200
+ POST /api/BritishTelecom/get-products 200 in 3.3s (compile: 63ms, render: 3.2s)
+ GET /checkout 200 in 145ms (compile: 127ms, render: 18ms)
+ POST /api/create-payment-intent 200 in 998ms (compile: 369ms, render: 629ms)
+[BT processOrder] ========== START ==========
+[BT processOrder] Product offering: Zippy Essential
+[BT processOrder] Openreach addr id: A15113070302
+[BT processOrder] Postcode: BR2 9RN
+[BT processOrder] Access technology: FTTP
+[BT processOrder] Contract: 24 Month
+[BT processOrder] District code: LS
+[BT processOrder] Min guaranteed speed: 0
+[BT processOrder] Sandbox: false
+[BT processOrder] Step 1: resolving RoBT site address…
+[BT API] REQUEST [GET] https://api.wholesale.bt.com/common/geographicAddressManagement/v1/geographicAddress?postcode=BR2%209RN&addressSource=ROBT (tracking: 7214837c-76c9-4ac8-a072-001edc730371)
+[BT API] RESPONSE [GET] /common/geographicAddressManagement/v1/geographicAddress?postcode=BR2%209RN&addressSource=ROBT → status: 200
+[BT processOrder] ⚠ Falling back to first RoBT in postcode: R09680295917
+[BT processOrder] ✅ RoBT site address: R09680295917
+[BT processOrder] Step 2: searching appointment slots…
+[BT API] [POST] /common/appointmentManagement/v4/searchTimeSlot → request body: {
+  relatedEntity: [
+    {
+      appointmentType: 'Standard',
+      siteVisitReason: 'Standard',
+      product: [Object],
+      id: '1',
+      role: 'OrderInformation',
+      '@referredType': 'BTProductAppointmentSpecification',
+      '@type': 'BTProductAppointmentSpecification',
+      '@baseType': 'RelatedEntity'
+    }
+  ],
+  requestedTimeSlot: [ { validFor: [Object] } ]
+}
+[BT API] REQUEST [POST] https://api.wholesale.bt.com/common/appointmentManagement/v4/searchTimeSlot (tracking: 93c71f09-6796-435a-8d46-c523bf3a26da)
+[BT API] RESPONSE [POST] /common/appointmentManagement/v4/searchTimeSlot → status: 201
+[BT processOrder] ✅ Slot found: 2026-06-04T08:00:00+01:00
+[BT processOrder] Step 3: booking appointment…
+[BT API] [POST] /common/appointmentManagement/v4/appointment → request body: {
+  relatedEntity: [
+    {
+      appointmentType: 'Standard',
+      siteVisitReason: 'Standard',
+      product: [Object],
+      id: '1',
+      role: 'OrderInformation',
+      '@referredType': 'BTProductAppointmentSpecification',
+      '@type': 'BTProductAppointmentSpecification',
+      '@baseType': 'RelatedEntity'
+    }
+  ],
+  validFor: {
+    startDateTime: '2026-06-04T08:00:00+01:00',
+    endDateTime: '2026-06-04T13:00:00+01:00'
+  }
+}
+[BT API] REQUEST [POST] https://api.wholesale.bt.com/common/appointmentManagement/v4/appointment (tracking: f2b43ac0-0bae-4091-a89c-1efdd4c46e6e)
+[BT API] RESPONSE [POST] /common/appointmentManagement/v4/appointment → status: 201
+[BT processOrder] ✅ Appointment booked: F323910FR
+[BT processOrder] Step 4: submitting product order…
+[BT processOrder] Order payload: {
+  "@type": "BTProductOrder",
+  "@baseType": "ProductOrder",
+  "externalId": "WC-1779381092468-18373",
+  "requestedCompletionDate": "2026-06-04T08:00:00+01:00",
+  "productOrderItem": [
+    {
+      "@type": "BTProductOrderItem",
+      "@baseType": "ProductOrderItem",
+      "id": "18373",
+      "action": "add",
+      "billingAccount": {
+        "id": "0455823991"
+      },
+      "appointment": {
+        "@type": "AppointmentRef",
+        "id": "F323910FR",
+        "BESAppointmentId": "F323910FR",
+        "appointmentStart": "2026-06-04T08:00:00+01:00"
+      },
+      "additionalNotes": [
+        {
+          "text": "Engineering instruction",
+          "type": "Engineering",
+          "@type": "BTNote"
+        },
+        {
+          "text": "PT Hazards Note",
+          "type": "HazardNote",
+          "@type": "BTNote"
+        }
+      ],
+      "product": {
+        "@type": "BTProductRefOrValue",
+        "@baseType": "Product",
+        "productOffering": {
+          "id": "Zippy Essential"
+        },
+        "place": [
+          {
+            "@type": "btRelatedPlaceRefOrValue",
+            "id": "R09680295917",
+            "role": "SiteAddress"
+          },
+          {
+            "@type": "btRelatedPlaceRefOrValue",
+            "id": "A15113070302",
+            "role": "OpenreachAddress",
+            "address": {
+              "districtCode": "LS"
+            }
+          }
+        ],
+        "productCharacteristic": [
+          {
+            "name": "ATT_RT_AccessTechnology",
+            "value": "FTTP"
+          },
+          {
+            "name": "ATT_RT_InstallType",
+            "value": "M"
+          },
+          {
+            "name": "ATT_RT_EndUserType",
+            "value": "Residential"
+          },
+          {
+            "name": "ATT_RT_TrafficWeighting",
+            "value": "Standard"
+          },
+          {
+            "name": "ATT_RT_ContractTerm",
+            "value": "24"
+          },
+          {
+            "name": "ATT_RT_ContractTermUnit",
+            "value": "Month"
+          },
+          {
+            "name": "ATT_RT_ResellerID",
+            "value": "ABC"
+          },
+          {
+            "name": "ATT_X_JOURNEYTYPE",
+            "value": "New Line Provide"
+          },
+          {
+            "name": "ATT_RT_ProductMinimumGuaranteedSpeed",
+            "value": "0"
+          },
+          {
+            "name": "ATT_RT_ONTType",
+            "value": "New ONT"
+          }
+        ],
+        "relatedParty": [
+          {
+            "@type": "BTRelatedParty",
+            "@baseType": "RelatedParty",
+            "@referredType": "Individual",
+            "id": "-1",
+            "role": "PrimarySiteContact",
+            "givenName": "Kessna",
+            "familyName": "McDuffie",
+            "contactMedium": [
+              {
+                "mediumType": "email",
+                "characteristic": {
+                  "contactType": "Primary Work",
+                  "emailAddress": "kessna26@gmail.com"
+                }
+              },
+              {
+                "mediumType": "telephone",
+                "characteristic": {
+                  "contactType": "Primary Work",
+                  "phoneNumber": "07438848851"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "productOrderItem": [
+        {
+          "@type": "BTProductOrderItem",
+          "id": "18373.1",
+          "action": "add",
+          "product": {
+            "@type": "BTProductRefOrValue",
+            "productOffering": {
+              "id": "E0000704"
+            }
+          }
+        },
+        {
+          "@type": "BTProductOrderItem",
+          "id": "18373.2",
+          "action": "add",
+          "product": {
+            "@type": "BTProductRefOrValue",
+            "productOffering": {
+              "id": "E0000703"
+            }
+          }
+        },
+        {
+          "@type": "BTProductOrderItem",
+          "id": "18373.3",
+          "action": "add",
+          "product": {
+            "@type": "BTProductRefOrValue",
+            "productOffering": {
+              "id": "E0000153"
+            },
+            "productCharacteristic": [
+              {
+                "name": "ATT_RT_ECCChargeband",
+                "value": "0"
+              },
+              {
+                "name": "ATT_RT_FTTPInstallType",
+                "value": "1 Stage"
+              },
+              {
+                "name": "ATT_RT_SiteVisitReason",
+                "value": "Standard"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "relatedParty": [
+    {
+      "@type": "BTRelatedParty",
+      "@baseType": "RelatedParty",
+      "@referredType": "Customer",
+      "id": "CUG5025628076",
+      "role": "BtCug",
+      "name": "BT CUG"
+    },
+    {
+      "@type": "BTRelatedParty",
+      "@baseType": "RelatedParty",
+      "@referredType": "Customer",
+      "id": "Kessna McDuffie",
+      "role": "EndCustomer"
+    },
+    {
+      "@type": "BTRelatedParty",
+      "@baseType": "RelatedParty",
+      "@referredType": "Individual",
+      "id": "primary_order_contact",
+      "role": "PrimaryOrderContact",
+      "givenName": "Kessna",
+      "familyName": "McDuffie",
+      "contactMedium": [
+        {
+          "mediumType": "email",
+          "characteristic": {
+            "contactType": "Primary Work",
+            "emailAddress": "kessna26@gmail.com"
+          }
+        },
+        {
+          "mediumType": "telephone",
+          "characteristic": {
+            "contactType": "Primary Work",
+            "phoneNumber": "07438848851"
+          }
+        }
+      ]
+    }
+  ]
+}
+[BT API] [POST] /hubco/tmf/productOrderingManagement/v4/productOrder → request body: {
+  '@type': 'BTProductOrder',
+  '@baseType': 'ProductOrder',
+  externalId: 'WC-1779381092468-18373',
+  requestedCompletionDate: '2026-06-04T08:00:00+01:00',
+  productOrderItem: [
+    {
+      '@type': 'BTProductOrderItem',
+      '@baseType': 'ProductOrderItem',
+      id: '18373',
+      action: 'add',
+      billingAccount: [Object],
+      appointment: [Object],
+      additionalNotes: [Array],
+      product: [Object],
+      productOrderItem: [Array]
+    }
+  ],
+  relatedParty: [
+    {
+      '@type': 'BTRelatedParty',
+      '@baseType': 'RelatedParty',
+      '@referredType': 'Customer',
+      id: 'CUG5025628076',
+      role: 'BtCug',
+      name: 'BT CUG'
+    },
+    {
+      '@type': 'BTRelatedParty',
+      '@baseType': 'RelatedParty',
+      '@referredType': 'Customer',
+      id: 'Kessna McDuffie',
+      role: 'EndCustomer'
+    },
+    {
+      '@type': 'BTRelatedParty',
+      '@baseType': 'RelatedParty',
+      '@referredType': 'Individual',
+      id: 'primary_order_contact',
+      role: 'PrimaryOrderContact',
+      givenName: 'Kessna',
+      familyName: 'McDuffie',
+      contactMedium: [Array]
+    }
+  ]
+}
+[BT API] REQUEST [POST] https://api.wholesale.bt.com/hubco/tmf/productOrderingManagement/v4/productOrder (tracking: 500558d3-f4c4-47e8-a142-3eb73b8adcac)
+[BT API] RESPONSE [POST] /hubco/tmf/productOrderingManagement/v4/productOrder → status: 202
+[BT processOrder] ✅ Order submitted. Status: 202
+[BT processOrder] Response: {
+  "success": true,
+  "status_code": 202,
+  "retry_count": 0
+}
+[BT processOrder] ========== END ==========
+ POST /api/BritishTelecom/process-order 200 in 5.7s (compile: 62ms, render: 5.6s)
+
+
+
+
+
+
+
