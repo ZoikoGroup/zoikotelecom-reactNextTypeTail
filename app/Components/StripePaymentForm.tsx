@@ -57,7 +57,7 @@ const StripePaymentForm = forwardRef<StripePaymentFormRef, StripePaymentFormProp
           const errorMsg = err.message || "An unexpected error occurred";
           setErrorMessage(errorMsg);
           onPaymentError?.(errorMsg);
-          return { success: falsez, error: errorMsg };
+          return { success: false, error: errorMsg };
         } finally {
           setLoading(false);
         }
