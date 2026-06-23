@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: "Invalid JSON" }, { status: 400 });
   }
 
-  const cugId        = process.env.BT_LND_CUG;
+  const cugId        = process.env.BT_CUG;
   const baseUrl      = process.env.NEXT_BT_ENDPOINT_URI;
   const apigwClientId = process.env.BT_APIGW_CLIENT_ID ?? "";
 
