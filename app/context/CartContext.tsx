@@ -108,7 +108,7 @@ export type ZoikoPlan = {
  */
 export type Plan = {
   // — display fields (legacy, still used) —
-  id: number | string;
+  id: number;
   name: string;
   price: number;
   speed: string;
@@ -133,7 +133,7 @@ export type Plan = {
 type CartContextType = {
   cart: Plan[];
   addToCart: (plan: Plan) => void;
-  removeFromCart: (id: string) => void;
+  removeFromCart: (id: number) => void;
   clearCart: () => void;
 };
 
@@ -173,7 +173,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const removeFromCart = (id: string) => {
+  const removeFromCart = (id: number) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
