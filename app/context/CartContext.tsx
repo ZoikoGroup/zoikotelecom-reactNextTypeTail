@@ -107,21 +107,23 @@ export type ZoikoPlan = {
  *   zoikoVariation                    ← variation the user actually picked
  */
 export type Plan = {
-  // — display fields (legacy, still used) —
+   // — display fields (legacy, still used) —
   id: number;
   name: string;
   price: number;
-  speed: string;
+  speed?: string;           // ✅ optional
   variation?: string;
   validity?: string;
   description?: string;
   bt_plan_id?: string | null;
   address?: FormattedAddress | null;
 
-  // — BT / Zoiko enrichment (new — needed by /process-order) —
-  productOfferingQualificationItem: BTProductOfferingQualificationItem;
-  zoikoPlan: ZoikoPlan;
-  zoikoVariation: ZoikoVariation | null;
+  // — BT / Zoiko enrichment (optional for non-BT products) —
+  productOfferingQualificationItem?: BTProductOfferingQualificationItem;  // ✅ optional
+  zoikoPlan?: ZoikoPlan;                                                   // ✅ optional
+  zoikoVariation?: ZoikoVariation | null;                                  // ✅ optional
+
+  // — Generic cart fields —
   slug: string;
   image: string;
   category: string;
