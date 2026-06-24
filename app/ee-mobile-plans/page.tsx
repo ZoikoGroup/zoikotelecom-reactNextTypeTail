@@ -1,6 +1,54 @@
 "use client"
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+
+// ─── Cart wiring ────────────────────────────────────────────────────────────────
+// Matches the localStorage key the checkout page reads from.
+const CART_KEY = "cart";
+
+interface RawCartItem {
+  id?: string | number;
+  name?: string;
+  price?: number | string;
+  planType?: string;
+  planName?: string;
+  planTitle?: string;
+  planDuration?: string;
+  finalPrice?: number;
+  salePrice?: number | string;
+  dataAllowance?: string;
+  eeCategory?: string;
+  billingPeriod?: "monthly" | "one-off";
+  features?: { id: number; title: string }[];
+  qty?: number;
+  timestamp?: number;
+  formData?: { priceQty: number; price: number };
+  [key: string]: unknown;
+}
+
+function readCart(): RawCartItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? (parsed as RawCartItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeCart(items: RawCartItem[]): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(CART_KEY, JSON.stringify(items));
+  window.dispatchEvent(new Event("cart:updated"));
+}
+
+/** "£15.00/m" → 15, "£5.00" → 5 */
+function parsePrice(raw: string): number {
+  return parseFloat(String(raw).replace(/[^0-9.]/g, "")) || 0;
+}
+
 
 const categories = [
     "EE Mobile Bundles",
@@ -469,6 +517,51 @@ export default function page() {
 
     const [openZone, setOpenZone] = useState<number | null>(1);
 
+    const router = useRouter();
+
+    const handleBuyNow = (plan: {
+        name: string;
+        data: string;
+        price: string;
+        features: string[];
+    }) => {
+        const price = parsePrice(plan.price);
+        // "/m" in the price = recurring monthly bundle; otherwise a one-off pass.
+        const isMonthly = /\/m\s*$/i.test(plan.price.trim());
+        // Contract duration only applies to the broadband plans (the only category
+        // that exposes the 12/24-month tabs).
+        const duration =
+            activeCategory === "EE Mobile Broadband Plans" ? activeDuration : "";
+
+        const item: RawCartItem = {
+            id: `ee-${activeCategory}-${plan.name}-${duration || "na"}`
+                .toLowerCase()
+                .replace(/\s+/g, "-"),
+            name: plan.name,
+            planName: plan.name,
+            planTitle: plan.name,
+            price,
+            salePrice: price,
+            finalPrice: price,
+            planType: "ee_mobile_manual",
+            eeCategory: activeCategory,
+            dataAllowance: plan.data,
+            planDuration: duration,
+            billingPeriod: isMonthly ? "monthly" : "one-off",
+            features: plan.features.map((title, i) => ({ id: i + 1, title })),
+            qty: 1,
+            timestamp: Date.now(),
+            formData: { priceQty: 1, price },
+        };
+
+        const cart = readCart();
+        cart.push(item);
+        writeCart(cart);
+
+        // Send the user to checkout. Change the path if your checkout route differs.
+        router.push("/checkout");
+    };
+
     const toggleZone = (id: number) => {
         setOpenZone(openZone === id ? null : id);
         };
@@ -629,6 +722,7 @@ export default function page() {
 
                                 {/* Button */}
                                 <button
+                                    onClick={() => handleBuyNow(plan)}
                                     className="mt-8 w-full rounded-full bg-[#C12172] hover:bg-pink-700
                 text-white font-semibold py-3 transition-all duration-300
                 shadow-xs shadow-pink-500/20"
