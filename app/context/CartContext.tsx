@@ -122,6 +122,10 @@ export type Plan = {
   productOfferingQualificationItem: BTProductOfferingQualificationItem;
   zoikoPlan: ZoikoPlan;
   zoikoVariation: ZoikoVariation | null;
+  slug: string;
+  image: string;
+  category: string;
+  quantity: number;
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────

@@ -169,6 +169,11 @@ function PlanCard({ item, contractType, selectedAddress }: PlanCardProps) {
       productOfferingQualificationItem,
       zoikoPlan,
       zoikoVariation: variation,
+
+      slug: String(variation?.id ?? item.id),
+      image: "",
+      category: "broadband",
+      quantity: 1,
     };
 
     addToCart(plan);
