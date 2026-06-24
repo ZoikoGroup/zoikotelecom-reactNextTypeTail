@@ -20,10 +20,10 @@ import type { StripeElementsOptions } from "@stripe/stripe-js";
 /** Raw shape coming from localStorage (as stored by the plan-selection page) */
 interface RawCartItem {
   id: string | number;
-  name: string;
-  price: number | string;
+  name?: string;
+  price?: number | string;
   speed?: string;
-  validity?: string;
+  validity?: string | number;
   description?: string;
   address?: {
     display: string;
@@ -31,6 +31,16 @@ interface RawCartItem {
     postcode: string;
     [key: string]: any;
   };
+
+  // ── Landline (manual) plan fields — written by the landline plans page ──
+  planType?: string;            // e.g. "landline_manual"
+  planName?: string;
+  planTitle?: string;
+  planDuration?: string;        // e.g. "36 Months"
+  finalPrice?: number;
+  salePrice?: number | string;
+
+  [key: string]: any;
 }
 
 /** Normalised shape used throughout the component */
@@ -42,6 +52,8 @@ interface CartItem {
   validity: string;
   speed: string;
   serviceAddress?: string;
+  planType?: string;
+  isLandline?: boolean;
   _raw: RawCartItem;
   bt_plan_id?: string | null;
 }
@@ -72,15 +84,37 @@ interface FormErrors {
 // ── Normalise a raw localStorage item into CartItem ───────────────────────────
 
 function normalizeCartItem(raw: RawCartItem): CartItem {
+  const isLandline = raw.planType === "landline_manual";
+
+  // Price can arrive as price / finalPrice / salePrice (string or number).
+  const rawPrice =
+    raw.price ?? raw.finalPrice ?? raw.salePrice ?? 0;
+  const price =
+    typeof rawPrice === "number" ? rawPrice : parseFloat(String(rawPrice)) || 0;
+
+  // Validity: landline already stores a label like "36 Months"; broadband
+  // stores a bare number of months that needs the suffix appended.
+  const validity = (() => {
+    if (typeof raw.planDuration === "string" && raw.planDuration) {
+      return raw.planDuration;
+    }
+    if (raw.validity !== undefined && raw.validity !== "") {
+      return `${raw.validity} Months`;
+    }
+    return "";
+  })();
 
   return {
     id:          raw.id,
-    title:       raw.name ?? "Unnamed Service",
-    price:       typeof raw.price === "number" ? raw.price : parseFloat(String(raw.price)) || 0,
+    title:       raw.name ?? raw.planName ?? raw.planTitle ?? "Unnamed Service",
+    price,
     description: raw.description ?? "",
-    validity:    raw.validity ? `${raw.validity} Months` : "",
-    speed:       raw.speed ? `${raw.speed} Mbps` : "",
+    validity,
+    // Landline plans have no broadband speed — leave blank so no Mbps badge shows.
+    speed:       !isLandline && raw.speed ? `${raw.speed} Mbps` : "",
     serviceAddress: raw.address?.display ?? "",
+    planType:    raw.planType,
+    isLandline,
     _raw:        raw,
   };
 }
@@ -662,6 +696,15 @@ export default function CheckoutPage() {
                         </p>
                         
                         <div className="flex flex-wrap items-center gap-3 mb-2">
+                          {/* 📞 Landline Type Badge */}
+                          {item.isLandline && (
+                            <span className="bg-purple-50 text-purple-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                              </svg>
+                              Business Landline
+                            </span>
+                          )}
                           {/* ⚡ Speed Badge */}
                           {item.speed && (
                             <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">

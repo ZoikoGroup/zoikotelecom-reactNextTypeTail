@@ -4,10 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 // ─── Cart wiring ────────────────────────────────────────────────────────────────
-// NOTE: this MUST match the localStorage key your checkout reads from.
-// Your other Zoiko flows use project-specific keys (e.g. "driverx_checkout",
-// "zoiko_landline_cart"). Set this to whatever BuyPlanModal / checkout uses here.
-const CART_KEY = "driverx_checkout";
+// Matches the localStorage key the checkout page reads from.
+const CART_KEY = "cart";
 
 /** One raw cart line — same shape the checkout normaliser already understands. */
 interface RawCartItem {
