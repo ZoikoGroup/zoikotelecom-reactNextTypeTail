@@ -1,6 +1,55 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+// ─── Cart wiring ────────────────────────────────────────────────────────────────
+// NOTE: this MUST match the localStorage key your checkout reads from.
+// Your other Zoiko flows use project-specific keys (e.g. "driverx_checkout",
+// "zoiko_landline_cart"). Set this to whatever BuyPlanModal / checkout uses here.
+const CART_KEY = "driverx_checkout";
+
+/** One raw cart line — same shape the checkout normaliser already understands. */
+interface RawCartItem {
+  planId?: number | string | null;
+  bqPlanID?: string | null;
+  planSlug?: string | null;
+  planName?: string | null;
+  planTitle?: string | null;
+  price?: string | number | null;
+  salePrice?: string | number | null;
+  finalPrice?: number | null;
+  planDuration?: string | null;
+  durationDays?: number | null;
+  planType?: string | null;
+  category?: { id: number; name: string; slug: string } | null;
+  features?: { id: number; title: string }[];
+  lineType?: string | null;
+  simType?: string | null;
+  setupType?: string | null;
+  qty?: number;
+  timestamp?: number;
+  formData?: { priceQty: number; price: number };
+  [key: string]: unknown;
+}
+
+function readCart(): RawCartItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? (parsed as RawCartItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeCart(items: RawCartItem[]): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(CART_KEY, JSON.stringify(items));
+  // Let header badge / other listeners in the same tab refresh.
+  window.dispatchEvent(new Event("cart:updated"));
+}
 
 // ─── Static Data ──────────────────────────────────────────────────────────────
 
@@ -39,6 +88,37 @@ const plans = [
 
 export default function BusinessLandlinePlans() {
   const [selectedDuration, setSelectedDuration] = useState<Duration>(36);
+  const router = useRouter();
+
+  const handleBuyNow = (plan: (typeof plans)[number], price: number) => {
+    const item: RawCartItem = {
+      planId: `landline-${plan.id}-${selectedDuration}`,
+      planSlug: plan.name.toLowerCase().replace(/\s+/g, "-"),
+      planName: plan.name,
+      planTitle: plan.name,
+      price,
+      salePrice: price,
+      finalPrice: price,
+      // Months contract — store as a readable label so the checkout shows it as-is.
+      planDuration: `${selectedDuration} Months`,
+      planType: "landline_manual",
+      category: { id: 0, name: "Business Landline", slug: "landline_manual" },
+      features: features.map((title, i) => ({ id: i + 1, title })),
+      lineType: "landline",
+      simType: "N/A",
+      setupType: null,
+      qty: 1,
+      timestamp: Date.now(),
+      formData: { priceQty: 1, price },
+    };
+
+    const cart = readCart();
+    cart.push(item);
+    writeCart(cart);
+
+    // Send the user to checkout. Change the path if your checkout route differs.
+    router.push("/checkout");
+  };
 
   return (
     <section className="w-full bg-[#FEF7FF] dark:bg-gray-900 py-[30px] md:py-[50px] px-4 sm:px-6 md:px-[40px]">
@@ -141,6 +221,7 @@ export default function BusinessLandlinePlans() {
                 {/* CTA Button */}
                 <div className="mt-8 flex w-full justify-center">
                   <button
+                    onClick={() => handleBuyNow(plan, price)}
                     className="flex h-[53.5px] w-full items-center justify-center rounded-[50px] px-0 py-[17px]"
                     style={{
                       background:
