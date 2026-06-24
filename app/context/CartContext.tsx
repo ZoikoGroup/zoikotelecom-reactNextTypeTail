@@ -108,7 +108,7 @@ export type ZoikoPlan = {
  */
 export type Plan = {
   // — display fields (legacy, still used) —
-  id: string;
+  id: number | string;
   name: string;
   price: number;
   speed: string;
