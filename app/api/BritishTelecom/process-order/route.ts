@@ -998,7 +998,7 @@ function resolveBtProductCode(cart: Plan): string {
     cart.bt_plan_id ??
     cart.zoikoVariation?.effective_bt_plan_id ??
     cart.zoikoPlan?.bt_plan_id ??
-    cart.productOfferingQualificationItem.product.productOffering.id
+    cart.productOfferingQualificationItem?.product.productOffering.id ?? ""
   );
 }
 
