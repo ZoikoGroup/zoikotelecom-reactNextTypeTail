@@ -2,76 +2,10 @@
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useCart } from "@/app/context/CartContext";
+import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 8;
-
-// const products = [
-//   {
-//     id: 1,
-//     slug: "yealink-t31g",
-//     title: "Yealink T31G",
-//     price: "£17.50 – £59.99",
-//     image: "/Images/PhoneEquipment/item1.png",
-//     category: "Phone & Equipment",
-//     description:
-//       "High-quality Polycom compatible PSU for stable and efficient device power delivery.",
-//   },
-
-//   {
-//     id: 2,
-//     slug: "yealink-w73p",
-//     title: "Yealink W73P",
-//     price: "£17.50 – £69.99",
-//     image: "/Images/PhoneEquipment/item2.png",
-//     category: "Phone & Equipment",
-//     description:
-//       "Professional DECT cordless phone system with superior audio quality and extended range for business communication.",
-//   },
-
-//   {
-//     id: 3,
-//     slug: "cisco-192-ata",
-//     title: "Cisco 192 ATA",
-//     price: "£17.50 – £79.99",
-//     image: "/Images/PhoneEquipment/item3.png",
-//     category: "Headsets",
-//     description:
-//       "Professional mono headset with noise cancellation for clear business communication.",
-//   },
-
-//   {
-//     id: 4,
-//     slug: "yealink-w70b",
-//     title: "Yealink W70B",
-//     price: "£18.99 – £89.99",
-//     image: "/Images/PhoneEquipment/item4.png",
-//     category: "Phone & Equipment",
-//     description:
-//       "Dual-ear professional headset built for high-quality office and call center communication.",
-//   },
-
-//   {
-//     id: 5,
-//     slug: "cisco-191-ata",
-//     title: "Cisco 191 ATA",
-//     price: "£109.99",
-//     image: "/Images/PhoneEquipment/item3.png",
-//     category: "Phone & Equipment",
-//     description:
-//       "High-quality Polycom compatible PSU for stable and efficient device power delivery.",
-//   },
-
-//   {
-//     id: 6,
-//     slug: "yealink-73h",
-//     title: "Yealink 73H",
-//     price: "£114.99",
-//     image: "/Images/PhoneEquipment/item5.png",
-//     category: "Phone & Equipment",
-//     description:
-//       "Professional DECT cordless phone system with superior audio quality and extended range for business communication.",
-//   },
-// ];
 
 interface Product {
   id: number;
@@ -137,6 +71,8 @@ export default function page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [durationFilter, setDurationFilter] = useState("All Options");
+  const { addToCart } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -204,6 +140,18 @@ export default function page() {
   const handleSearch = (value: string) => {
     setSearch(value);
     setCurrentPage(1);
+  };
+
+  const handleBuyNow = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      image: product.images.find((img) => img.is_main)?.image || product.images[0]?.image || "/Images/placeholder.png",
+      category: "phone-equipment",
+      quantity: 1,
+      price: Number(getDisplayPrice(product, durationFilter).replace("£", "")),
+    });
   };
 
   if (loading) {
@@ -499,6 +447,9 @@ export default function page() {
                               transition-all duration-300
                               hover:scale-[1.01]
                             "
+                      onClick={() =>{ handleBuyNow(product)
+                        router.push("/checkout");
+                       }}
                     >
                       Buy Now
                     </button>

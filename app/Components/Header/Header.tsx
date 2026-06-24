@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import CartIcon from "./CartIcon";
 import toast from "react-hot-toast";
 import {
   FaChevronDown,
@@ -220,6 +221,7 @@ export default function Header() {
 
           {/* Right Side */}
           <div className="flex items-center gap-4">
+            {/* <CartIcon /> */}
             <Link
               href="/contact"
               onClick={closeAll}

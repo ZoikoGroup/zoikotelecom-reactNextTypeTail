@@ -2,131 +2,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {useCart} from "@/app/context/CartContext";
+import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 8;
-
-// const products = [
-//   {
-//     id: 1,
-//     slug: "yealink-t31g-t43u-psu",
-//     title: "Yealink T31G/T43U PSU",
-//     price: 14.99,
-//     image: "/Images/Accessories/item1.png",
-//     category: "Accessories",
-//     description:
-//       "Reliable power supply unit designed for Yealink T31G and T43U business IP phones.",
-//   },
-
-//   {
-//     id: 2,
-//     slug: "polycom-psu",
-//     title: "Polycom PSU",
-//     price: 19.99,
-//     image: "/Images/Accessories/item2.png",
-//     category: "Accessories",
-//     description:
-//       "High-quality Polycom compatible PSU for stable and efficient device power delivery.",
-//   },
-
-//   {
-//     id: 3,
-//     slug: "jabra-biz-2300-mono",
-//     title: "Jabra BIZ 2300 – Mono Noise Cancellation/Phone",
-//     price: 79.99,
-//     image: "/Images/Accessories/item3.png",
-//     category: "Headsets",
-//     description:
-//       "Professional mono headset with noise cancellation for clear business communication.",
-//   },
-
-//   {
-//     id: 4,
-//     slug: "jabra-biz-2300-duo",
-//     title: "Jabra BIZ 2300 – Duo Noise Cancellation/Phone",
-//     price: 89.99,
-//     image: "/Images/Accessories/item4.png",
-//     category: "Headsets",
-//     description:
-//       "Dual-ear professional headset built for high-quality office and call center communication.",
-//   },
-
-//   {
-//     id: 5,
-//     slug: "yealink-cp700-speaker",
-//     title: "Yealink – CP700 Speaker",
-//     price: 109.99,
-//     image: "/Images/Accessories/item5.png",
-//     category: "Speakers",
-//     description:
-//       "Portable conference speakerphone optimized for meetings and remote collaboration.",
-//   },
-
-//   {
-//     id: 6,
-//     slug: "jabra-speak-510",
-//     title: "Jabra Speak 510",
-//     price: 114.99,
-//     image: "/Images/Accessories/item6.png",
-//     category: "Speakers",
-//     description:
-//       "Compact USB/Bluetooth speakerphone delivering crystal-clear audio for conferencing.",
-//   },
-
-//   {
-//     id: 7,
-//     slug: "jabra-pro-920-polycom",
-//     title: "Jabra PRO 920 – Mono for Polycom",
-//     price: 129.99,
-//     image: "/Images/Accessories/item7.png",
-//     category: "Wireless Headsets",
-//     description:
-//       "Wireless professional headset solution designed for Polycom desk phone environments.",
-//   },
-
-//   {
-//     id: 8,
-//     slug: "jabra-pro-920-yealink",
-//     title: "Jabra PRO 920 – Mono for Yealink",
-//     price: 129.99,
-//     image: "/Images/Accessories/item8.png",
-//     category: "Wireless Headsets",
-//     description:
-//       "Reliable wireless headset optimized for Yealink business phone systems.",
-//   },
-
-//   {
-//     id: 9,
-//     slug: "cisco-ip-phone-adapter",
-//     title: "Cisco IP Phone Adapter",
-//     price: 59.99,
-//     image: "/Images/Accessories/item9.png",
-//     category: "Accessories",
-//     description:
-//       "Business-grade adapter compatible with Cisco IP phone deployment environments.",
-//   },
-
-//   {
-//     id: 10,
-//     slug: "business-conference-speaker",
-//     title: "Business Conference Speaker",
-//     price: 149.99,
-//     image: "/Images/Accessories/item10.png",
-//     category: "Conference Devices",
-//     description:
-//       "Premium business conferencing speaker designed for professional meeting rooms.",
-//   },
-
-//   {
-//     id: 11,
-//     slug: "wireless-office-headset",
-//     title: "Wireless Office Headset",
-//     price: 179.99,
-//     image: "/Images/Accessories/item11.png",
-//     category: "Wireless Headsets",
-//     description:
-//       "Advanced wireless office headset delivering all-day comfort and superior audio clarity.",
-//   },
-// ];
 
 type Product = {
   id: number;
@@ -142,7 +21,9 @@ export default function page() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
+  const { addToCart } = useCart();
+  const router = useRouter();
+  
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -231,6 +112,24 @@ export default function page() {
     setSearch(value);
     setCurrentPage(1);
   };
+
+ const handleBuyNow = (product: Product) => {
+  addToCart({
+    id: product.id,
+    name: product.title,
+    slug: product.slug,
+
+    image: product.image,
+
+    category: "accessories",
+
+    quantity: 1,
+
+    price: Number(product.price),
+  });
+
+  console.log("Added to cart:", product);
+};
 
   // console.log(products[0]?.image)
   if (loading) {
@@ -469,6 +368,9 @@ export default function page() {
                       transition-all duration-300
                       hover:scale-[1.01]
                     "
+                      onClick={() =>{ handleBuyNow(product)
+                        router.push("/checkout");
+                      }}
                     >
                       Buy Now
                     </button>

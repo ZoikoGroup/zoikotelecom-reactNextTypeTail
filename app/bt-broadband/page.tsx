@@ -3,7 +3,7 @@ import {useState} from 'react'
 import Image from "next/image";
 import {  FaCheck } from "react-icons/fa";
 
-// 
+//
 const durationTabs = [
   {
     label: "24 Months Plan",

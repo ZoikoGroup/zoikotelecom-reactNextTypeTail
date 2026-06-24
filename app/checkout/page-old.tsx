@@ -24,7 +24,7 @@ export default function CheckoutPage() {
             >
               <div>
                 <h2 className="font-semibold">{item.name}</h2>
-                <p>Speed: {item.speed}</p>
+                {/* <p>Speed: {item.speed}</p> */}
                 <p>Price: ₹{item.price}</p>
               </div>
 

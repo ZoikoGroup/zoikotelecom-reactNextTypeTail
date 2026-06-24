@@ -130,6 +130,32 @@ export type Plan = {
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
+// type CartContextType = {
+//   cart: Plan[];
+//   addToCart: (plan: Plan) => void;
+//   removeFromCart: (id: string) => void;
+//   clearCart: () => void;
+// };
+export type CartItem = {
+  id: number;
+  name: string;
+  slug: string;
+  image: string;
+  category: string;
+
+  quantity: number;
+
+  selectedVariant?: {
+    id: number;
+    duration?: string;
+    duration_display?: string;
+    regular_price?: string;
+    sale_price?: string;
+  };
+
+  price: number;
+};
+
 type CartContextType = {
   cart: Plan[];
   addToCart: (plan: Plan) => void;
@@ -140,7 +166,8 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | null>(null);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [cart, setCart] = useState<Plan[]>([]);
+  // const [cart, setCart] = useState<Plan[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   // Load from localStorage
   useEffect(() => {
@@ -164,14 +191,39 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, [cart]);
 
   // Add plan (with full details)
-  const addToCart = (plan: Plan) => {
-    setCart([]);
-    setCart((prev) => {
-      const exists = prev.find((item) => item.id === plan.id);
-      if (exists) return prev;
-      return [...prev, plan];
-    });
-  };
+  // const addToCart = (plan: Plan) => {
+  //   setCart([]);
+  //   setCart((prev) => {
+  //     const exists = prev.find((item) => item.id === plan.id);
+  //     if (exists) return prev;
+  //     return [...prev, plan];
+  //   });
+  // };
+ const addToCart = (newItem: CartItem) => {
+  setCart((prev) => {
+    const existing = prev.find(
+      (item) =>
+        item.id === newItem.id &&
+        item.selectedVariant?.id ===
+          newItem.selectedVariant?.id
+    );
+
+    if (existing) {
+      return prev.map((item) =>
+        item.id === newItem.id &&
+        item.selectedVariant?.id ===
+          newItem.selectedVariant?.id
+          ? {
+              ...item,
+              quantity: item.quantity + 1,
+            }
+          : item
+      );
+    }
+
+    return [...prev, newItem];
+  });
+};
 
   const removeFromCart = (id: number) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
