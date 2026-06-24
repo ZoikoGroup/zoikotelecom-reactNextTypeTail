@@ -33,12 +33,17 @@ interface RawCartItem {
   };
 
   // ── Landline (manual) plan fields — written by the landline plans page ──
-  planType?: string;            // e.g. "landline_manual"
+  planType?: string;            // e.g. "landline_manual" | "ee_mobile_manual"
   planName?: string;
   planTitle?: string;
   planDuration?: string;        // e.g. "36 Months"
   finalPrice?: number;
   salePrice?: number | string;
+
+  // ── EE mobile (manual) plan fields — written by the EE mobile plans page ──
+  dataAllowance?: string;       // e.g. "50GB", "Unlimited"
+  eeCategory?: string;          // e.g. "EE Mobile Bundles"
+  billingPeriod?: "monthly" | "one-off";
 
   [key: string]: any;
 }
@@ -54,6 +59,9 @@ interface CartItem {
   serviceAddress?: string;
   planType?: string;
   isLandline?: boolean;
+  isEEMobile?: boolean;
+  dataAllowance?: string;
+  categoryLabel?: string;
   _raw: RawCartItem;
   bt_plan_id?: string | null;
 }
@@ -85,6 +93,7 @@ interface FormErrors {
 
 function normalizeCartItem(raw: RawCartItem): CartItem {
   const isLandline = raw.planType === "landline_manual";
+  const isEEMobile = raw.planType === "ee_mobile_manual";
 
   // Price can arrive as price / finalPrice / salePrice (string or number).
   const rawPrice =
@@ -92,8 +101,9 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
   const price =
     typeof rawPrice === "number" ? rawPrice : parseFloat(String(rawPrice)) || 0;
 
-  // Validity: landline already stores a label like "36 Months"; broadband
-  // stores a bare number of months that needs the suffix appended.
+  // Validity: landline / EE broadband store a label like "36 Months"; broadband
+  // stores a bare number of months that needs the suffix appended. One-off EE
+  // passes (roaming / voice) have no contract, so this stays blank.
   const validity = (() => {
     if (typeof raw.planDuration === "string" && raw.planDuration) {
       return raw.planDuration;
@@ -110,11 +120,14 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
     price,
     description: raw.description ?? "",
     validity,
-    // Landline plans have no broadband speed — leave blank so no Mbps badge shows.
-    speed:       !isLandline && raw.speed ? `${raw.speed} Mbps` : "",
+    // Only broadband items carry a Mbps speed; landline / EE mobile do not.
+    speed:       !isLandline && !isEEMobile && raw.speed ? `${raw.speed} Mbps` : "",
     serviceAddress: raw.address?.display ?? "",
     planType:    raw.planType,
     isLandline,
+    isEEMobile,
+    dataAllowance: isEEMobile ? raw.dataAllowance : undefined,
+    categoryLabel: isEEMobile ? raw.eeCategory : undefined,
     _raw:        raw,
   };
 }
@@ -705,6 +718,15 @@ export default function CheckoutPage() {
                               Business Landline
                             </span>
                           )}
+                          {/* 📱 EE Mobile Type Badge (+ data allowance) */}
+                          {item.isEEMobile && (
+                            <span className="bg-pink-50 text-pink-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-1m-6-8h8m0 0V4m0 3v3" />
+                              </svg>
+                              EE Mobile{item.dataAllowance ? ` · ${item.dataAllowance}` : ""}
+                            </span>
+                          )}
                           {/* ⚡ Speed Badge */}
                           {item.speed && (
                             <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
@@ -718,6 +740,12 @@ export default function CheckoutPage() {
                           {item.validity && (
                             <span className="text-xs text-gray-500 font-medium">
                               Contract: {item.validity}
+                            </span>
+                          )}
+                          {/* 🏷️ EE Category Label */}
+                          {item.categoryLabel && (
+                            <span className="text-xs text-gray-500 font-medium">
+                              {item.categoryLabel}
                             </span>
                           )}
                         </div>
