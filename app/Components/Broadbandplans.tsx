@@ -150,7 +150,7 @@ function PlanCard({ item, contractType, selectedAddress }: PlanCardProps) {
 
     const plan: Plan = {
       // — display fields (legacy) —
-      id: String(variation?.id ?? item.id),
+      id: Number(variation?.id ?? item.id),
       name: planName,
       price: parseFloat(price ?? "0"),
       speed: download || "Unknown",
