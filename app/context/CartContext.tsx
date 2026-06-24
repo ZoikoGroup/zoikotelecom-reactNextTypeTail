@@ -108,7 +108,7 @@ export type ZoikoPlan = {
  */
 export type Plan = {
   // — display fields (legacy, still used) —
-  id: number | string;
+  id: number;
   name: string;
   price: number;
   speed: string;
@@ -157,8 +157,8 @@ export type CartItem = {
 };
 
 type CartContextType = {
-  cart: CartItem[];
-  addToCart: (item: CartItem) => void;
+  cart: Plan[];
+  addToCart: (plan: Plan) => void;
   removeFromCart: (id: number) => void;
   clearCart: () => void;
 };
