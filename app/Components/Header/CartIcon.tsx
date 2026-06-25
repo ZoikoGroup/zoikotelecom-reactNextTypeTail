@@ -1,28 +1,69 @@
 "use client";
 
 import { ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/app/context/CartContext";
+
+/**
+ * localStorage key that your cart-write logic uses.
+ * Adjust this if your add-to-cart code stores under a different key.
+ */
+const CART_KEY = "cart";
+
+const getCartCount = (): number => {
+  if (typeof window === "undefined") return 0;
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    if (!raw) return 0;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.length : 0;
+  } catch {
+    return 0;
+  }
+};
 
 const CartIcon = () => {
   const router = useRouter();
-  const { cart } = useCart();
+  const [cartCount, setCartCount] = useState(0);
 
-  const cartCount = cart.length;
+  useEffect(() => {
+    const updateCount = () => setCartCount(getCartCount());
+
+    // Initial read happens client-side only, so server render (0) and first
+    // client render match — no hydration mismatch.
+    updateCount();
+
+    // Same-tab updates: after writing the cart, dispatch
+    //   window.dispatchEvent(new Event("cartChanged"));
+    window.addEventListener("cartChanged", updateCount);
+    // Cross-tab updates (fires automatically when another tab writes).
+    window.addEventListener("storage", updateCount);
+
+    return () => {
+      window.removeEventListener("cartChanged", updateCount);
+      window.removeEventListener("storage", updateCount);
+    };
+  }, []);
 
   return (
-    <div
-      className="relative cursor-pointer"
+    <button
+      type="button"
       onClick={() => router.push("/checkout")}
+      aria-label={
+        cartCount > 0
+          ? `Cart, ${cartCount} item${cartCount > 1 ? "s" : ""}`
+          : "Cart"
+      }
+      className="relative flex h-11 w-11 items-center justify-center rounded-full text-[#111] transition-colors hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196]"
     >
-      <ShoppingCart className="w-6 h-6" />
+      <ShoppingCart className="h-6 w-6" />
 
       {cartCount > 0 && (
-        <span className="absolute -top-2 -right-2 bg-[#C12172] text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-          {cartCount}
+        <span className="absolute right-0.5 top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#C12172] px-1 text-[11px] font-bold leading-none text-white">
+          {cartCount > 99 ? "99+" : cartCount}
         </span>
       )}
-    </div>
+    </button>
   );
 };
 
