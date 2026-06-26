@@ -43,6 +43,7 @@ interface RawCartItem {
   // ── EE mobile (manual) plan fields — written by the EE mobile plans page ──
   dataAllowance?: string;       // e.g. "50GB", "Unlimited"
   eeCategory?: string;          // e.g. "EE Mobile Bundles"
+  simType?: string;             // e.g. "eSIM" | "pSIM"
   billingPeriod?: "monthly" | "one-off";
 
   [key: string]: any;
@@ -62,6 +63,7 @@ interface CartItem {
   isEEMobile?: boolean;
   dataAllowance?: string;
   categoryLabel?: string;
+  simType?: string;
   _raw: RawCartItem;
   bt_plan_id?: string | null;
 }
@@ -128,6 +130,8 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
     isEEMobile,
     dataAllowance: isEEMobile ? raw.dataAllowance : undefined,
     categoryLabel: isEEMobile ? raw.eeCategory : undefined,
+    // SIM delivery type (eSIM / pSIM) — only EE mobile items carry this.
+    simType:     isEEMobile ? raw.simType : undefined,
     _raw:        raw,
   };
 }
@@ -550,6 +554,7 @@ export default function CheckoutPage() {
         description: item.description,
         validity: item.validity,
         speed: item.speed,
+        simType: item.simType,
         address: item.serviceAddress,
       };
   });
@@ -727,6 +732,16 @@ export default function CheckoutPage() {
                               EE Mobile{item.dataAllowance ? ` · ${item.dataAllowance}` : ""}
                             </span>
                           )}
+                          {/* 📶 SIM Type Badge (eSIM / pSIM) */}
+                          {item.simType && (
+                            <span className="bg-teal-50 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 3h6l4 4v12a2 2 0 01-2 2H8a2 2 0 01-2-2V5a2 2 0 012-2z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 13h6m-6 4h6m-6-8h2" />
+                              </svg>
+                              {item.simType}
+                            </span>
+                          )}
                           {/* ⚡ Speed Badge */}
                           {item.speed && (
                             <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
@@ -871,6 +886,11 @@ export default function CheckoutPage() {
                   <div key={idx} className="flex items-start justify-between gap-2 text-sm">
                     <div className="min-w-0">
                       <p className="font-medium text-gray-900 dark:text-white truncate">{item.title}</p>
+                      {item.simType && (
+                        <span className="text-xs text-teal-600 dark:text-teal-400 font-medium">
+                          {item.simType}
+                        </span>
+                      )}
                       {item.speed && (
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           Speed: {item.speed}

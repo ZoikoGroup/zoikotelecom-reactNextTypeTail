@@ -1,7 +1,67 @@
 "use client"
-import {useState} from 'react'
+import { useState, useEffect } from 'react'
 import Image from "next/image";
 import {  FaCheck } from "react-icons/fa";
+
+const PLANS_API_URL =
+  "https://api.zoikotelecom.com/api/v1/plans/category/broadband-plans/";
+
+// ---- API response types ----
+type Duration = "24" | "18" | "12";
+
+interface PlanVariation {
+  id: number;
+  label: string;
+  duration_value: number;
+  duration_unit: string;
+  duration_display: string;
+  price: string;
+  sale_price: string | null;
+  bt_plan_id: string;
+  effective_bt_plan_id: string;
+  is_default: boolean;
+  is_active: boolean;
+  sort_order: number;
+}
+
+interface Plan {
+  id: number;
+  name: string;
+  slug: string;
+  bt_plan_id: string;
+  bt_plan_name: string;
+  description: string;
+  is_active: boolean;
+  is_featured: boolean;
+  sort_order: number;
+  variations: PlanVariation[];
+}
+
+interface PlansApiResponse {
+  count: number;
+  results: Plan[];
+}
+
+// Generic feature list shown on every card for now.
+// TODO: replace with per-plan features once the API exposes them.
+const planFeatures = [
+  "No Long-Term Contracts",
+  "Unlimited Downloads",
+  "Reliable Fibre Connection",
+  "Price Lock Guarantee",
+  "24/7 Customer Support",
+];
+
+// Pick the variation that matches the selected contract length.
+const getVariation = (plan: Plan, duration: Duration) =>
+  plan.variations.find((v) => String(v.duration_value) === duration);
+
+// Format a variation's price as "£45.99/m" (uses sale_price when present).
+const formatPrice = (variation?: PlanVariation) => {
+  if (!variation) return "—";
+  const value = variation.sale_price ?? variation.price;
+  return `£${value}/m`;
+};
 
 //
 const durationTabs = [
@@ -18,70 +78,6 @@ const durationTabs = [
     value: "12",
   },
 ];
-
-const plans= [
-  {
-    name: "Z-Royal",
-    data: "50GB",
-
-    monthlyPrice: {
-      "24": "£15.00/m",
-      "18": "£18.00/m",
-      "12": "£22.00/m",
-    },
-
-    features: [
-      "No Long-Term Contracts",
-      "Unlimited Data Pass Available",
-      "Affordable & Competitive Pricing",
-      "5G Ready SIMs",
-      "Inclusive EU Roaming",
-      "Exceptional Customer Support",
-    ],
-  },
-
-  {
-    name: "Super-Z",
-    data: "100GB",
-
-    monthlyPrice: {
-      "24": "£23.00/m",
-      "18": "£26.00/m",
-      "12": "£30.00/m",
-    },
-
-    badge: "MOST POPULAR",
-
-    features: [
-      "No Long-Term Contracts",
-      "Unlimited Data Options",
-      "Affordable & Competitive Pricing",
-      "5G Ready SIMs",
-      "Inclusive EU Roaming",
-      "Exceptional Customer Support",
-    ],
-  },
-
-  {
-    name: "Z-Unlimited",
-    data: "Unlimited",
-
-    monthlyPrice: {
-      "24": "£29.00/m",
-      "18": "£34.00/m",
-      "12": "£39.00/m",
-    },
-
-    features: [
-      "No Long-Term Contracts",
-      "Lightning-Fast Options",
-      "Affordable & Competitive Pricing",
-      "5G Ready SIMs",
-      "Inclusive EU Roaming",
-      "Exceptional Customer Support",
-    ],
-  },
-]
 
 const benefits = [
   {
@@ -140,9 +136,45 @@ const features =[
 ]
 
 export default function page() {
-  const [selectedDuration, setSelectedDuration] = useState<
-    "24" | "18" | "12"
-  >("24");
+  const [selectedDuration, setSelectedDuration] = useState<Duration>("24");
+
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchPlans = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await fetch(PLANS_API_URL, { signal: controller.signal });
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
+
+        const data: PlansApiResponse = await res.json();
+
+        // Only show active plans, ordered by the backend sort_order.
+        const activePlans = (data.results ?? [])
+          .filter((p) => p.is_active)
+          .sort((a, b) => a.sort_order - b.sort_order);
+
+        setPlans(activePlans);
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          setError("Unable to load broadband plans. Please try again.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+    return () => controller.abort();
+  }, []);
 
   return (
     <>
@@ -221,7 +253,7 @@ export default function page() {
             <button
               key={tab.value}
               onClick={() =>
-                setSelectedDuration(tab.value as "24" | "18" | "12")
+                setSelectedDuration(tab.value as Duration)
               }
               className={`
                 rounded-full
@@ -260,7 +292,27 @@ export default function page() {
           ))}
         </div>
 
+        {/* Loading state */}
+        {loading && (
+          <p className="mt-14 text-center text-[#5f6470] dark:text-gray-300">
+            Loading plans…
+          </p>
+        )}
+
+        {/* Error state */}
+        {!loading && error && (
+          <p className="mt-14 text-center text-red-500">{error}</p>
+        )}
+
+        {/* Empty state */}
+        {!loading && !error && plans.length === 0 && (
+          <p className="mt-14 text-center text-[#5f6470] dark:text-gray-300">
+            No broadband plans available right now.
+          </p>
+        )}
+
         {/* Plans */}
+        {!loading && !error && plans.length > 0 && (
         <div
           className="
             mt-14
@@ -271,9 +323,11 @@ export default function page() {
             gap-8
           "
         >
-          {plans.map((plan, index) => (
+          {plans.map((plan) => {
+            const variation = getVariation(plan, selectedDuration);
+            return (
             <div
-              key={index}
+              key={plan.id}
               className={`
                 relative
                 rounded-[28px]
@@ -290,14 +344,14 @@ export default function page() {
                 hover:shadow-pink-500/10
 
                 ${
-                  plan.badge
+                  plan.is_featured
                     ? "ring-2 ring-pink-500 scale-[1.02]"
                     : ""
                 }
               `}
             >
               {/* Badge */}
-              {plan.badge && (
+              {plan.is_featured && (
                 <div
                   className="
                     absolute
@@ -319,7 +373,7 @@ export default function page() {
                       shadow-lg
                     "
                   >
-                    {plan.badge}
+                    MOST POPULAR
                   </span>
                 </div>
               )}
@@ -365,7 +419,7 @@ export default function page() {
                   {plan.name}
                 </h3>
 
-                {/* DATA */}
+                {/* SPEED — TODO: populate from API once exposed */}
                 <p
                   className="
                     mt-5
@@ -375,10 +429,10 @@ export default function page() {
                     text-[#8d8d9c]
                   "
                 >
-                  DATA
+                  SPEED
                 </p>
 
-                {/* Data Amount */}
+                {/* Speed value (placeholder until API provides it) */}
                 <h2
                   className="
                     mt-2
@@ -390,13 +444,26 @@ export default function page() {
                     break-words
                   "
                 >
-                  {plan.data}
+                  —
                 </h2>
+
+                {/* Contract length */}
+                <p
+                  className="
+                    mt-3
+                    text-[11px]
+                    uppercase
+                    tracking-[0.2em]
+                    text-[#8d8d9c]
+                  "
+                >
+                  {variation?.duration_display ?? `${selectedDuration} Month(s)`}
+                </p>
 
                 {/* Price */}
                 <p
                   className="
-                    mt-3
+                    mt-2
                     text-2xl
                     md:text-3xl
                     lg:text-4xl
@@ -405,13 +472,13 @@ export default function page() {
                     dark:text-white
                   "
                 >
-                  {plan.monthlyPrice[selectedDuration]}
+                  {formatPrice(variation)}
                 </p>
               </div>
 
               {/* Features */}
               <div className="mt-8 space-y-4">
-                {plan.features.map((feature, i) => (
+                {planFeatures.map((feature, i) => (
                   <div
                     key={i}
                     className="
@@ -483,8 +550,10 @@ export default function page() {
                 Buy Now
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
+        )}
             </div>
         </section>
 

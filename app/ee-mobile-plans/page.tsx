@@ -19,6 +19,7 @@ interface RawCartItem {
   salePrice?: number | string;
   dataAllowance?: string;
   eeCategory?: string;
+  simType?: string;
   billingPeriod?: "monthly" | "one-off";
   features?: { id: number; title: string }[];
   qty?: number;
@@ -57,7 +58,14 @@ const categories = [
     "Voice and Text Plans",
 ];
 
-const durationTabs = ["12 Months", "24 Months"];
+// Duration tabs are category-specific. Bundles expose three terms; broadband keeps two.
+const durationTabsByCategory: Record<string, string[]> = {
+    "EE Mobile Bundles": ["30 Days", "12 Months", "24 Months"],
+    "EE Mobile Broadband Plans": ["12 Months", "24 Months"],
+};
+
+// SIM delivery type — applies to every SIM plan on this page.
+const simTypes = ["eSIM", "pSIM"];
 
 const plansData = {
     "EE Mobile Bundles": [
@@ -512,6 +520,14 @@ export default function page() {
 
     const [activeDuration, setActiveDuration] = useState("12 Months");
 
+    // The plan whose SIM-type popup is currently open (null = closed).
+    const [pendingPlan, setPendingPlan] = useState<{
+        name: string;
+        data: string;
+        price: string;
+        features: string[];
+    } | null>(null);
+
     const currentPlans =
         plansData[activeCategory as keyof typeof plansData];
 
@@ -519,22 +535,31 @@ export default function page() {
 
     const router = useRouter();
 
+    // Buy Now just opens the SIM-type popup for the chosen plan.
     const handleBuyNow = (plan: {
         name: string;
         data: string;
         price: string;
         features: string[];
     }) => {
+        setPendingPlan(plan);
+    };
+
+    // Called from the popup once the user picks eSIM or pSIM.
+    const confirmPurchase = (simType: string) => {
+        const plan = pendingPlan;
+        if (!plan) return;
+
         const price = parsePrice(plan.price);
         // "/m" in the price = recurring monthly bundle; otherwise a one-off pass.
         const isMonthly = /\/m\s*$/i.test(plan.price.trim());
-        // Contract duration only applies to the broadband plans (the only category
-        // that exposes the 12/24-month tabs).
+        // Contract duration applies to any category that exposes duration tabs
+        // (EE Mobile Bundles and EE Mobile Broadband Plans).
         const duration =
-            activeCategory === "EE Mobile Broadband Plans" ? activeDuration : "";
+            durationTabsByCategory[activeCategory] ? activeDuration : "";
 
         const item: RawCartItem = {
-            id: `ee-${activeCategory}-${plan.name}-${duration || "na"}`
+            id: `ee-${activeCategory}-${plan.name}-${duration || "na"}-${simType}`
                 .toLowerCase()
                 .replace(/\s+/g, "-"),
             name: plan.name,
@@ -545,6 +570,7 @@ export default function page() {
             finalPrice: price,
             planType: "ee_mobile_manual",
             eeCategory: activeCategory,
+            simType,
             dataAllowance: plan.data,
             planDuration: duration,
             billingPeriod: isMonthly ? "monthly" : "one-off",
@@ -558,8 +584,20 @@ export default function page() {
         cart.push(item);
         writeCart(cart);
 
+        setPendingPlan(null);
+
         // Send the user to checkout. Change the path if your checkout route differs.
         router.push("/checkout");
+    };
+
+    // Keep the selected duration valid when switching categories
+    // (e.g. "30 Days" doesn't exist for broadband).
+    const handleCategoryChange = (category: string) => {
+        setActiveCategory(category);
+        const tabs = durationTabsByCategory[category];
+        if (tabs && !tabs.includes(activeDuration)) {
+            setActiveDuration(tabs[0]);
+        }
     };
 
     const toggleZone = (id: number) => {
@@ -613,7 +651,7 @@ export default function page() {
                         {categories.map((item) => (
                             <button
                                 key={item}
-                                onClick={() => setActiveCategory(item)}
+                                onClick={() => handleCategoryChange(item)}
                                 className={`rounded-full border px-5 py-2 text-sm font-medium transition-all duration-300
                 ${activeCategory === item
                                         ? "bg-[#C12172] text-white border-pink-600 shadow-sm shadow-pink-500/20"
@@ -630,9 +668,9 @@ export default function page() {
                     <div className="mt-10 border-t border-gray-300 dark:border-white/10" />
 
                     {/* Duration Tabs */}
-                    {activeCategory === "EE Mobile Broadband Plans" && (
+                    {durationTabsByCategory[activeCategory] && (
                         <div className="flex justify-center gap-3 mt-8">
-                            {durationTabs.map((tab) => (
+                            {durationTabsByCategory[activeCategory].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveDuration(tab)}
@@ -914,6 +952,82 @@ export default function page() {
         </div>
                 </div>
             </section>
+
+            {/* SIM Type Popup */}
+            {pendingPlan && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    role="dialog"
+                    aria-modal="true"
+                >
+                    {/* Backdrop */}
+                    <div
+                        onClick={() => setPendingPlan(null)}
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                    />
+
+                    {/* Modal */}
+                    <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-[#18181f] border border-gray-200 dark:border-white/10 p-8 shadow-2xl">
+                        {/* Close */}
+                        <button
+                            onClick={() => setPendingPlan(null)}
+                            aria-label="Close"
+                            className="absolute right-5 top-5 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="w-6 h-6"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+
+                        {/* Heading */}
+                        <div className="text-center">
+                            <h3 className="text-2xl font-bold text-pink-700 dark:text-pink-500">
+                                {pendingPlan.name}
+                            </h3>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                {pendingPlan.data} • {pendingPlan.price}
+                            </p>
+                            <p className="mt-6 text-base font-semibold text-gray-800 dark:text-white">
+                                Choose your SIM type
+                            </p>
+                        </div>
+
+                        {/* Options */}
+                        <div className="mt-6 grid grid-cols-2 gap-4">
+                            {simTypes.map((type) => (
+                                <button
+                                    key={type}
+                                    onClick={() => confirmPurchase(type)}
+                                    className="group rounded-2xl border border-gray-200 dark:border-white/10
+                  bg-[#faf6f9] dark:bg-[#0f0f14] p-5 text-center
+                  hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-500/10
+                  transition-all duration-300"
+                                >
+                                    <span className="block text-lg font-bold text-gray-800 dark:text-white group-hover:text-pink-700 dark:group-hover:text-pink-500">
+                                        {type}
+                                    </span>
+                                    <span className="mt-1 block text-xs text-gray-500 dark:text-gray-400">
+                                        {type === "eSIM"
+                                            ? "Instant digital activation"
+                                            : "Physical SIM by post"}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     )
 }
