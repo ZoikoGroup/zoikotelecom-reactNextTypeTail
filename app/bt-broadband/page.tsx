@@ -24,6 +24,12 @@ interface PlanVariation {
   sort_order: number;
 }
 
+interface PlanFeature {
+  id: number;
+  text: string;
+  sort_order: number;
+}
+
 interface Plan {
   id: number;
   name: string;
@@ -31,9 +37,13 @@ interface Plan {
   bt_plan_id: string;
   bt_plan_name: string;
   description: string;
+  download_speed: number | null;
+  upload_speed: number | null;
+  speed_display: string;
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
+  features: PlanFeature[];
   variations: PlanVariation[];
 }
 
@@ -42,13 +52,10 @@ interface PlansApiResponse {
   results: Plan[];
 }
 
-// Generic feature list shown on every card for now.
-// TODO: replace with per-plan features once the API exposes them.
-const planFeatures = [
+// Fallback features shown only if a plan has none configured yet.
+const fallbackFeatures = [
   "No Long-Term Contracts",
-  "Unlimited Downloads",
   "Reliable Fibre Connection",
-  "Price Lock Guarantee",
   "24/7 Customer Support",
 ];
 
@@ -419,7 +426,7 @@ export default function page() {
                   {plan.name}
                 </h3>
 
-                {/* SPEED — TODO: populate from API once exposed */}
+                {/* SPEED */}
                 <p
                   className="
                     mt-5
@@ -432,7 +439,7 @@ export default function page() {
                   SPEED
                 </p>
 
-                {/* Speed value (placeholder until API provides it) */}
+                {/* Speed value */}
                 <h2
                   className="
                     mt-2
@@ -444,7 +451,7 @@ export default function page() {
                     break-words
                   "
                 >
-                  —
+                  {plan.speed_display || "—"}
                 </h2>
 
                 {/* Contract length */}
@@ -478,9 +485,12 @@ export default function page() {
 
               {/* Features */}
               <div className="mt-8 space-y-4">
-                {planFeatures.map((feature, i) => (
+                {(plan.features.length > 0
+                  ? plan.features.map((f) => ({ key: String(f.id), text: f.text }))
+                  : fallbackFeatures.map((text, i) => ({ key: `fb-${i}`, text }))
+                ).map((feature) => (
                   <div
-                    key={i}
+                    key={feature.key}
                     className="
                       flex
                       items-start
@@ -521,7 +531,7 @@ export default function page() {
                         dark:text-gray-300
                       "
                     >
-                      {feature}
+                      {feature.text}
                     </p>
                   </div>
                 ))}
