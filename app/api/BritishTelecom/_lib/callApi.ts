@@ -140,7 +140,7 @@ export async function callApi<T = unknown>(
     return {
       success: false,
       message:
-        "BT_API_BASE_URL environment variable is not set.",
+        "NEXT_BT_ENDPOINT_URI environment variable is not set.",
     };
   }
 

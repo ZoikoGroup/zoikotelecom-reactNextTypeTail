@@ -67,7 +67,7 @@ async function generateToken(name = "BritishTelecom"): Promise<string> {
   if (!clientId || !clientSecret || !authUrl) {
     throw new Error(
       "BT API credentials are not configured. " +
-        "Please set BT_CLIENT_ID, BT_CLIENT_SECRET, and BT_AUTH_URL env vars."
+        "Please set NEXT_BT_CLIENT_ID, NEXT_BT_CLIENT_SECRET, and NEXT_BT_ENDPOINT_URI env vars."
     );
   }
 
