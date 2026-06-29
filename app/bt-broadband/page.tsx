@@ -570,7 +570,7 @@ function AvailabilityModal({ open, onClose, selected }: AvailabilityModalProps) 
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-none mb-6 rounded-3xl bg-[#faf6fb] dark:bg-[#0f1117] shadow-2xl"
+        className="relative w-full md:w-[60%] mb-6 rounded-3xl bg-[#faf6fb] dark:bg-[#0f1117] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -902,39 +902,27 @@ function AvailabilityModal({ open, onClose, selected }: AvailabilityModalProps) 
                       )}
 
                       {/* Selected plan (highlighted) */}
-                      {selectedAvailable && (
-                        <section>
-                          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-                            Your selected plan
-                          </p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <PlanCard
-                              item={selectedAvailable}
-                              contractType={contractType}
-                              selectedAddress={selectedAddress}
-                              highlight
-                            />
-                          </div>
-                        </section>
-                      )}
-
-                      {/* Other available plans */}
-                      {otherAvailablePlans.length > 0 && (
+                      {/* All available plans — selected first & highlighted */}
+                      {availablePlans.length > 0 && (
                         <section>
                           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
                             {selectedAvailable
-                              ? "Other plans available at your address"
-                              : `${otherAvailablePlans.length} plan${
-                                  otherAvailablePlans.length !== 1 ? "s" : ""
-                                } available`}
+                              ? "Plans available at your address"
+                              : `${availablePlans.length} plan${
+                                  availablePlans.length !== 1 ? "s" : ""
+                                } available at your address`}
                           </p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {otherAvailablePlans.map((item) => (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {(selectedAvailable
+                              ? [selectedAvailable, ...otherAvailablePlans]
+                              : availablePlans
+                            ).map((item) => (
                               <PlanCard
                                 key={item.id}
                                 item={item}
                                 contractType={contractType}
                                 selectedAddress={selectedAddress}
+                                highlight={item === selectedAvailable}
                               />
                             ))}
                           </div>
