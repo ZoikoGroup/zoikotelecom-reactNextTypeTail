@@ -44,11 +44,40 @@ interface ZoikoPlansResponse {
   results: ZoikoPlan[];
 }
 
+// ─── Catalogue selection ──────────────────────────────────────────────────────
+//
+// The BT productOfferingQualification is brand-agnostic, but the Zoiko plans we
+// enrich it with are NOT: Zoiko Telecom (bt-broadband page) and Zoiko Broadband
+// (fibre-packages page) have separate catalogues on separate API hosts. Which
+// one to match against is decided per-request via the `catalog` field in the
+// POST body, so a single deployment can serve both flows correctly.
+//
+// URLs are overridable by env var; the defaults match the current production
+// endpoints. `catalog` defaults to ZOIKO_DEFAULT_CATALOG (or "broadband") so the
+// existing fibre-packages flow keeps working without sending the new field.
+
+type Catalog = "telecom" | "broadband";
+
+const CATALOG_URLS: Record<Catalog, string> = {
+  telecom:
+    process.env.ZOIKO_TELECOM_PLANS_URL ??
+    "https://api.zoikotelecom.com/api/v1/plans/category/broadband-plans/",
+  broadband:
+    process.env.ZOIKO_BROADBAND_PLANS_URL ??
+    "https://api.zoikobroadband.com/api/v1/plans/",
+};
+
+function resolveCatalog(raw: unknown): Catalog {
+  if (raw === "telecom" || raw === "broadband") return raw;
+  const fallback = process.env.ZOIKO_DEFAULT_CATALOG;
+  return fallback === "telecom" ? "telecom" : "broadband";
+}
+
 // ─── Fetch Zoiko plans ────────────────────────────────────────────────────────
 
-async function fetchZoikoPlans(): Promise<ZoikoPlan[]> {
+async function fetchZoikoPlans(catalog: Catalog): Promise<ZoikoPlan[]> {
   try {
-    const res = await fetch("https://api.zoikobroadband.com/api/v1/plans/", {
+    const res = await fetch(CATALOG_URLS[catalog], {
       next: { revalidate: 300 }, // cache for 5 minutes
     });
     if (!res.ok) return [];
@@ -82,7 +111,7 @@ function matchZoikoPlan(
 
 export async function POST(req: NextRequest) {
   try {
-    const { address_id, district_code } = await req.json();
+    const { address_id, district_code, catalog } = await req.json();
 
     if (!address_id) {
       return NextResponse.json({
@@ -90,6 +119,8 @@ export async function POST(req: NextRequest) {
         message: "address_id is required",
       });
     }
+
+    const selectedCatalog = resolveCatalog(catalog);
 
     const requestBody = {
       "@type": "btProductOfferingQualification",
@@ -138,7 +169,7 @@ export async function POST(req: NextRequest) {
           body: requestBody,
         }
       ),
-      fetchZoikoPlans(),
+      fetchZoikoPlans(selectedCatalog),
     ]);
 
     if (!response.success) {
