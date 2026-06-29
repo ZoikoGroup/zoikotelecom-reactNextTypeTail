@@ -3,13 +3,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
 import {
-  useCart,
   type FormattedAddress,
   type ProductCharacteristic,
   type ZoikoVariation,
   type ZoikoPlan,
   type BTProductOfferingQualificationItem,
-  type Plan as CartPlan,
 } from "@/app/context/CartContext";
 
 const PLANS_API_URL =
@@ -284,8 +282,11 @@ function PlanCard({
   const price = variation?.sale_price ?? variation?.price ?? null;
   const contractMonths = parseInt(contractType);
 
-  const { addToCart } = useCart();
-
+  // Write a broadband line into the shared localStorage cart (the checkout
+  // reads localStorage["cart"] and normalises planType === "broadband"). We
+  // also keep the BT enrichment (productOfferingQualificationItem / zoikoPlan /
+  // zoikoVariation / bt_plan_id) on the raw item because /process-order reads
+  // the raw cart from localStorage at order time.
   const handleAddToCart = () => {
     const {
       zoikoPlan: _strippedZoikoPlan,
@@ -295,31 +296,42 @@ function PlanCard({
     void _strippedZoikoPlan;
     void _strippedBtPlanId;
 
-    const plan: CartPlan = {
-      id: Number(variation?.id ?? item.id),
+    const speedNum = parseFloat(download);
+
+    const rawItem = {
+      id: variation?.id ?? item.id,
+      planType: "broadband",
       name: planName,
+      planName,
       price: parseFloat(price ?? "0"),
-      speed: download || "Unknown",
-      validity: `${contractMonths}`,
+      planDuration: `${contractMonths} Months`,
+      // Stored bare; the checkout appends " Mbps". Omit when not a real number.
+      speed: download && speedNum ? download : undefined,
       description: `${planName} broadband — up to ${formatDownload(
         download,
       )} down / ${formatUpload(upload)}.`,
-      address: selectedAddress,
+      address: selectedAddress ?? undefined,
+      category: "broadband",
       bt_plan_id:
         variation?.effective_bt_plan_id ??
         variation?.bt_plan_id ??
         zoikoPlan.bt_plan_id ??
         null,
+      // — BT / Zoiko enrichment (needed by /process-order) —
       productOfferingQualificationItem,
       zoikoPlan,
       zoikoVariation: variation,
-      slug: String(variation?.id ?? item.id),
-      image: "",
-      category: "broadband",
-      quantity: 1,
     };
 
-    addToCart(plan);
+    try {
+      const existing = JSON.parse(localStorage.getItem("cart") ?? "[]");
+      const cartArr = Array.isArray(existing) ? existing : [];
+      cartArr.push(rawItem);
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+    } catch {
+      localStorage.setItem("cart", JSON.stringify([rawItem]));
+    }
+
     window.location.href = "/checkout";
   };
 
@@ -411,7 +423,10 @@ function PlanCard({
 
       <div className="px-5 pb-5 mt-auto">
         <button
-          onClick={handleAddToCart}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAddToCart();
+          }}
           className="w-full py-3 rounded-xl bg-[#c61b7f] hover:bg-[#b21771] active:scale-95
             text-white font-bold text-sm tracking-wide transition-all duration-200 shadow-md shadow-pink-500/20"
         >
@@ -551,11 +566,11 @@ function AvailabilityModal({ open, onClose, selected }: AvailabilityModalProps) 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 backdrop-blur-sm p-4 sm:p-6"
+      className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-black/60 backdrop-blur-sm px-4 sm:px-6 pt-[50px] pb-10"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-3xl my-6 rounded-3xl bg-[#faf6fb] dark:bg-[#0f1117] shadow-2xl"
+        className="relative w-full max-w-none mb-6 rounded-3xl bg-[#faf6fb] dark:bg-[#0f1117] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -913,7 +928,7 @@ function AvailabilityModal({ open, onClose, selected }: AvailabilityModalProps) 
                                   otherAvailablePlans.length !== 1 ? "s" : ""
                                 } available`}
                           </p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {otherAvailablePlans.map((item) => (
                               <PlanCard
                                 key={item.id}
