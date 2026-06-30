@@ -61,7 +61,6 @@ interface CartItem {
   planType?: string;
   isLandline?: boolean;
   isEEMobile?: boolean;
-  isBroadband?: boolean;
   dataAllowance?: string;
   categoryLabel?: string;
   simType?: string;
@@ -97,7 +96,6 @@ interface FormErrors {
 function normalizeCartItem(raw: RawCartItem): CartItem {
   const isLandline = raw.planType === "landline_manual";
   const isEEMobile = raw.planType === "ee_mobile_manual";
-  const isBroadband = raw.planType === "broadband";
 
   // Price can arrive as price / finalPrice / salePrice (string or number).
   const rawPrice =
@@ -130,7 +128,6 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
     planType:    raw.planType,
     isLandline,
     isEEMobile,
-    isBroadband,
     dataAllowance: isEEMobile ? raw.dataAllowance : undefined,
     categoryLabel: isEEMobile ? raw.eeCategory : undefined,
     // SIM delivery type (eSIM / pSIM) — only EE mobile items carry this.
@@ -600,7 +597,7 @@ export default function CheckoutPage() {
     };
 
     const response = await processOrderStripe(orderData);
-    console.log("✅ processOrderStripe response:", response);  // ← ADD
+    console.log("✅ processOrderStripe response:", response);
 
     if (!response?.status) {
       setOrderError(response?.message || "Order processing failed.");
@@ -608,28 +605,59 @@ export default function CheckoutPage() {
       return;
     }
 
-    const payload = (response as Record<string, unknown>).data ?? response;
-    console.log("✅ payload to Django:", payload);  // ← ADD
+    // processOrderStripe splits a mixed cart into one payload per order
+    // (broadband / ee_mobile / landline). Save each to Django.
+    const orders =
+      (response as Record<string, unknown>).orders as Record<string, unknown>[] | undefined;
+    const payloads =
+      orders && orders.length
+        ? orders
+        : [((response as Record<string, unknown>).data ?? response)];
 
-    // 3️⃣ Save to Django
-    const orderRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bqorders/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    // 3️⃣ Save each order to Django
+    let savedCount = 0;
+    let lastError = "";
+    for (const payload of payloads) {
+      try {
+        const orderRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/bqorders/`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          },
+        );
+        const orderResData = await orderRes.json().catch(() => ({}));
+        console.log(
+          "✅ Django response ok:", orderRes.ok,
+          "status:", orderRes.status, "data:", orderResData,
+        );
+        if (orderRes.ok && orderResData?.success) {
+          savedCount += 1;
+        } else {
+          lastError = orderResData?.message || "Order could not be saved.";
+        }
+      } catch (e) {
+        lastError = e instanceof Error ? e.message : "Order could not be saved.";
+      }
+    }
 
-    const orderResData = await orderRes.json().catch(() => ({}));
-    console.log("✅ Django response ok:", orderRes.ok, "status:", orderRes.status, "data:", orderResData);  // ← ADD
-
-    if (!orderRes.ok || !orderResData?.success) {
-      setOrderError(orderResData?.message || "Order could not be saved.");
+    if (savedCount === 0) {
+      setOrderError(lastError || "Order could not be saved.");
       setShowOrderErrorPopup(true);
       return;
     }
-    // localStorage.removeItem("cart");
+
+    // Order(s) saved — clear the cart so it isn't re-submitted.
+    try {
+      localStorage.removeItem("cart");
+      window.dispatchEvent(new Event("cart-updated"));
+    } catch {
+      /* ignore storage errors */
+    }
     setShowThankYou(true);
-    
-    console.log("✅ showThankYou set to true");  // ← ADD
+
+    console.log(`✅ showThankYou set to true (${savedCount}/${payloads.length} orders saved)`);
 
   } catch (err: any) {
     console.error("❌ caught error:", err);  // ← ADD
@@ -733,15 +761,6 @@ export default function CheckoutPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-1m-6-8h8m0 0V4m0 3v3" />
                               </svg>
                               EE Mobile{item.dataAllowance ? ` · ${item.dataAllowance}` : ""}
-                            </span>
-                          )}
-                          {/* 🌐 Broadband Type Badge */}
-                          {item.isBroadband && (
-                            <span className="bg-[#c61b7f]/10 text-[#c61b7f] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
-                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12.55a11 11 0 0114 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" />
-                              </svg>
-                              Broadband
                             </span>
                           )}
                           {/* 📶 SIM Type Badge (eSIM / pSIM) */}
