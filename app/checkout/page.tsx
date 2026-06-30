@@ -647,7 +647,14 @@ export default function CheckoutPage() {
       setShowOrderErrorPopup(true);
       return;
     }
-    // localStorage.removeItem("cart");
+
+    // Order(s) saved — clear the cart so it isn't re-submitted.
+    try {
+      localStorage.removeItem("cart");
+      window.dispatchEvent(new Event("cart-updated"));
+    } catch {
+      /* ignore storage errors */
+    }
     setShowThankYou(true);
 
     console.log(`✅ showThankYou set to true (${savedCount}/${payloads.length} orders saved)`);
