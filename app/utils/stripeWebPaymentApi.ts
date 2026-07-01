@@ -28,7 +28,7 @@ type CartRow = Plan & {
   [key: string]: unknown;
 };
 
-type OrderType = "broadband" | "ee_mobile" | "landline";
+type OrderType = "broadband" | "ee_mobile" | "landline" | "accessories";
 
 function readCart(): CartRow[] {
   try {
@@ -47,7 +47,9 @@ function orderTypeOf(item: CartRow): OrderType {
   const t = String(item.planType ?? "").toLowerCase();
   if (t === "ee_mobile" || t === "ee_mobile_manual") return "ee_mobile";
   if (t === "landline" || t === "landline_manual") return "landline";
+  if (t === "accessories" || t === "accessory") return "accessories";
   if (t === "broadband") return "broadband";
+  if (String(item.category ?? "").toLowerCase() === "accessories") return "accessories";
   if (item.productOfferingQualificationItem) return "broadband";
   return "broadband";
 }
@@ -121,6 +123,7 @@ export async function processOrderStripe(orderData: ProcessOrderInput) {
     const broadbandItems = rawCart.filter((i) => orderTypeOf(i) === "broadband");
     const eeItems        = rawCart.filter((i) => orderTypeOf(i) === "ee_mobile");
     const landlineItems  = rawCart.filter((i) => orderTypeOf(i) === "landline");
+    const accessoryItems = rawCart.filter((i) => orderTypeOf(i) === "accessories");
 
     const orders: Record<string, unknown>[] = [];
 
@@ -184,9 +187,10 @@ export async function processOrderStripe(orderData: ProcessOrderInput) {
       });
     }
 
-    // ── 2) EE mobile + landline → save only (no BT), one order per item ─────
+    // ── 2) EE mobile + landline + accessories → save only (no BT) ───────────
     for (const item of eeItems) orders.push(buildSimpleOrder("ee_mobile", item, orderData));
     for (const item of landlineItems) orders.push(buildSimpleOrder("landline", item, orderData));
+    for (const item of accessoryItems) orders.push(buildSimpleOrder("accessories", item, orderData));
 
     if (!orders.length) {
       return { status: false, message: "No valid items to order." };
