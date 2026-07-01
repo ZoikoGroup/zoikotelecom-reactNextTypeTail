@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {useCart} from "@/app/context/CartContext";
 import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 8;
@@ -21,7 +20,6 @@ export default function page() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const { addToCart } = useCart();
   const router = useRouter();
   
   useEffect(() => {
@@ -114,21 +112,32 @@ export default function page() {
   };
 
  const handleBuyNow = (product: Product) => {
-  addToCart({
+  // Write into the shared localStorage cart (the checkout reads localStorage["cart"]
+  // and saves planType === "accessories" as its own order type).
+  const rawItem = {
     id: product.id,
-    name: product.title,
-    slug: product.slug,
-
-    image: product.image,
-
+    planType: "accessories",
     category: "accessories",
-
-    quantity: 1,
-
+    name: product.title,
+    planName: product.title,
+    slug: product.slug,
+    image: product.image,
     price: Number(product.price),
-  });
+    quantity: 1,
+    qty: 1,
+  };
 
-  console.log("Added to cart:", product);
+  try {
+    const existing = JSON.parse(localStorage.getItem("cart") ?? "[]");
+    const cartArr = Array.isArray(existing) ? existing : [];
+    cartArr.push(rawItem);
+    localStorage.setItem("cart", JSON.stringify(cartArr));
+    window.dispatchEvent(new Event("cart-updated"));
+  } catch {
+    localStorage.setItem("cart", JSON.stringify([rawItem]));
+  }
+
+  console.log("Added to cart:", rawItem);
 };
 
   // console.log(products[0]?.image)

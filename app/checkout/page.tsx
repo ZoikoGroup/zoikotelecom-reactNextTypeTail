@@ -62,6 +62,7 @@ interface CartItem {
   isLandline?: boolean;
   isEEMobile?: boolean;
   isBroadband?: boolean;
+  isAccessories?: boolean;
   dataAllowance?: string;
   categoryLabel?: string;
   simType?: string;
@@ -98,6 +99,7 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
   const isLandline = raw.planType === "landline_manual";
   const isEEMobile = raw.planType === "ee_mobile_manual";
   const isBroadband = raw.planType === "broadband";
+  const isAccessories = raw.planType === "accessories";
 
   // Price can arrive as price / finalPrice / salePrice (string or number).
   const rawPrice =
@@ -131,6 +133,7 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
     isLandline,
     isEEMobile,
     isBroadband,
+    isAccessories,
     dataAllowance: isEEMobile ? raw.dataAllowance : undefined,
     categoryLabel: isEEMobile ? raw.eeCategory : undefined,
     // SIM delivery type (eSIM / pSIM) — only EE mobile items carry this.
@@ -773,6 +776,15 @@ export default function CheckoutPage() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12.55a11 11 0 0114 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" />
                               </svg>
                               Broadband
+                            </span>
+                          )}
+                          {/* 🎧 Accessories Type Badge */}
+                          {item.isAccessories && (
+                            <span className="bg-[#7B2983]/10 text-[#7B2983] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                              </svg>
+                              Accessories
                             </span>
                           )}
                           {/* 📶 SIM Type Badge (eSIM / pSIM) */}

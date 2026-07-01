@@ -1142,9 +1142,59 @@ export default function Page() {
                       <p className="mt-5 text-[11px] uppercase tracking-[0.2em] text-[#8d8d9c]">
                         SPEED
                       </p>
-                      <h2 className="mt-2 text-2xl md:text-3xl lg:text-5xl font-extrabold text-[#c61b7f] break-words">
-                        {plan.speed_display || "—"}
-                      </h2>
+
+                      {/* Download / Upload speeds */}
+                      {(plan.download_speed != null ||
+                        plan.upload_speed != null) && (
+                        <div className="mt-3 flex items-center justify-center gap-5">
+                          {plan.download_speed != null && (
+                            <div className="flex items-center gap-1.5">
+                              <svg
+                                className="h-4 w-4 text-[#c61b7f] shrink-0"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14"
+                                />
+                              </svg>
+                              <span className="text-sm font-semibold text-[#1d2b4f] dark:text-gray-200">
+                                {plan.download_speed} Mbps
+                              </span>
+                              <span className="text-[10px] uppercase tracking-wide text-[#8d8d9c]">
+                                down
+                              </span>
+                            </div>
+                          )}
+                          {plan.upload_speed != null && (
+                            <div className="flex items-center gap-1.5">
+                              <svg
+                                className="h-4 w-4 text-[#c61b7f] shrink-0"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 20V8m0 0l-4 4m4-4l4 4M5 4h14"
+                                />
+                              </svg>
+                              <span className="text-sm font-semibold text-[#1d2b4f] dark:text-gray-200">
+                                {plan.upload_speed} Mbps
+                              </span>
+                              <span className="text-[10px] uppercase tracking-wide text-[#8d8d9c]">
+                                up
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* Contract length */}
                       <p className="mt-3 text-[11px] uppercase tracking-[0.2em] text-[#8d8d9c]">
