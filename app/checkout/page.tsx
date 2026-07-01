@@ -967,7 +967,7 @@ export default function CheckoutPage() {
                     Discount (
                     {discountData.type === "percentage"
                       ? formatDiscount(discountData.discount) + "%"
-                      : "$" + formatDiscount(discountData.discount)}
+                      : "£" + formatDiscount(discountData.discount)}
                     )
                   </span>
                   <span className="font-medium text-green-600">
@@ -978,7 +978,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between font-bold text-base mt-4 pt-4 border-t border-gray-100">
                 <span>Total</span>
-                <span className="text-red-500">${total.toFixed(2)}</span>
+                <span className="text-red-500">£{total.toFixed(2)}</span>
               </div>
             </div>
 
