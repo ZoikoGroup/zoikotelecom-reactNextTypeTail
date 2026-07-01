@@ -835,7 +835,7 @@ export default function CheckoutPage() {
                       {/* 💰 Price Display */}
                       <div className="text-right shrink-0">
                         <p className="font-bold dark:text-white text-lg">
-                          ${item.price.toFixed(2)}
+                          £{item.price.toFixed(2)}
                         </p>
                         <button
                           onClick={() => handleRemove(idx)}
@@ -953,7 +953,7 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <span className="font-semibold text-gray-900 dark:text-white shrink-0">
-                       ${item.price.toFixed(2)}
+                       £{item.price.toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -971,7 +971,7 @@ export default function CheckoutPage() {
                     )
                   </span>
                   <span className="font-medium text-green-600">
-                    −${discountAmount.toFixed(2)}
+                    −£{discountAmount.toFixed(2)}
                   </span>
                 </div>
               )}

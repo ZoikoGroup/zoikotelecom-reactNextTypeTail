@@ -63,9 +63,8 @@ export default function Page() {
 
   const isPhoneEquipment = product?.category?.slug === "phone-equipment";
 
-  // Add to cart — same shape/behaviour as the Accessories list page: write a
-  // planType:"accessories" row into localStorage["cart"] so the checkout saves
-  // it as an accessories order and the header badge updates.
+  // Add to cart — same behaviour as the Accessories list page: write a
+  // planType:"accessories" row into localStorage["cart"].
   const handleAddToCart = () => {
     if (!product) return;
 
@@ -117,11 +116,20 @@ export default function Page() {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/reviews/?product_id=${productId}&product_slug=${productSlug}`
       );
+      // Guard against HTML error pages (500/404) that aren't JSON.
+      const ct = res.headers.get("content-type") || "";
+      if (!res.ok || !ct.includes("application/json")) {
+        setReviews([]);
+        setReviewAvg(0);
+        return;
+      }
       const data = await res.json();
       setReviews(data.results || []);
       setReviewAvg(data.average || 0);
     } catch (err) {
       console.error("Failed to load reviews", err);
+      setReviews([]);
+      setReviewAvg(0);
     }
   };
 
@@ -157,7 +165,6 @@ export default function Page() {
         setReviewError(data?.message || "Could not submit your review.");
         return;
       }
-      // Reset form + refresh list
       setReviewName("");
       setReviewEmail("");
       setReviewText("");
@@ -218,7 +225,6 @@ export default function Page() {
 
           {/* LEFT: Product Image */}
           <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-            {/* Zoom icon */}
             <button className="absolute top-3 right-3 z-10 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.35-4.35m0 0A7.65 7.65 0 1 0 5.8 5.8a7.65 7.65 0 0 0 10.85 10.85Z" />
@@ -237,7 +243,6 @@ export default function Page() {
 
           {/* RIGHT: Product Info */}
           <div>
-            {/* Breadcrumb */}
             <nav className="text-sm text-gray-500 dark:text-gray-400 mb-3">
               <span>Home</span>
               <span className="mx-1">/</span>
@@ -246,27 +251,44 @@ export default function Page() {
               <span className="text-gray-800 dark:text-gray-200">{product.name}</span>
             </nav>
 
-            {/* Category link */}
-            <a href="#" className="text-sm text-[#BC2273] dark:text-[#e05fa0] hover:underline">
+            <span className="text-sm text-[#BC2273] dark:text-[#e05fa0]">
               {product.category.name}
-            </a>
+            </span>
 
-            {/* Product Title */}
             <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
               {product.name}
             </h1>
 
-            {/* Price */}
+            {/* Rating summary (jumps to reviews) */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("reviews");
+                document.getElementById("reviews-tabs")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="mt-2 flex items-center gap-2 group"
+            >
+              <span className="text-base text-yellow-400">
+                {"★".repeat(Math.round(reviewAvg))}
+                <span className="text-orange-200 dark:text-gray-600">
+                  {"☆".repeat(5 - Math.round(reviewAvg))}
+                </span>
+              </span>
+              <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-[#BC2273] transition-colors">
+                {reviews.length > 0
+                  ? `${reviewAvg} (${reviews.length} review${reviews.length !== 1 ? "s" : ""})`
+                  : "No reviews yet"}
+              </span>
+            </button>
+
             <div className="mt-3 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {displayPrice}
             </div>
 
-            {/* Description */}
             <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
               {product.description}
             </p>
 
-            {/* Duration selector (phone-equipment only) */}
             {isPhoneEquipment && product.variants?.length > 0 && (
               <div className="mt-5">
                 <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1">
@@ -298,20 +320,15 @@ export default function Page() {
                       </option>
                     ))}
                   </select>
-                  {/* Custom chevron */}
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
                     <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </div>
-                <button className="mt-1 text-xs text-gray-400 dark:text-gray-500 uppercase tracking-widest hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                  CLEAR
-                </button>
               </div>
             )}
 
-            {/* Selected price (after variant pick) */}
             {isPhoneEquipment && selectedVariant && (
               <div className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">
                 £{Number(selectedVariant.sale_price || selectedVariant.regular_price).toFixed(2)}
@@ -320,9 +337,7 @@ export default function Page() {
 
             {/* Quantity + Add to Cart */}
             <div className="mt-5 flex items-center gap-3">
-              {/* Quantity box */}
               <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden h-11">
-               <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden h-11">
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -364,9 +379,7 @@ export default function Page() {
                   +
                 </button>
               </div>
-              </div>
 
-              {/* Add to cart */}
               <button
                 onClick={handleAddToCart}
                 className="
@@ -380,24 +393,19 @@ export default function Page() {
               </button>
             </div>
 
-            {/* SKU & Category */}
             <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-              {/* <span>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">SKU:</span>{" "}
-                N/A
-              </span> */}
               <span>
                 <span className="font-semibold text-gray-700 dark:text-gray-300">Category:</span>{" "}
-                <a href="#" className="text-[#BC2273] dark:text-[#e05fa0] hover:underline">
+                <span className="text-[#BC2273] dark:text-[#e05fa0]">
                   {product.category.name}
-                </a>
+                </span>
               </span>
             </div>
           </div>
         </div>
 
-        {/* ── TABS: Additional Information / Reviews ── */}
-        <div className="mt-16 border-b border-gray-200 dark:border-gray-700">
+        {/* ── TABS ── */}
+        <div id="reviews-tabs" className="mt-16 border-b border-gray-200 dark:border-gray-700">
           <div className="flex gap-0">
             <button
               onClick={() => setActiveTab("additional")}
@@ -429,7 +437,6 @@ export default function Page() {
         {/* Tab Content */}
         <div className="mt-6">
           {activeTab === "additional" ? (
-            /* Additional Information Tab */
             isPhoneEquipment && product.variants?.length > 0 ? (
               <div className="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-md">
                 <table className="w-full text-sm">
@@ -453,20 +460,55 @@ export default function Page() {
           ) : (
             /* Reviews Tab */
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-8">
-                There are no reviews yet.
-              </p>
+              {reviews.length > 0 ? (
+                <div className="mb-8">
+                  <div className="flex items-center gap-2 mb-5">
+                    <span className="text-lg text-yellow-400">
+                      {"★".repeat(Math.round(reviewAvg))}
+                      <span className="text-orange-200 dark:text-gray-600">
+                        {"☆".repeat(5 - Math.round(reviewAvg))}
+                      </span>
+                    </span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      {reviewAvg} out of 5 &middot; {reviews.length} review{reviews.length !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+
+                  <div className="space-y-4">
+                    {reviews.map((r: any) => (
+                      <div key={r.id} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{r.name}</span>
+                          <span className="text-xs text-gray-400">
+                            {new Date(r.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="text-sm text-yellow-400 mb-1">
+                          {"★".repeat(r.rating)}
+                          <span className="text-orange-200 dark:text-gray-600">{"☆".repeat(5 - r.rating)}</span>
+                        </div>
+                        {r.comment && (
+                          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{r.comment}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-8">
+                  There are no reviews yet.
+                </p>
+              )}
 
               {/* Review Form */}
               <div className="border border-gray-200 dark:border-gray-700 rounded-md p-6">
                 <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">
-                  Be the first to review &ldquo;{product.name}&rdquo;
+                  {reviews.length > 0 ? "Add a review" : `Be the first to review “${product.name}”`}
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
                   Your email address will not be published. Required fields are marked *
                 </p>
 
-                {/* Star Rating */}
                 <div className="mb-5">
                   <label className="block text-sm font-semibold text-gray-800 dark:text-white mb-2">
                     Your rating *
@@ -485,19 +527,20 @@ export default function Page() {
                             : "text-orange-200 dark:text-gray-600"
                         }`}
                       >
-                        ☆
+                        {star <= (hoverRating || rating) ? "★" : "☆"}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Your Review */}
                 <div className="mb-5">
                   <label className="block text-sm font-semibold text-gray-800 dark:text-white mb-2">
                     Your review *
                   </label>
                   <textarea
                     rows={6}
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
                     className="
                       w-full border border-gray-300 dark:border-gray-600
                       rounded-md p-3 text-sm
@@ -509,7 +552,6 @@ export default function Page() {
                   />
                 </div>
 
-                {/* Name + Email */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                   <div>
                     <label className="block text-sm font-semibold text-gray-800 dark:text-white mb-2">
@@ -517,6 +559,8 @@ export default function Page() {
                     </label>
                     <input
                       type="text"
+                      value={reviewName}
+                      onChange={(e) => setReviewName(e.target.value)}
                       className="
                         w-full h-10 border border-gray-300 dark:border-gray-600
                         rounded-md px-3 text-sm
@@ -533,6 +577,8 @@ export default function Page() {
                     </label>
                     <input
                       type="email"
+                      value={reviewEmail}
+                      onChange={(e) => setReviewEmail(e.target.value)}
                       className="
                         w-full h-10 border border-gray-300 dark:border-gray-600
                         rounded-md px-3 text-sm
@@ -545,29 +591,27 @@ export default function Page() {
                   </div>
                 </div>
 
-                {/* Checkbox */}
-                <label className="flex items-start gap-2 mb-6 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="mt-0.5 accent-[#BC2273] cursor-pointer"
-                  />
-                  <span className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                    Save my name, email, and website in this browser for the next time I comment.
-                  </span>
-                </label>
+                {reviewError && <p className="text-sm text-red-600 mb-3">{reviewError}</p>}
+                {reviewDone && (
+                  <p className="text-sm text-green-600 mb-3">
+                    Thank you! Your review has been submitted.
+                  </p>
+                )}
 
-                {/* Submit */}
                 <button
                   type="button"
+                  onClick={handleSubmitReview}
+                  disabled={reviewSubmitting}
                   className="
                     h-10 px-6
                     bg-[#BC2273] hover:bg-[#a51d63]
                     text-white text-sm font-semibold
                     rounded-md
                     transition-colors duration-200
+                    disabled:opacity-50 disabled:cursor-not-allowed
                   "
                 >
-                  Submit
+                  {reviewSubmitting ? "Submitting…" : "Submit"}
                 </button>
               </div>
             </div>
@@ -587,9 +631,7 @@ export default function Page() {
                   href={`/product/${item.slug}`}
                   className="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 hover:shadow-md transition-shadow duration-200"
                 >
-                  {/* Image */}
                   <div className="relative h-52 bg-gray-100 dark:bg-gray-700">
-                    {/* Cart icon overlay */}
                     <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <div className="w-8 h-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full flex items-center justify-center shadow-sm">
                         <svg className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -606,7 +648,6 @@ export default function Page() {
                     />
                   </div>
 
-                  {/* Info */}
                   <div className="p-4 border-t border-gray-100 dark:border-gray-700">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                       {item.category.name}
@@ -617,17 +658,15 @@ export default function Page() {
                     <p className="text-sm font-bold text-gray-900 dark:text-white mb-3">
                       {relatedDisplayPrice(item)}
                     </p>
-                    <Link href={`/product/${item.slug}`}>
-                    <button className="
-                      w-full md:w-auto px-6 py-3
+                    <span className="
+                      inline-block w-full md:w-auto px-6 py-3
                       bg-[#BC2273] hover:bg-[#a51d63]
-                      text-white text-xs md:text-sm font-semibold
+                      text-white text-xs md:text-sm font-semibold text-center
                       rounded-md
                       transition-colors duration-200
                     ">
-                      Add to cart
-                    </button>
-                    </Link>
+                      View Details
+                    </span>
                   </div>
                 </Link>
               ))}
