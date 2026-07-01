@@ -10,6 +10,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<"additional" | "reviews">("reviews");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -51,6 +52,54 @@ export default function Page() {
   }, [slug]);
 
   const isPhoneEquipment = product?.category?.slug === "phone-equipment";
+
+  // Add to cart — same shape/behaviour as the Accessories list page: write a
+  // planType:"accessories" row into localStorage["cart"] so the checkout saves
+  // it as an accessories order and the header badge updates.
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    const price = Number(
+      selectedVariant?.sale_price ??
+      selectedVariant?.regular_price ??
+      product?.variants?.[0]?.sale_price ??
+      product?.variants?.[0]?.regular_price ??
+      0
+    );
+
+    const image =
+      product.images?.find((img: any) => img.is_main)?.image ||
+      product.images?.[0]?.image ||
+      "/Images/placeholder.png";
+
+    const rawItem = {
+      id: selectedVariant?.id ?? product.id,
+      variantId: selectedVariant?.id ?? null,
+      planType: "accessories",
+      category: "accessories",
+      name: product.name,
+      planName: product.name,
+      slug: product.slug,
+      image,
+      price,
+      quantity,
+      qty: quantity,
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem("cart") ?? "[]");
+      const cartArr = Array.isArray(existing) ? existing : [];
+      cartArr.push(rawItem);
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+      window.dispatchEvent(new Event("cart-updated"));
+    } catch {
+      localStorage.setItem("cart", JSON.stringify([rawItem]));
+    }
+
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+    console.log("Added to cart:", rawItem);
+  };
 
   const prices = product?.variants?.map((v: any) =>
     Number(v.sale_price || v.regular_price)
@@ -127,7 +176,7 @@ export default function Page() {
             </nav>
 
             {/* Category link */}
-            <a href="#" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+            <a href="#" className="text-sm text-[#BC2273] dark:text-[#e05fa0] hover:underline">
               {product.category.name}
             </a>
 
@@ -168,7 +217,7 @@ export default function Page() {
                       text-gray-900 dark:text-white
                       text-sm
                       appearance-none
-                      focus:outline-none focus:ring-2 focus:ring-blue-500
+                      focus:outline-none focus:ring-2 focus:ring-[#BC2273]
                       cursor-pointer
                     "
                   >
@@ -247,53 +296,16 @@ export default function Page() {
               </div>
 
               {/* Add to cart */}
-              <button className="
+              <button
+                onClick={handleAddToCart}
+                className="
                 h-11 px-6
-                bg-blue-600 hover:bg-blue-700
+                bg-[#BC2273] hover:bg-[#a51d63]
                 text-white text-sm font-semibold
                 rounded-md
                 transition-colors duration-200
               ">
-                Add to cart
-              </button>
-            </div>
-
-            {/* Payment Buttons */}
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {/* Apple Pay */}
-              <button className="
-                h-11
-                bg-black hover:bg-gray-900
-                text-white text-sm font-semibold
-                rounded-md
-                flex items-center justify-center gap-2
-                transition-colors duration-200
-              ">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-                </svg>
-                Pay
-              </button>
-
-              {/* Amazon Pay */}
-              <button className="
-                h-11
-                bg-[#FFD814] hover:bg-[#F7CA00]
-                text-black text-sm font-bold
-                rounded-md
-                flex items-center justify-center gap-1
-                transition-colors duration-200
-              ">
-                <svg className="h-5" viewBox="0 0 603 185" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M373.2 144.6c-34.9 25.7-85.5 39.4-129 39.4-61 0-115.9-22.6-157.5-60.1-3.3-3 .3-7 3.6-4.7 44.8 26.1 100.3 41.7 157.5 41.7 38.6 0 81.1-8 120.2-24.6 5.9-2.5 10.8 3.8 5.2 8.3z" fill="#F90"/>
-                  <path d="M386.8 129.1c-4.4-5.7-29.4-2.7-40.6-1.4-3.4.4-3.9-2.6-.9-4.7 19.9-14 52.5-9.9 56.3-5.3 3.8 4.7-1 37.3-19.6 52.8-2.9 2.4-5.6 1.1-4.3-2 4.2-10.4 13.6-33.7 9.1-39.4z" fill="#F90"/>
-                  <path d="M347.5 20.5V7.2c0-2 1.5-3.3 3.3-3.3h58.8c1.9 0 3.4 1.4 3.4 3.3v11.4c0 1.9-1.6 4.3-4.4 8.2l-30.5 43.5c11.3-.3 23.3 1.4 33.6 7.1 2.3 1.3 2.9 3.2 3.1 5.1v14.2c0 1.9-2.1 4.1-4.3 3-18-9.4-41.9-10.4-61.8.1-2 1.1-4.2-1.1-4.2-3V83.4c0-2.1 0-5.7 2.2-8.9l35.3-50.6h-30.7c-1.9 0-3.3-1.4-3.3-3.3v-.1z" fill="#221F1F"/>
-                  <path d="M124.5 100.9H107c-1.7-.1-3.1-1.4-3.2-3.1V7.4c0-1.9 1.6-3.4 3.5-3.4h16.3c1.8.1 3.2 1.5 3.3 3.2v11.8h.3c4.2-11.5 12.3-16.9 23.1-16.9 11 0 17.8 5.4 22.8 16.9 4.2-11.5 13.8-16.9 24.1-16.9 7.3 0 15.3 3 20.2 9.8 5.5 7.5 4.4 18.4 4.4 28v56.5c0 1.9-1.6 3.4-3.5 3.4H203c-1.8-.1-3.2-1.6-3.2-3.4V46.1c0-3.8.3-13.2-.5-16.8-1.3-6-5.2-7.7-10.2-7.7-4.2 0-8.6 2.8-10.4 7.3-1.8 4.5-1.6 12-.1 16.5v52c0 1.9-1.6 3.4-3.5 3.4h-17.3c-1.9-.1-3.2-1.6-3.2-3.4l-.1-52c0-10.9 1.8-27-11-27-12.9 0-12.4 15.7-12.4 27v52c0 1.9-1.6 3.4-3.5 3.4h-.1z" fill="#221F1F"/>
-                  <path d="M458.2 2c26.7 0 41.1 22.9 41.1 52.1 0 28.2-16 50.6-41.1 50.6-26.2 0-40.4-22.9-40.4-51.5C417.7 24.6 432.1 2 458.2 2zm.1 18.7c-13.2 0-14.1 18-14.1 29.2 0 11.3-.2 35.4 13.9 35.4 14 0 14.6-19.3 14.6-31.1 0-7.8-.3-17-2.8-24.4-2.2-6.4-6.4-9.1-11.6-9.1z" fill="#221F1F"/>
-                  <path d="M538.4 100.9h-17.2c-1.9-.1-3.2-1.6-3.2-3.4l-.1-90.3c.1-1.8 1.6-3.2 3.5-3.2h16c1.6.1 2.9 1.2 3.2 2.7v13.8h.3c4.9-12.4 11.6-18.3 23.6-18.3 7.8 0 15.3 2.8 20.2 10.6 4.5 7.3 4.5 19.5 4.5 28.3v57.1c-.2 1.7-1.7 3.1-3.5 3.1h-17.3c-1.7-.1-3-1.4-3.2-3.1V45.2c0-10.7 1.2-26.4-11.2-26.4-4.3 0-8.3 2.9-10.3 7.2-2.5 5.5-2.8 11-2.8 19.2v52.4c0 1.9-1.6 3.4-3.5 3.4l.1-.1z" fill="#221F1F"/>
-                  <path d="M305.6 56.9c0 7.4.2 13.6-3.6 20.2-3 5.3-7.8 8.6-13.1 8.6-7.3 0-11.5-5.5-11.5-13.7 0-16.1 14.5-19 28.2-19v3.9zm19.1 46.2c-1.2 1.1-3.1 1.2-4.5.4-6.3-5.3-7.5-7.7-10.9-12.7-10.5 10.7-17.9 13.9-31.5 13.9-16.1 0-28.6-9.9-28.6-29.8 0-15.5 8.4-26.1 20.4-31.3 10.4-4.6 24.9-5.4 36-6.7V34c0-5-.4-10.9-2.6-15.2-1.9-3.9-5.6-5.5-8.9-5.5-6 0-11.4 3.1-12.7 9.6-.3 1.4-1.3 2.8-2.7 2.8l-15.1-1.6c-1.3-.3-2.7-1.3-2.3-3.2C264.8 6.3 282 0 297.5 0c7.9 0 18.3 2.1 24.6 8.1 7.9 7.4 7.1 17.2 7.1 27.9v25.3c0 7.6 3.1 10.9 6.1 15 1 1.5 1.3 3.2-.1 4.3l-10.5 8.8v-.3z" fill="#221F1F"/>
-                  <path d="M60.9 56.9c0 7.4.2 13.6-3.5 20.2-3 5.3-7.8 8.6-13.1 8.6-7.2 0-11.5-5.5-11.5-13.7 0-16.1 14.5-19 28.1-19v3.9zm19.2 46.2c-1.3 1.1-3.1 1.2-4.6.4-6.3-5.3-7.4-7.7-10.9-12.7-10.4 10.7-17.9 13.9-31.5 13.9C17 104.7 4.5 94.8 4.5 74.9c0-15.5 8.4-26.1 20.4-31.3 10.4-4.6 24.9-5.4 36-6.7V34c0-5-.4-10.9-2.6-15.2-1.9-3.9-5.6-5.5-8.9-5.5-6.1 0-11.4 3.1-12.7 9.6-.3 1.4-1.3 2.8-2.7 2.8L18.9 24.1c-1.3-.3-2.7-1.3-2.3-3.2C20.1 6.3 37.4 0 52.9 0 60.7 0 71.1 2.1 77.4 8.1c7.9 7.4 7.1 17.2 7.1 27.9v25.3c0 7.6 3.1 10.9 6.1 15 1.1 1.5 1.3 3.2-.1 4.3l-10.4 8.8v-.3z" fill="#221F1F"/>
-                </svg>
+                {added ? "Added ✓" : "Add to cart"}
               </button>
             </div>
 
@@ -305,7 +317,7 @@ export default function Page() {
               </span> */}
               <span>
                 <span className="font-semibold text-gray-700 dark:text-gray-300">Category:</span>{" "}
-                <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline">
+                <a href="#" className="text-[#BC2273] dark:text-[#e05fa0] hover:underline">
                   {product.category.name}
                 </a>
               </span>
@@ -321,7 +333,7 @@ export default function Page() {
               className={`
                 px-5 py-3 text-sm font-semibold border-b-2 transition-colors duration-200
                 ${activeTab === "additional"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400"
+                  ? "border-[#BC2273] text-[#BC2273] dark:text-[#e05fa0] dark:border-[#e05fa0]"
                   : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 }
               `}
@@ -333,7 +345,7 @@ export default function Page() {
               className={`
                 px-5 py-3 text-sm font-semibold border-b-2 transition-colors duration-200
                 ${activeTab === "reviews"
-                  ? "border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400"
+                  ? "border-[#BC2273] text-[#BC2273] dark:text-[#e05fa0] dark:border-[#e05fa0]"
                   : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 }
               `}
@@ -421,7 +433,7 @@ export default function Page() {
                       bg-white dark:bg-gray-800
                       text-gray-900 dark:text-white
                       outline-none resize-none
-                      focus:ring-2 focus:ring-blue-500
+                      focus:ring-2 focus:ring-[#BC2273]
                     "
                   />
                 </div>
@@ -440,7 +452,7 @@ export default function Page() {
                         bg-white dark:bg-gray-800
                         text-gray-900 dark:text-white
                         outline-none
-                        focus:ring-2 focus:ring-blue-500
+                        focus:ring-2 focus:ring-[#BC2273]
                       "
                     />
                   </div>
@@ -456,7 +468,7 @@ export default function Page() {
                         bg-white dark:bg-gray-800
                         text-gray-900 dark:text-white
                         outline-none
-                        focus:ring-2 focus:ring-blue-500
+                        focus:ring-2 focus:ring-[#BC2273]
                       "
                     />
                   </div>
@@ -466,7 +478,7 @@ export default function Page() {
                 <label className="flex items-start gap-2 mb-6 cursor-pointer">
                   <input
                     type="checkbox"
-                    className="mt-0.5 accent-blue-600 cursor-pointer"
+                    className="mt-0.5 accent-[#BC2273] cursor-pointer"
                   />
                   <span className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                     Save my name, email, and website in this browser for the next time I comment.
@@ -478,7 +490,7 @@ export default function Page() {
                   type="button"
                   className="
                     h-10 px-6
-                    bg-blue-600 hover:bg-blue-700
+                    bg-[#BC2273] hover:bg-[#a51d63]
                     text-white text-sm font-semibold
                     rounded-md
                     transition-colors duration-200
@@ -537,7 +549,7 @@ export default function Page() {
                     <Link href={`/product/${item.slug}`}>
                     <button className="
                       w-full md:w-auto px-6 py-3
-                      bg-blue-600 hover:bg-blue-700
+                      bg-[#BC2273] hover:bg-[#a51d63]
                       text-white text-xs md:text-sm font-semibold
                       rounded-md
                       transition-colors duration-200
