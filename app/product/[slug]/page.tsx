@@ -14,6 +14,16 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState<"additional" | "reviews">("reviews");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+
+  // Reviews
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewAvg, setReviewAvg] = useState(0);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewEmail, setReviewEmail] = useState("");
+  const [reviewText, setReviewText] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+  const [reviewDone, setReviewDone] = useState(false);
   const params = useParams();
   const slug = params.slug as string;
 
@@ -99,6 +109,67 @@ export default function Page() {
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
     console.log("Added to cart:", rawItem);
+  };
+
+  // Load reviews for this product
+  const loadReviews = async (productId: number, productSlug: string) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/reviews/?product_id=${productId}&product_slug=${productSlug}`
+      );
+      const data = await res.json();
+      setReviews(data.results || []);
+      setReviewAvg(data.average || 0);
+    } catch (err) {
+      console.error("Failed to load reviews", err);
+    }
+  };
+
+  useEffect(() => {
+    if (product?.id) loadReviews(product.id, product.slug);
+  }, [product?.id, product?.slug]);
+
+  const handleSubmitReview = async () => {
+    setReviewError("");
+    if (!rating) return setReviewError("Please select a rating.");
+    if (!reviewName.trim()) return setReviewError("Please enter your name.");
+    if (!reviewText.trim()) return setReviewError("Please write your review.");
+
+    try {
+      setReviewSubmitting(true);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/reviews/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: product.id,
+            product_slug: product.slug,
+            name: reviewName.trim(),
+            email: reviewEmail.trim(),
+            rating,
+            comment: reviewText.trim(),
+          }),
+        }
+      );
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data?.success) {
+        setReviewError(data?.message || "Could not submit your review.");
+        return;
+      }
+      // Reset form + refresh list
+      setReviewName("");
+      setReviewEmail("");
+      setReviewText("");
+      setRating(0);
+      setReviewDone(true);
+      setTimeout(() => setReviewDone(false), 3000);
+      await loadReviews(product.id, product.slug);
+    } catch {
+      setReviewError("Network error. Please try again.");
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
   const prices = product?.variants?.map((v: any) =>
@@ -350,7 +421,7 @@ export default function Page() {
                 }
               `}
             >
-              Reviews (0)
+              Reviews ({reviews.length})
             </button>
           </div>
         </div>
