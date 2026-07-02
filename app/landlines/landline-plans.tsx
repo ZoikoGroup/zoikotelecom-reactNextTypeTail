@@ -100,7 +100,7 @@ export default function BusinessLandlinePlans() {
       // Months contract — store as a readable label so the checkout shows it as-is.
       planDuration: `${selectedDuration} Months`,
       planType: "landline_manual",
-      category: { id: 0, name: "Business Landline", slug: "landline_manual" },
+      category: { id: 0, name: "Landline", slug: "landline_manual" },
       features: features.map((title, i) => ({ id: i + 1, title })),
       lineType: "landline",
       simType: "N/A",
