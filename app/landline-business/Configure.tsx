@@ -107,6 +107,7 @@ export default function Configure() {
       productPrice: product.base,
       dataAllowance: allowance.title,
       allowance: allowance.title,
+      allowancePrice: allowance.add,
       porting,
       planDuration: contract.title,
       contractPrice: contract.price,
