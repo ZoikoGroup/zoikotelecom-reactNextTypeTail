@@ -28,7 +28,7 @@ type CartRow = Plan & {
   [key: string]: unknown;
 };
 
-type OrderType = "broadband" | "ee_mobile" | "landline" | "accessories" | "phone_equipment";
+type OrderType = "broadband" | "ee_mobile" | "landline" | "business_landline" | "accessories" | "phone_equipment";
 
 function readCart(): CartRow[] {
   try {
@@ -47,10 +47,12 @@ function orderTypeOf(item: CartRow): OrderType {
   const t = String(item.planType ?? "").toLowerCase();
   if (t === "ee_mobile" || t === "ee_mobile_manual") return "ee_mobile";
   if (t === "landline" || t === "landline_manual") return "landline";
+  if (t === "business_landline" || t === "business-landline") return "business_landline";
   if (t === "accessories" || t === "accessory") return "accessories";
   if (t === "phone_equipment" || t === "phone-equipment") return "phone_equipment";
   if (t === "broadband") return "broadband";
   const cat = String(item.category ?? "").toLowerCase();
+  if (cat === "business-landline" || cat === "business_landline") return "business_landline";
   if (cat === "accessories") return "accessories";
   if (cat === "phone-equipment" || cat === "phone_equipment") return "phone_equipment";
   if (item.productOfferingQualificationItem) return "broadband";
@@ -126,6 +128,7 @@ export async function processOrderStripe(orderData: ProcessOrderInput) {
     const broadbandItems = rawCart.filter((i) => orderTypeOf(i) === "broadband");
     const eeItems        = rawCart.filter((i) => orderTypeOf(i) === "ee_mobile");
     const landlineItems  = rawCart.filter((i) => orderTypeOf(i) === "landline");
+    const bizLandlineItems = rawCart.filter((i) => orderTypeOf(i) === "business_landline");
     const accessoryItems = rawCart.filter((i) => orderTypeOf(i) === "accessories");
     const phoneEquipItems = rawCart.filter((i) => orderTypeOf(i) === "phone_equipment");
 
@@ -194,6 +197,7 @@ export async function processOrderStripe(orderData: ProcessOrderInput) {
     // ── 2) EE mobile + landline + accessories → save only (no BT) ───────────
     for (const item of eeItems) orders.push(buildSimpleOrder("ee_mobile", item, orderData));
     for (const item of landlineItems) orders.push(buildSimpleOrder("landline", item, orderData));
+    for (const item of bizLandlineItems) orders.push(buildSimpleOrder("business_landline", item, orderData));
     for (const item of accessoryItems) orders.push(buildSimpleOrder("accessories", item, orderData));
     for (const item of phoneEquipItems) orders.push(buildSimpleOrder("phone_equipment", item, orderData));
 
