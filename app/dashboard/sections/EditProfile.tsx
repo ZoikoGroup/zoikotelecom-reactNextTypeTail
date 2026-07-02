@@ -97,6 +97,11 @@ export default function EditProfile() {
       });
       const data = await res.json();
       if (res.ok) {
+        // Backend rotates the auth token on password change (invalidates
+        // old sessions), so persist the new one or the next request 401s.
+        if (data.token && typeof window !== "undefined") {
+          localStorage.setItem("token", data.token);
+        }
         setPasswordMsg({ type: "success", text: "Password changed successfully." });
         setPasswords({ current_password: "", new_password: "", new_password2: "" });
       } else {
