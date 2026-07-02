@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 
 interface Props {
@@ -9,6 +8,7 @@ interface Props {
     id: number | null
   ) => void;
   prevStep: () => void;
+  onCheckout: (hardwareId: number | null) => void;
 }
 
 const hardware = [
@@ -45,6 +45,7 @@ export default function StepSix({
   selectedHardware,
   setSelectedHardware,
   prevStep,
+  onCheckout,
 }: Props) {
   return (
     <div className="space-y-5">
@@ -122,12 +123,13 @@ export default function StepSix({
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
-        <Link
-          href="#"
+        <button
+          type="button"
+          onClick={() => onCheckout(null)}
           className="text-[#E91E8C] text-sm font-bold tracking-wide"
         >
           Skip
-        </Link>
+        </button>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
           <button
@@ -137,12 +139,13 @@ export default function StepSix({
             &lt; Back
           </button>
 
-          <Link
-            href="#"
+          <button
+            type="button"
+            onClick={() => onCheckout(selectedHardware)}
             className="w-full sm:w-auto h-[42px] px-8 rounded-full bg-[#E91E8C] text-white text-sm font-bold flex items-center justify-center whitespace-nowrap"
           >
             Proceed to Checkout &gt;
-          </Link>
+          </button>
         </div>
       </div>
     </div>

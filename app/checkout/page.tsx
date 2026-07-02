@@ -60,6 +60,7 @@ interface CartItem {
   serviceAddress?: string;
   planType?: string;
   isLandline?: boolean;
+  isBusinessLandline?: boolean;
   isEEMobile?: boolean;
   isBroadband?: boolean;
   isAccessories?: boolean;
@@ -98,6 +99,7 @@ interface FormErrors {
 
 function normalizeCartItem(raw: RawCartItem): CartItem {
   const isLandline = raw.planType === "landline_manual";
+  const isBusinessLandline = raw.planType === "business_landline";
   const isEEMobile = raw.planType === "ee_mobile_manual";
   const isBroadband = raw.planType === "broadband";
   const isAccessories = raw.planType === "accessories";
@@ -133,6 +135,7 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
     serviceAddress: raw.address?.display ?? "",
     planType:    raw.planType,
     isLandline,
+    isBusinessLandline,
     isEEMobile,
     isBroadband,
     isAccessories,
@@ -421,13 +424,11 @@ export default function CheckoutPage() {
     newCart.splice(index, 1);
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart.map((i) => i._raw)));
-    window.dispatchEvent(new Event("cart-updated"));
   };
 
   const handleClearCart = () => {
     setCart([]);
     localStorage.removeItem("cart");
-    window.dispatchEvent(new Event("cart-updated"));
   };
 
   // ── Coupon ────────────────────────────────────────────────────────────────
@@ -762,7 +763,16 @@ export default function CheckoutPage() {
                               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                               </svg>
-                              Landline
+                              Business Landline
+                            </span>
+                          )}
+                          {/* 📞 Business Landline (configured digital landline) */}
+                          {item.isBusinessLandline && (
+                            <span className="bg-[#E91E8C]/10 text-[#E91E8C] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.21l-2.26 1.13a11 11 0 005.52 5.52l1.13-2.26a1 1 0 011.21-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
+                              </svg>
+                              Business Landline
                             </span>
                           )}
                           {/* 📱 EE Mobile Type Badge (+ data allowance) */}

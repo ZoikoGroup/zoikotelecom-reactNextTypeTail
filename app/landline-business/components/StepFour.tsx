@@ -12,19 +12,22 @@ const contracts = [
     id: 1,
     title: "12 Months",
     description: "Best flexibility for growing businesses.",
-    price: "£0 Setup",
+    price: 11.99,
+    badge: "£0 Setup",
   },
   {
     id: 2,
     title: "24 Months",
     description: "Lower monthly pricing with longer commitment.",
-    price: "Most Popular",
+    price: 9.99,
+    badge: "Most Popular",
   },
   {
     id: 3,
     title: "36 Months",
     description: "Maximum savings for long-term stability.",
-    price: "Best Value",
+    price: 6.99,
+    badge: "Best Value",
   },
 ];
 
@@ -72,9 +75,15 @@ export default function StepFour({
                 {item.description}
               </p>
 
-              <span className="text-[#F91E8C] font-bold text-sm">
-                {item.price}
-              </span>
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-[#1A1A2E] dark:text-white font-extrabold text-2xl">
+                  £{item.price.toFixed(2)}
+                </span>
+                <span className="text-[#8D8DAA] text-xs font-semibold">/mo</span>
+                <span className="ml-1 text-[#F91E8C] font-bold text-xs">
+                  {item.badge}
+                </span>
+              </div>
             </button>
           );
         })}
