@@ -177,6 +177,7 @@ function PlanCard({ item, contractType, selectedAddress }: PlanCardProps) {
     };
 
     addToCart(plan);
+    window.dispatchEvent(new Event("cart-updated"));
     window.location.href = "/checkout";
 
   };

@@ -331,7 +331,7 @@ function PlanCard({
     } catch {
       localStorage.setItem("cart", JSON.stringify([rawItem]));
     }
-
+    window.dispatchEvent(new Event("cart-updated"));
     window.location.href = "/checkout";
   };
 

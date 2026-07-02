@@ -113,7 +113,7 @@ export default function BusinessLandlinePlans() {
     const cart = readCart();
     cart.push(item);
     writeCart(cart);
-
+    window.dispatchEvent(new Event("cart-updated"));
     // Send the user to checkout. Change the path if your checkout route differs.
     router.push("/checkout");
   };

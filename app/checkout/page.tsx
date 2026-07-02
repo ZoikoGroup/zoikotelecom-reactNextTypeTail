@@ -421,11 +421,13 @@ export default function CheckoutPage() {
     newCart.splice(index, 1);
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart.map((i) => i._raw)));
+    window.dispatchEvent(new Event("cart-updated"));
   };
 
   const handleClearCart = () => {
     setCart([]);
     localStorage.removeItem("cart");
+    window.dispatchEvent(new Event("cart-updated"));
   };
 
   // ── Coupon ────────────────────────────────────────────────────────────────

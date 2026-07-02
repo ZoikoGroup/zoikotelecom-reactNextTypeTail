@@ -33,6 +33,7 @@ function readCart(): RawCartItem[] {
   try {
     const raw = localStorage.getItem(CART_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
+    window.dispatchEvent(new Event("cart-updated"));
     return Array.isArray(parsed) ? (parsed as RawCartItem[]) : [];
   } catch {
     return [];
@@ -42,6 +43,7 @@ function readCart(): RawCartItem[] {
 function writeCart(items: RawCartItem[]): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(CART_KEY, JSON.stringify(items));
+  
   window.dispatchEvent(new Event("cart:updated"));
 }
 
@@ -582,10 +584,12 @@ export default function page() {
 
         const cart = readCart();
         cart.push(item);
+
+        
         writeCart(cart);
 
         setPendingPlan(null);
-
+        window.dispatchEvent(new Event("cart-updated"));
         // Send the user to checkout. Change the path if your checkout route differs.
         router.push("/checkout");
     };
