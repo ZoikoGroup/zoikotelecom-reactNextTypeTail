@@ -63,10 +63,16 @@ export default function Page() {
 
   const isPhoneEquipment = product?.category?.slug === "phone-equipment";
 
-  // Add to cart — same behaviour as the Accessories list page: write a
-  // planType:"accessories" row into localStorage["cart"].
+  // Add to cart — the product detail page serves both "accessories" and
+  // "phone-equipment" products, so tag the cart row by the product's category
+  // slug. The checkout/splitter saves each as its own order type.
   const handleAddToCart = () => {
     if (!product) return;
+
+    const categorySlug: string = product?.category?.slug ?? "accessories";
+    const isPhoneEquip = categorySlug === "phone-equipment";
+    const planType = isPhoneEquip ? "phone_equipment" : "accessories";
+    const category = isPhoneEquip ? "phone-equipment" : "accessories";
 
     const price = Number(
       selectedVariant?.sale_price ??
@@ -84,13 +90,14 @@ export default function Page() {
     const rawItem = {
       id: selectedVariant?.id ?? product.id,
       variantId: selectedVariant?.id ?? null,
-      planType: "accessories",
-      category: "accessories",
+      planType,
+      category,
       name: product.name,
       planName: product.name,
       slug: product.slug,
       image,
       price,
+      planDuration: selectedVariant?.duration_display ?? "",
       quantity,
       qty: quantity,
     };

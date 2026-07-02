@@ -63,6 +63,7 @@ interface CartItem {
   isEEMobile?: boolean;
   isBroadband?: boolean;
   isAccessories?: boolean;
+  isPhoneEquipment?: boolean;
   dataAllowance?: string;
   categoryLabel?: string;
   simType?: string;
@@ -100,6 +101,7 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
   const isEEMobile = raw.planType === "ee_mobile_manual";
   const isBroadband = raw.planType === "broadband";
   const isAccessories = raw.planType === "accessories";
+  const isPhoneEquipment = raw.planType === "phone_equipment";
 
   // Price can arrive as price / finalPrice / salePrice (string or number).
   const rawPrice =
@@ -134,6 +136,7 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
     isEEMobile,
     isBroadband,
     isAccessories,
+    isPhoneEquipment,
     dataAllowance: isEEMobile ? raw.dataAllowance : undefined,
     categoryLabel: isEEMobile ? raw.eeCategory : undefined,
     // SIM delivery type (eSIM / pSIM) — only EE mobile items carry this.
@@ -787,6 +790,15 @@ export default function CheckoutPage() {
                               Accessories
                             </span>
                           )}
+                          {/* 📞 Phone & Equipment Type Badge */}
+                          {item.isPhoneEquipment && (
+                            <span className="bg-[#C12172]/10 text-[#C12172] text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.21l-2.26 1.13a11 11 0 005.52 5.52l1.13-2.26a1 1 0 011.21-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
+                              </svg>
+                              Phone &amp; Equipment
+                            </span>
+                          )}
                           {/* 📶 SIM Type Badge (eSIM / pSIM) */}
                           {item.simType && (
                             <span className="bg-teal-50 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
@@ -835,7 +847,7 @@ export default function CheckoutPage() {
                       {/* 💰 Price Display */}
                       <div className="text-right shrink-0">
                         <p className="font-bold dark:text-white text-lg">
-                          £{item.price.toFixed(2)}
+                          ${item.price.toFixed(2)}
                         </p>
                         <button
                           onClick={() => handleRemove(idx)}
@@ -953,7 +965,7 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <span className="font-semibold text-gray-900 dark:text-white shrink-0">
-                       £{item.price.toFixed(2)}
+                       ${item.price.toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -967,18 +979,18 @@ export default function CheckoutPage() {
                     Discount (
                     {discountData.type === "percentage"
                       ? formatDiscount(discountData.discount) + "%"
-                      : "£" + formatDiscount(discountData.discount)}
+                      : "$" + formatDiscount(discountData.discount)}
                     )
                   </span>
                   <span className="font-medium text-green-600">
-                    −£{discountAmount.toFixed(2)}
+                    −${discountAmount.toFixed(2)}
                   </span>
                 </div>
               )}
 
               <div className="flex justify-between font-bold text-base mt-4 pt-4 border-t border-gray-100">
                 <span>Total</span>
-                <span className="text-red-500">£{total.toFixed(2)}</span>
+                <span className="text-red-500">${total.toFixed(2)}</span>
               </div>
             </div>
 

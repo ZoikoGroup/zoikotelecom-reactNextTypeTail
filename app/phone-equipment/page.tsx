@@ -2,7 +2,6 @@
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "@/app/context/CartContext";
 import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 8;
@@ -64,6 +63,24 @@ const getDisplayPrice = (
   ).toFixed(2)}`;
 };
 
+// Numeric price for the cart (handles ranges + the active duration filter).
+const getNumericPrice = (
+  product: Product,
+  durationFilter: string
+): number => {
+  if (!product.variants?.length) return 0;
+
+  if (durationFilter !== "All Options") {
+    const selected = product.variants.find(
+      (v) => v.duration_display === durationFilter
+    );
+    if (selected) return Number(selected.sale_price || selected.regular_price) || 0;
+  }
+  // Default to the cheapest variant.
+  const prices = product.variants.map((v) => Number(v.sale_price || v.regular_price) || 0);
+  return prices.length ? Math.min(...prices) : 0;
+};
+
 export default function page() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,7 +88,6 @@ export default function page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [durationFilter, setDurationFilter] = useState("All Options");
-  const { addToCart } = useCart();
   const router = useRouter();
 
   useEffect(() => {
@@ -142,16 +158,45 @@ export default function page() {
     setCurrentPage(1);
   };
 
+  // Write into the shared localStorage cart (checkout reads localStorage["cart"]
+  // and saves planType === "phone_equipment" as its own order type).
   const handleBuyNow = (product: Product) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      image: product.images.find((img) => img.is_main)?.image || product.images[0]?.image || "/Images/placeholder.png",
+    const image =
+      product.images.find((img) => img.is_main)?.image ||
+      product.images[0]?.image ||
+      "/Images/placeholder.png";
+
+    const selectedVariant =
+      durationFilter !== "All Options"
+        ? product.variants.find((v) => v.duration_display === durationFilter)
+        : undefined;
+
+    const rawItem = {
+      id: selectedVariant?.id ?? product.id,
+      variantId: selectedVariant?.id ?? null,
+      planType: "phone_equipment",
       category: "phone-equipment",
+      name: product.name,
+      planName: product.name,
+      slug: product.slug,
+      image,
+      price: getNumericPrice(product, durationFilter),
+      planDuration: selectedVariant?.duration_display ?? durationFilter,
       quantity: 1,
-      price: Number(getDisplayPrice(product, durationFilter).replace("£", "")),
-    });
+      qty: 1,
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem("cart") ?? "[]");
+      const cartArr = Array.isArray(existing) ? existing : [];
+      cartArr.push(rawItem);
+      localStorage.setItem("cart", JSON.stringify(cartArr));
+      window.dispatchEvent(new Event("cart-updated"));
+    } catch {
+      localStorage.setItem("cart", JSON.stringify([rawItem]));
+    }
+
+    console.log("Added to cart:", rawItem);
   };
 
   if (loading) {
@@ -421,9 +466,10 @@ export default function page() {
 
                     {/* VIEW DETAILS */}
                     <Link href={`/product/${product.slug}`}>
-                      <button
+                      <span
                         className="
                                 mb-2
+                                flex items-center justify-center
                                 w-full h-11
                                 rounded-full
                                 border border-fuchsia-600
@@ -432,7 +478,7 @@ export default function page() {
                                 "
                       >
                         View Details
-                      </button>
+                      </span>
                     </Link>
 
                     {/* BUY NOW */}
@@ -447,9 +493,10 @@ export default function page() {
                               transition-all duration-300
                               hover:scale-[1.01]
                             "
-                      onClick={() =>{ handleBuyNow(product)
+                      onClick={() => {
+                        handleBuyNow(product);
                         router.push("/checkout");
-                       }}
+                      }}
                     >
                       Buy Now
                     </button>

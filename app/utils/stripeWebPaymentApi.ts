@@ -28,7 +28,7 @@ type CartRow = Plan & {
   [key: string]: unknown;
 };
 
-type OrderType = "broadband" | "ee_mobile" | "landline" | "accessories";
+type OrderType = "broadband" | "ee_mobile" | "landline" | "accessories" | "phone_equipment";
 
 function readCart(): CartRow[] {
   try {
@@ -48,8 +48,11 @@ function orderTypeOf(item: CartRow): OrderType {
   if (t === "ee_mobile" || t === "ee_mobile_manual") return "ee_mobile";
   if (t === "landline" || t === "landline_manual") return "landline";
   if (t === "accessories" || t === "accessory") return "accessories";
+  if (t === "phone_equipment" || t === "phone-equipment") return "phone_equipment";
   if (t === "broadband") return "broadband";
-  if (String(item.category ?? "").toLowerCase() === "accessories") return "accessories";
+  const cat = String(item.category ?? "").toLowerCase();
+  if (cat === "accessories") return "accessories";
+  if (cat === "phone-equipment" || cat === "phone_equipment") return "phone_equipment";
   if (item.productOfferingQualificationItem) return "broadband";
   return "broadband";
 }
@@ -124,6 +127,7 @@ export async function processOrderStripe(orderData: ProcessOrderInput) {
     const eeItems        = rawCart.filter((i) => orderTypeOf(i) === "ee_mobile");
     const landlineItems  = rawCart.filter((i) => orderTypeOf(i) === "landline");
     const accessoryItems = rawCart.filter((i) => orderTypeOf(i) === "accessories");
+    const phoneEquipItems = rawCart.filter((i) => orderTypeOf(i) === "phone_equipment");
 
     const orders: Record<string, unknown>[] = [];
 
@@ -191,6 +195,7 @@ export async function processOrderStripe(orderData: ProcessOrderInput) {
     for (const item of eeItems) orders.push(buildSimpleOrder("ee_mobile", item, orderData));
     for (const item of landlineItems) orders.push(buildSimpleOrder("landline", item, orderData));
     for (const item of accessoryItems) orders.push(buildSimpleOrder("accessories", item, orderData));
+    for (const item of phoneEquipItems) orders.push(buildSimpleOrder("phone_equipment", item, orderData));
 
     if (!orders.length) {
       return { status: false, message: "No valid items to order." };
