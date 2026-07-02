@@ -1,16 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const API = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-/* Send the auth cookie with every request. */
-const authFetch = (url: string, init: RequestInit = {}) =>
-  fetch(url, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...(init.headers || {}) },
+/* Where to send visitors who aren't logged in. Adjust to your login route. */
+const LOGIN_PATH = "/login";
+
+/* Auth scheme for the Authorization header. Your login stores `data.token` in
+ * localStorage, which is DRF TokenAuthentication → "Token". If your backend
+ * uses SimpleJWT instead, change this to "Bearer". */
+const AUTH_SCHEME = "Token";
+
+/* Attach the saved token (localStorage) to every request. Token auth is
+ * header-based, so we do NOT send cookies — sending credentials would force
+ * stricter CORS (Access-Control-Allow-Credentials) that the API isn't set up
+ * for, which silently blocks the response in the browser. */
+const authFetch = (url: string, init: RequestInit = {}) => {
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  return fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `${AUTH_SCHEME} ${token}` } : {}),
+      ...(init.headers || {}),
+    },
     ...init,
   });
+};
 
 const money = (v: any, currency = "GBP") => {
   const n = Number(v);
@@ -159,7 +177,7 @@ function ProfileSection() {
     first_name: "",
     last_name: "",
     email: "",
-    phone: "",
+    username: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -169,16 +187,15 @@ function ProfileSection() {
   useEffect(() => {
     (async () => {
       try {
-        // Adjust this path to your accounts API if different.
-        const res = await authFetch(`${API}/api/accounts/profile/`);
+        // DashboardAPI returns the current user's fields.
+        const res = await authFetch(`${API}/api/accounts/dashboard/`);
         if (res.ok) {
-          const data = await res.json();
-          const u = data?.data ?? data ?? {};
+          const u = await res.json();
           setForm({
             first_name: u.first_name ?? "",
             last_name: u.last_name ?? "",
             email: u.email ?? "",
-            phone: u.phone ?? "",
+            username: u.username ?? "",
           });
         } else if (res.status === 401 || res.status === 403) {
           setErr("Please sign in to edit your profile.");
@@ -196,15 +213,42 @@ function ProfileSection() {
     setErr("");
     setSaving(true);
     try {
-      const res = await authFetch(`${API}/api/accounts/profile/`, {
+      // UpdateUserAPI accepts PUT with partial data.
+      const res = await authFetch(`${API}/api/accounts/update-profile/`, {
         method: "PUT",
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          first_name: form.first_name,
+          last_name: form.last_name,
+          email: form.email,
+        }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data?.success !== false) {
+      if (res.ok) {
         setMsg("Profile updated.");
+        // Keep the header's cached user name in sync.
+        try {
+          const raw = localStorage.getItem("user");
+          const stored = raw ? JSON.parse(raw) : {};
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              ...stored,
+              first_name: form.first_name,
+              last_name: form.last_name,
+              email: form.email,
+            })
+          );
+          window.dispatchEvent(new Event("authChanged"));
+        } catch {
+          /* ignore */
+        }
       } else {
-        setErr(data?.message || "Could not update your profile.");
+        setErr(
+          data?.email?.[0] ||
+            data?.detail ||
+            data?.message ||
+            "Could not update your profile."
+        );
       }
     } catch {
       setErr("Network error. Please try again.");
@@ -235,8 +279,8 @@ function ProfileSection() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {field("First name", "first_name")}
         {field("Last name", "last_name")}
-        {field("Email", "email", "email", true)}
-        {field("Phone", "phone")}
+        {field("Email", "email", "email")}
+        {field("Username", "username", "text", true)}
       </div>
 
       {err && <p className="text-sm text-red-600 mt-3">{err}</p>}
@@ -253,10 +297,148 @@ function ProfileSection() {
   );
 }
 
+/* ────────────────────── Change password ─────────────────────── */
+
+function ChangePasswordSection() {
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
+
+  const submit = async () => {
+    setMsg("");
+    setErr("");
+    if (!current || !next) return setErr("Please fill in all fields.");
+    if (next.length < 8) return setErr("New password must be at least 8 characters.");
+    if (next !== confirm) return setErr("New passwords do not match.");
+
+    setSaving(true);
+    try {
+      // Adjust the path/field names to your accounts API if different.
+      const res = await authFetch(`${API}/api/accounts/change-password/`, {
+        method: "POST",
+        body: JSON.stringify({
+          old_password: current,
+          new_password: next,
+          confirm_password: confirm,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.success !== false && !data?.error) {
+        setMsg("Password changed successfully.");
+        setCurrent("");
+        setNext("");
+        setConfirm("");
+      } else {
+        setErr(
+          data?.error ||
+            data?.message ||
+            (data?.old_password && `Current password: ${data.old_password}`) ||
+            (data?.new_password && `New password: ${data.new_password}`) ||
+            "Could not change your password."
+        );
+      }
+    } catch {
+      setErr("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const field = (
+    label: string,
+    value: string,
+    setter: (v: string) => void
+  ) => (
+    <div>
+      <label className="block text-sm font-semibold text-gray-800 dark:text-white mb-1">
+        {label}
+      </label>
+      <input
+        type="password"
+        value={value}
+        onChange={(e) => setter(e.target.value)}
+        className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md px-3 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#BC2273]"
+      />
+    </div>
+  );
+
+  return (
+    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
+      <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">
+        Change password
+      </h3>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {field("Current password", current, setCurrent)}
+        <div className="hidden sm:block" />
+        {field("New password", next, setNext)}
+        {field("Confirm new password", confirm, setConfirm)}
+      </div>
+
+      {err && <p className="text-sm text-red-600 mt-3">{err}</p>}
+      {msg && <p className="text-sm text-green-600 mt-3">{msg}</p>}
+
+      <button
+        onClick={submit}
+        disabled={saving}
+        className="mt-4 h-10 px-6 rounded-md bg-[#BC2273] hover:bg-[#a51d63] text-white text-sm font-semibold transition-colors disabled:opacity-50"
+      >
+        {saving ? "Updating…" : "Update password"}
+      </button>
+    </div>
+  );
+}
+
 /* ─────────────────────────── Page ─────────────────────────── */
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<"orders" | "profile">("orders");
+  // null = checking, true = authed, false = not authed
+  const [authed, setAuthed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      // No token at all → straight to login.
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      if (!token) {
+        setAuthed(false);
+        router.replace(`${LOGIN_PATH}?next=${encodeURIComponent("/dashboard")}`);
+        return;
+      }
+      try {
+        // my-orders is auth-gated (IsAuthenticated) — a 200 means the token is
+        // valid, 401/403 means it isn't.
+        const res = await authFetch(`${API}/api/v1/my-orders/`);
+        if (res.status === 401 || res.status === 403) {
+          setAuthed(false);
+          router.replace(`${LOGIN_PATH}?next=${encodeURIComponent("/dashboard")}`);
+          return;
+        }
+        setAuthed(res.ok);
+        if (!res.ok) router.replace(LOGIN_PATH);
+      } catch (e) {
+        console.error("Dashboard auth check failed:", e);
+        setAuthed(false);
+        router.replace(LOGIN_PATH);
+      }
+    })();
+  }, [router]);
+
+  // While checking (or redirecting), don't render the dashboard.
+  if (authed !== true) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F5FA] dark:bg-gray-950">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {authed === false ? "Redirecting to sign in…" : "Loading…"}
+        </p>
+      </div>
+    );
+  }
 
   const tabBtn = (key: typeof tab, label: string) => (
     <button
@@ -284,7 +466,12 @@ export default function DashboardPage() {
         </div>
 
         {tab === "orders" && <OrdersSection />}
-        {tab === "profile" && <ProfileSection />}
+        {tab === "profile" && (
+          <div className="space-y-6">
+            <ProfileSection />
+            <ChangePasswordSection />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import CartIcon from "./CartIcon";
 import toast from "react-hot-toast";
@@ -72,6 +72,9 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
 
@@ -79,20 +82,50 @@ export default function Header() {
     const checkAuth = () => {
       const token = localStorage.getItem("token");
       setIsLoggedIn(!!token);
+
+      // Derive a display name from the stored user object.
+      let name = "";
+      try {
+        const raw = localStorage.getItem("user");
+        if (raw) {
+          const u = JSON.parse(raw);
+          name =
+            u.name ||
+            [u.first_name, u.last_name].filter(Boolean).join(" ") ||
+            u.username ||
+            u.email ||
+            "";
+        }
+      } catch {
+        /* ignore */
+      }
+      setUserName(name);
     };
 
     checkAuth();
 
     window.addEventListener("authChanged", checkAuth);
-
     return () => {
       window.removeEventListener("authChanged", checkAuth);
     };
   }, []);
 
+  // Close the user menu when clicking outside it.
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [userMenuOpen]);
+
   const closeAll = () => {
     setMenuOpen(false);
     setDropdownOpen(false);
+    setUserMenuOpen(false);
   };
 
   const handleLogout = () => {
@@ -100,6 +133,7 @@ export default function Header() {
     localStorage.removeItem("user");
 
     setIsLoggedIn(false);
+    setUserMenuOpen(false);
 
     window.dispatchEvent(new Event("authChanged"));
 
@@ -231,17 +265,60 @@ export default function Header() {
             </Link>
 
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px]"
-              >
-                Logout
-              </button>
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen((o) => !o)}
+                  aria-label="Account menu"
+                  className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] px-3 py-2.5 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px]"
+                >
+                  <FaUserCircle className="text-lg" />
+                  {userName && (
+                    <span className="hidden max-w-[120px] truncate lg:inline">
+                      {userName}
+                    </span>
+                  )}
+                  <FaChevronDown
+                    className={`text-[10px] transition-transform duration-200 ${
+                      userMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-[calc(100%+10px)] w-56 overflow-hidden rounded-2xl border border-[#f0f0f0] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.14)] dark:border-neutral-700 dark:bg-neutral-800">
+                    {/* Name header */}
+                    <div className="border-b border-[#f0f0f0] px-4 py-3 dark:border-neutral-700">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#aaa] dark:text-neutral-500">
+                        Signed in as
+                      </p>
+                      <p className="mt-0.5 truncate text-sm font-semibold text-[#111] dark:text-neutral-100">
+                        {userName || "My account"}
+                      </p>
+                    </div>
+
+                    {/* Dashboard */}
+                    <Link
+                      href="/dashboard"
+                      onClick={closeAll}
+                      className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-[#111] transition-colors hover:bg-[#C12172]/10 hover:text-[#C12172] dark:text-neutral-100 dark:hover:bg-[#C12172]/20 dark:hover:text-[#e94196]"
+                    >
+                      Dashboard
+                    </Link>
+
+                    {/* Logout */}
+                    <button
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 border-t border-[#f0f0f0] px-4 py-3 text-left text-sm font-medium text-[#C12172] transition-colors hover:bg-[#C12172]/10 dark:border-neutral-700 dark:text-[#e94196] dark:hover:bg-[#C12172]/20"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link href="/login">
                 <button className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] px-3 py-3 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px]">
                   <FaUserCircle />
-                  
                 </button>
               </Link>
             )}
