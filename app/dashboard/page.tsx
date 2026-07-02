@@ -316,27 +316,34 @@ function ChangePasswordSection() {
 
     setSaving(true);
     try {
-      // Adjust the path/field names to your accounts API if different.
       const res = await authFetch(`${API}/api/accounts/change-password/`, {
         method: "POST",
         body: JSON.stringify({
-          old_password: current,
+          current_password: current,
           new_password: next,
-          confirm_password: confirm,
+          new_password2: confirm,
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data?.success !== false && !data?.error) {
+      if (res.ok) {
+        // Backend rotates the auth token on password change (invalidates
+        // old sessions), so persist the new one or the next request 401s.
+        if (data?.token && typeof window !== "undefined") {
+          localStorage.setItem("token", data.token);
+        }
         setMsg("Password changed successfully.");
         setCurrent("");
         setNext("");
         setConfirm("");
       } else {
+        const fieldError = (v: unknown) =>
+          Array.isArray(v) ? v.join(" ") : typeof v === "string" ? v : undefined;
         setErr(
-          data?.error ||
+          fieldError(data?.current_password) ||
+            fieldError(data?.new_password) ||
+            fieldError(data?.new_password2) ||
+            data?.error ||
             data?.message ||
-            (data?.old_password && `Current password: ${data.old_password}`) ||
-            (data?.new_password && `New password: ${data.new_password}`) ||
             "Could not change your password."
         );
       }
