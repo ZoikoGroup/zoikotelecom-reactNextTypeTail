@@ -177,7 +177,7 @@ function ProfileSection() {
     first_name: "",
     last_name: "",
     email: "",
-    phone: "",
+    username: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -187,16 +187,15 @@ function ProfileSection() {
   useEffect(() => {
     (async () => {
       try {
-        // Adjust this path to your accounts API if different.
-        const res = await authFetch(`${API}/api/accounts/profile/`);
+        // DashboardAPI returns the current user's fields.
+        const res = await authFetch(`${API}/api/accounts/dashboard/`);
         if (res.ok) {
-          const data = await res.json();
-          const u = data?.data ?? data ?? {};
+          const u = await res.json();
           setForm({
             first_name: u.first_name ?? "",
             last_name: u.last_name ?? "",
             email: u.email ?? "",
-            phone: u.phone ?? "",
+            username: u.username ?? "",
           });
         } else if (res.status === 401 || res.status === 403) {
           setErr("Please sign in to edit your profile.");
@@ -214,15 +213,42 @@ function ProfileSection() {
     setErr("");
     setSaving(true);
     try {
-      const res = await authFetch(`${API}/api/accounts/profile/`, {
+      // UpdateUserAPI accepts PUT with partial data.
+      const res = await authFetch(`${API}/api/accounts/update-profile/`, {
         method: "PUT",
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          first_name: form.first_name,
+          last_name: form.last_name,
+          email: form.email,
+        }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data?.success !== false) {
+      if (res.ok) {
         setMsg("Profile updated.");
+        // Keep the header's cached user name in sync.
+        try {
+          const raw = localStorage.getItem("user");
+          const stored = raw ? JSON.parse(raw) : {};
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              ...stored,
+              first_name: form.first_name,
+              last_name: form.last_name,
+              email: form.email,
+            })
+          );
+          window.dispatchEvent(new Event("authChanged"));
+        } catch {
+          /* ignore */
+        }
       } else {
-        setErr(data?.message || "Could not update your profile.");
+        setErr(
+          data?.email?.[0] ||
+            data?.detail ||
+            data?.message ||
+            "Could not update your profile."
+        );
       }
     } catch {
       setErr("Network error. Please try again.");
@@ -253,8 +279,8 @@ function ProfileSection() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {field("First name", "first_name")}
         {field("Last name", "last_name")}
-        {field("Email", "email", "email", true)}
-        {field("Phone", "phone")}
+        {field("Email", "email", "email")}
+        {field("Username", "username", "text", true)}
       </div>
 
       {err && <p className="text-sm text-red-600 mt-3">{err}</p>}
