@@ -20,23 +20,21 @@ const servicesLinks: FooterLink[] = [
   { id: "ee", label: "EE Mobile", href: "/ee-mobile-plans" },
   { id: "iot", label: "IoT Services", href: "#" },
   { id: "voip", label: "VoIP Solutions", href: "#" },
-  { id: "reseller", label: "Become a Reseller", href: "/become-a-reseller" },
 ];
 
 const companyLinks: FooterLink[] = [
   { id: "about", label: "About Us", href: "/about-us" },
-  { id: "careers", label: "Careers", href: "#" },
-  { id: "partner", label: "Partner Programme", href: "#" },
+  // { id: "careers", label: "Careers", href: "#" },
+  { id: "partner", label: "Partner Programme", href: "/become-a-reseller" },
   { id: "newsblogs", label: "News & Blogs", href: "/blogs-news" },
-  { id: "faqs", label: "FAQs", href: "/faqs" },
+  
 ];
 
 const quickLinks: FooterLink[] = [
   
   { id: "news", label: "News", href: "/blogs-news" },
   { id: "blogs", label: "Blogs", href: "/blogs-news" },
-  { id: "partner", label: "Partner Programme", href: "#" },
-  { id: "careers", label: "Careers", href: "#" },
+  { id: "faqs", label: "FAQs", href: "/faqs" },
 ];
 
 const socials: Social[] = [
