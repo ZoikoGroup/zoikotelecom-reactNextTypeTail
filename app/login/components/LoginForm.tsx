@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import SocialButtons from "./SocialButtons";
 
 
 type Tab = "login" | "register" | "reset-password";
@@ -176,7 +177,10 @@ export default function LoginForm({ setActiveTab }: Props) {
             Create Account
           </button>
         </p>
-      
+      {/* Social login (Google + Facebook) */}
+        <div className="mt-4">
+          <SocialButtons redirectTo="/dashboard" />
+        </div>
       </footer>
     </section>
   );
