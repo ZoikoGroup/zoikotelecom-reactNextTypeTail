@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import router from "next/router";
 
 export default function AboutUs() {
   const whyChooseUs = [
@@ -262,7 +263,7 @@ export default function AboutUs() {
           </p>
 
           {/* BUTTON */}
-          <button className="w-full max-w-[293px] h-[60px] bg-white rounded-full text-[#C12172] text-[16px] font-semibold shadow-lg hover:scale-105 transition-all duration-300">
+          <button onClick={() => router.push("/bt-broadband")} className="w-full max-w-[293px] h-[60px] bg-white rounded-full text-[#C12172] text-[16px] font-semibold shadow-lg hover:scale-105 transition-all duration-300">
             Start Your Journey Today
           </button>
         </div>
