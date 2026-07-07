@@ -58,7 +58,12 @@ const testimonials = [
       "The unlimited minutes bundle means we never think about call costs anymore. Our whole team is on digital landlines now. Crystal clear audio every time — even with multiple calls.",
   },
 ];
-
+const handleClick = () => {
+    const element = document.getElementById('configureplan');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 export default function HeroSection() {
   return (
     <main>
@@ -207,7 +212,7 @@ export default function HeroSection() {
                 </div>
               </div>
 
-              <Link href="">
+              <Link href="" onClick={handleClick}>
               <button className="w-full h-[56px] rounded-full mt-10 bg-gradient-to-r from-[#7B1FA2] to-[#E91E8C] text-white text-[15px] font-bold hover:scale-[1.02] transition-transform">
                 Start Configuring
               </button>
@@ -321,7 +326,7 @@ export default function HeroSection() {
         </p>
 
         {/* STEPS */}
-        <div className="mt-12 overflow-x-auto pb-4">
+        <div className="mt-12 overflow-x-auto pb-4" id="configure-landline-section">
   <div className="flex items-start justify-start lg:justify-center gap-4 min-w-max px-1">
     {steps.map((step, index) => {
       return (

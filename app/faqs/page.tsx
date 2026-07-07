@@ -570,7 +570,7 @@ export default function page() {
       >
         {/* Primary Button */}
         <Link
-          href="#"
+          href="/contact"
           className="
             min-w-[220px]
             rounded-full
@@ -596,7 +596,7 @@ export default function page() {
 
         {/* Secondary Button */}
         <Link
-          href="#"
+          href="tel:+442071646399"
           className="
             min-w-[220px]
             rounded-full
