@@ -316,7 +316,7 @@ const services2 = [
 ];
 
 const countries = [
-  { code: "GB", name: "United Kingdom", dialCode: "+44" },
+  { code: "UK", name: "United Kingdom", dialCode: "+44" },
   { code: "US", name: "United States", dialCode: "+1" },
   { code: "IN", name: "India", dialCode: "+91" },
   { code: "AE", name: "United Arab Emirates", dialCode: "+971" },
