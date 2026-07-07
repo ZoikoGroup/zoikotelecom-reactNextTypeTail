@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import Image from "next/image";
 import Link from "next/link";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 const services = [
   {
@@ -326,6 +327,7 @@ const countries = [
   { code: "IT", name: "Italy", dialCode: "+39" },
   { code: "ZA", name: "South Africa", dialCode: "+27" },
 ];
+
 export default function page() {
 
   const [selectedService, setSelectedService] = useState("");
@@ -340,81 +342,317 @@ export default function page() {
   consent: false,
 });
 
-const [loading, setLoading] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
-  const handleChange = (
-  e: React.ChangeEvent<
-    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-  >
-) => {
-  const { name, value, type } = e.target;
+  type FormErrors = {
+    full_name: string;
+    company: string;
+    email: string;
+    phone: string;
+    service_interest: string;
+    notes: string;
+    consent: string;
+  };
 
-  setFormData({
-    ...formData,
-    [name]:
-      type === "checkbox"
-        ? (e.target as HTMLInputElement).checked
-        : value,
-  });
-};
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  setLoading(true);
-
-  try {
-    const payload = {
-      full_name: formData.full_name,
-      company: formData.company,
-      email: formData.email,
-      phone: formData.phone,
-      country: formData.country,
-      service_interest: formData.service_interest,
-      notes: formData.notes,
-      consent: formData.consent,
-    };
-
-    const response = await fetch(
-  `${process.env.NEXT_PUBLIC_API_BASE_URL}/business-solutions/submit/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-
-    const data = await response.json();
-
-    if (response.ok) {
-  alert("Submitted successfully");
-
-  setFormData({
+  const emptyErrors: FormErrors = {
     full_name: "",
     company: "",
     email: "",
     phone: "",
-    country: countries[0].name,
     service_interest: "",
     notes: "",
+    consent: "",
+  };
+
+  const [errors, setErrors] = useState<FormErrors>(emptyErrors);
+
+  // Tracks which fields the user has actually interacted with, so we don't
+  // show error messages before they've had a chance to type anything.
+  const [touched, setTouched] = useState<Record<keyof FormErrors, boolean>>({
+    full_name: false,
+    company: false,
+    email: false,
+    phone: false,
+    service_interest: false,
+    notes: false,
     consent: false,
   });
 
-  setSelectedCountry(countries[0]);
+  const [loading, setLoading] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
 
-    } else {
-      alert("Something went wrong");
-      console.log(data);
+  // ---- Field-level validators (all logic lives here, independent of any
+  // native HTML "required"/"type" browser validation) ----
+
+  const validateFullName = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Full name is required";
+    if (trimmed.length < 2) return "Enter your full name";
+    if (!/^[a-zA-Z\u00C0-\u017F\s'-]+$/.test(trimmed)) {
+      return "Name can only contain letters, spaces, hyphens and apostrophes";
     }
-  } catch (error) {
-    console.error(error);
-    alert("Failed to submit");
-  } finally {
-    setLoading(false);
-  }
-};
+    return "";
+  };
+
+  const validateCompany = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Company name is required";
+    if (trimmed.length < 2) return "Enter a valid company name";
+    return "";
+  };
+
+  // Proper email validation: structural check (RFC-5322 subset) plus
+  // sanity checks a simple `type="email"` input never catches.
+  const validateEmail = (value: string) => {
+    const email = value.trim();
+
+    if (!email) return "Email address is required";
+    if (email.length > 254) return "Email address is too long";
+
+    const emailRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
+    if (!emailRegex.test(email)) return "Enter a valid email address";
+
+    const [local, domain] = email.split("@");
+    if (local.length > 64) return "Email address is invalid";
+    if (domain.split(".").some((part) => part.length === 0)) {
+      return "Enter a valid email address";
+    }
+    if (/\.\./.test(email)) return "Email address cannot contain '..'";
+
+    return "";
+  };
+
+  // Real phone number validation using libphonenumber-js — checks the
+  // number against the actual numbering plan for the selected country
+  // (correct length, valid area/operator prefixes, etc.), not just a
+  // digit-count regex.
+  const validatePhone = (value: string, countryCode: string) => {
+    const phone = value.trim();
+
+    if (!phone) return "Phone number is required";
+
+    try {
+      if (!isValidPhoneNumber(phone, countryCode as any)) {
+        return `Enter a valid ${countryCode} phone number`;
+      }
+    } catch {
+      return "Enter a valid phone number";
+    }
+
+    return "";
+  };
+
+  const validateServiceInterest = (value: string) => {
+    if (!value) return "Please select a service";
+    return "";
+  };
+
+  const validateNotes = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Please add a short note about your requirements";
+    if (trimmed.length < 10) return "Please provide a bit more detail (min 10 characters)";
+    return "";
+  };
+
+  const validateConsent = (value: boolean) => {
+    if (!value) return "You must agree before submitting this form";
+    return "";
+  };
+
+  // Runs every validator and returns a fresh errors object
+  const validateAll = (): FormErrors => {
+    return {
+      full_name: validateFullName(formData.full_name),
+      company: validateCompany(formData.company),
+      email: validateEmail(formData.email),
+      phone: validatePhone(formData.phone, selectedCountry.code),
+      service_interest: validateServiceInterest(formData.service_interest),
+      notes: validateNotes(formData.notes),
+      consent: validateConsent(formData.consent),
+    };
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value, type } = e.target;
+    const fieldName = name as keyof FormErrors;
+
+    const nextValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: nextValue,
+    }));
+
+    // Only re-validate live once the field has been touched, so errors
+    // don't appear before the user has interacted with it
+    if (touched[fieldName]) {
+      let message = "";
+      switch (fieldName) {
+        case "full_name":
+          message = validateFullName(nextValue as string);
+          break;
+        case "company":
+          message = validateCompany(nextValue as string);
+          break;
+        case "email":
+          message = validateEmail(nextValue as string);
+          break;
+        case "phone":
+          message = validatePhone(nextValue as string, selectedCountry.code);
+          break;
+        case "service_interest":
+          message = validateServiceInterest(nextValue as string);
+          break;
+        case "notes":
+          message = validateNotes(nextValue as string);
+          break;
+        case "consent":
+          message = validateConsent(nextValue as boolean);
+          break;
+      }
+      setErrors((prev) => ({ ...prev, [fieldName]: message }));
+    }
+  };
+
+  const handleBlur = (
+    e: React.FocusEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name } = e.target;
+    const fieldName = name as keyof FormErrors;
+
+    setTouched((prev) => ({ ...prev, [fieldName]: true }));
+
+    let message = "";
+    switch (fieldName) {
+      case "full_name":
+        message = validateFullName(formData.full_name);
+        break;
+      case "company":
+        message = validateCompany(formData.company);
+        break;
+      case "email":
+        message = validateEmail(formData.email);
+        break;
+      case "phone":
+        message = validatePhone(formData.phone, selectedCountry.code);
+        break;
+      case "service_interest":
+        message = validateServiceInterest(formData.service_interest);
+        break;
+      case "notes":
+        message = validateNotes(formData.notes);
+        break;
+      case "consent":
+        message = validateConsent(formData.consent);
+        break;
+    }
+    setErrors((prev) => ({ ...prev, [fieldName]: message }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const freshErrors = validateAll();
+    setErrors(freshErrors);
+    setTouched({
+      full_name: true,
+      company: true,
+      email: true,
+      phone: true,
+      service_interest: true,
+      notes: true,
+      consent: true,
+    });
+
+    const hasErrors = Object.values(freshErrors).some(
+      (message) => message !== ""
+    );
+
+    if (hasErrors) {
+      // Focus the first invalid field for accessibility
+      const firstErrorField = Object.keys(freshErrors).find(
+        (key) => freshErrors[key as keyof FormErrors] !== ""
+      );
+      if (firstErrorField) {
+        const el = document.querySelector<HTMLElement>(
+          `[name="${firstErrorField}"]`
+        );
+        el?.focus();
+      }
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const payload = {
+        full_name: formData.full_name,
+        company: formData.company,
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+        service_interest: formData.service_interest,
+        notes: formData.notes,
+        consent: formData.consent,
+      };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/business-solutions/submit/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Submitted successfully");
+
+        setFormData({
+          full_name: "",
+          company: "",
+          email: "",
+          phone: "",
+          country: countries[0].name,
+          service_interest: "",
+          notes: "",
+          consent: false,
+        });
+
+        setSelectedCountry(countries[0]);
+        setErrors(emptyErrors);
+        setTouched({
+          full_name: false,
+          company: false,
+          email: false,
+          phone: false,
+          service_interest: false,
+          notes: false,
+          consent: false,
+        });
+
+      } else {
+        alert("Something went wrong");
+        console.log(data);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <>
       {/* Hero section */}
@@ -2047,7 +2285,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             {/* FORM */}
             <div>
 
-              <form onSubmit={handleSubmit} className="  space-y-5">
+              <form onSubmit={handleSubmit} noValidate className="  space-y-5">
 
                 {/* ROW */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -2073,18 +2311,25 @@ const handleSubmit = async (e: React.FormEvent) => {
                       name="full_name"
                        value={formData.full_name}
                        onChange={handleChange}
-                       required
-                      className="
+                       onBlur={handleBlur}
+                       aria-invalid={!!errors.full_name}
+                       aria-describedby="full_name-error"
+                      className={`
                         w-full h-14
                         rounded-xl
-                        border border-white/20
+                        border ${errors.full_name ? "border-red-400" : "border-white/20"}
                         bg-white dark:text-[#111827]
                         px-4
                         text-sm
                         outline-none
                         focus:border-white
-                      "
+                      `}
                     />
+                    {errors.full_name && (
+                      <p id="full_name-error" className="mt-2 text-xs font-medium text-red-100">
+                        {errors.full_name}
+                      </p>
+                    )}
                   </div>
 
                   {/* COMPANY */}
@@ -2107,19 +2352,26 @@ const handleSubmit = async (e: React.FormEvent) => {
                         name="company"
                       value={formData.company}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       placeholder="Acme Ltd"
-                      required
-                      className="
+                      aria-invalid={!!errors.company}
+                      aria-describedby="company-error"
+                      className={`
                         w-full h-14
                         rounded-xl
-                        border border-white/20
+                        border ${errors.company ? "border-red-400" : "border-white/20"}
                         bg-white dark:text-[#111827]
                         px-4
                         text-sm
                         outline-none
                         focus:border-white
-                      "
+                      `}
                     />
+                    {errors.company && (
+                      <p id="company-error" className="mt-2 text-xs font-medium text-red-100">
+                        {errors.company}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -2142,23 +2394,31 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </label>
 
                     <input
-                      type="email"
+                      type="text"
+                      inputMode="email"
                       placeholder="jane@acme.co.uk"
                        name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        required
-                      className="
+                        onBlur={handleBlur}
+                        aria-invalid={!!errors.email}
+                        aria-describedby="email-error"
+                      className={`
                         w-full h-14
                         rounded-xl
-                        border border-white/20
+                        border ${errors.email ? "border-red-400" : "border-white/20"}
                         bg-white dark:text-[#111827]
                         px-4
                         text-sm
                         outline-none
                         focus:border-white
-                      "
+                      `}
                     />
+                    {errors.email && (
+                      <p id="email-error" className="mt-2 text-xs font-medium text-red-100">
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
 
                   {/* PHONE */}
@@ -2178,13 +2438,13 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                     <div
                     
-                      className="
+                      className={`
                         flex items-center
                         overflow-hidden
                         rounded-xl
-                        border border-white/20
+                        border ${errors.phone ? "border-red-400" : "border-white/20"}
                         bg-white dark:text-[#111827]
-                      "
+                      `}
                     >
 
                       {/* COUNTRY SELECT */}
@@ -2201,6 +2461,15 @@ const handleSubmit = async (e: React.FormEvent) => {
                             ...prev,
                             country: country.name,
                           }));
+
+                            // Re-check the phone number against the newly
+                            // selected country's numbering plan
+                            if (touched.phone) {
+                              setErrors((prev) => ({
+                                ...prev,
+                                phone: validatePhone(formData.phone, country.code),
+                              }));
+                            }
                           }
                         }}
                         className="
@@ -2218,18 +2487,21 @@ const handleSubmit = async (e: React.FormEvent) => {
                             key={country.code}
                             value={country.code}
                           >
-                            {country.name} ({country.dialCode})
+                            {country.code} ({country.dialCode})
                           </option>
                         ))}
                       </select>
 
                       {/* PHONE INPUT */}
                       <input
-                        type="tel"
+                        type="text"
+                        inputMode="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        required
+                        onBlur={handleBlur}
+                        aria-invalid={!!errors.phone}
+                        aria-describedby="phone-error"
                         placeholder="07700 000000"
                         className="
                           flex-1
@@ -2241,6 +2513,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                         "
                       />
                     </div>
+                    {errors.phone && (
+                      <p id="phone-error" className="mt-2 text-xs font-medium text-red-100">
+                        {errors.phone}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -2263,18 +2540,19 @@ const handleSubmit = async (e: React.FormEvent) => {
                   name="service_interest"
                   value={formData.service_interest}
                   onChange={handleChange}
-                  required
-
-                    className="
+                  onBlur={handleBlur}
+                  aria-invalid={!!errors.service_interest}
+                  aria-describedby="service_interest-error"
+                    className={`
                       w-full h-14
                       rounded-xl
-                      border border-white/20
+                      border ${errors.service_interest ? "border-red-400" : "border-white/20"}
                       bg-white
                       dark:text-[#111827]
                       px-4
                       text-sm
                       outline-none
-                    "
+                    `}
                   >
                     <option value="">Select a service</option>
 
@@ -2284,6 +2562,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </option>
                   ))}
                   </select>
+                  {errors.service_interest && (
+                    <p id="service_interest-error" className="mt-2 text-xs font-medium text-red-100">
+                      {errors.service_interest}
+                    </p>
+                  )}
                 </div>
 
                 {/* TEXTAREA */}
@@ -2306,47 +2589,63 @@ const handleSubmit = async (e: React.FormEvent) => {
                     name="notes"
                     value={formData.notes}
                     onChange={handleChange}
-                    required
+                    onBlur={handleBlur}
+                    aria-invalid={!!errors.notes}
+                    aria-describedby="notes-error"
                     placeholder="Tell us about your connectivity requirements..."
-                    className="
+                    className={`
                       w-full
                       rounded-xl
-                      border border-white/20
+                      border ${errors.notes ? "border-red-400" : "border-white/20"}
                       bg-white dark:text-[#111827]
                       p-4
                       text-sm
                       outline-none
                       resize-none
-                    "
+                    `}
                   />
+                  {errors.notes && (
+                    <p id="notes-error" className="mt-2 text-xs font-medium text-red-100">
+                      {errors.notes}
+                    </p>
+                  )}
                 </div>
 
                 {/* CHECKBOX */}
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name="consent"
-                    checked={formData.consent}
-                    onChange={handleChange}
-                    required
-                    className="
-                      mt-1
-                      accent-white
-                    "
-                  />
+                <div>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="consent"
+                      checked={formData.consent}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      aria-invalid={!!errors.consent}
+                      aria-describedby="consent-error"
+                      className="
+                        mt-1
+                        accent-white
+                      "
+                    />
 
-                  <span
-                    className="
-                      text-xs
-                      leading-6
-                      text-white/80
-                    "
-                  >
-                    I agree to be contacted by Zoiko Telecom regarding my
-                    enquiry. All data is processed in accordance with our
-                    Privacy Policy.
-                  </span>
-                </label>
+                    <span
+                      className="
+                        text-xs
+                        leading-6
+                        text-white/80
+                      "
+                    >
+                      I agree to be contacted by Zoiko Telecom regarding my
+                      enquiry. All data is processed in accordance with our
+                      Privacy Policy.
+                    </span>
+                  </label>
+                  {errors.consent && (
+                    <p id="consent-error" className="mt-2 text-xs font-medium text-red-100">
+                      {errors.consent}
+                    </p>
+                  )}
+                </div>
 
                 {/* SUBMIT BUTTON */}
                 <button
