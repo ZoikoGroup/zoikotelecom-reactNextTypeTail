@@ -43,7 +43,7 @@ function readCart(): RawCartItem[] {
 function writeCart(items: RawCartItem[]): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(CART_KEY, JSON.stringify(items));
-  
+
   window.dispatchEvent(new Event("cart:updated"));
 }
 
@@ -52,6 +52,16 @@ function parsePrice(raw: string): number {
   return parseFloat(String(raw).replace(/[^0-9.]/g, "")) || 0;
 }
 
+interface Plan {
+  name: string;
+  data: string;
+  // Static price for single-price categories (roaming / voice & text).
+  price?: string;
+  // Duration-keyed price for categories with duration tabs (bundles / broadband).
+  prices?: Record<string, string>;
+  badge: string | false;
+  features: string[];
+}
 
 const categories = [
     "EE Mobile Bundles",
@@ -69,26 +79,70 @@ const durationTabsByCategory: Record<string, string[]> = {
 // SIM delivery type — applies to every SIM plan on this page.
 const simTypes = ["eSIM", "pSIM"];
 
-const plansData = {
+// Shared feature list for the bundle tiers.
+const BUNDLE_FEATURES = [
+    "No Long-Term Contracts",
+    "Unlimited Data Pass Available",
+    "Affordable & Competitive Pricing",
+    "5G Ready SIMs",
+    "Inclusive EU Roaming",
+    "Exceptional Customer Support",
+];
+
+// Shared feature list for the broadband tiers.
+const BROADBAND_FEATURES = [
+    "Unlimited Data Options",
+    "Nationwide 5G Coverage",
+    "Portable Wi-Fi Hotspot",
+    "Affordable Plans",
+    "Roaming Included",
+    "Free SIM & Free Delivery",
+];
+
+const plansData: Record<string, Plan[]> = {
+    // Ordered cheapest → most expensive.
     "EE Mobile Bundles": [
+        {
+            name: "Z-Essentials",
+            data: "10GB",
+            prices: {
+                "30 Days": "£11.50/m",
+                "12 Months": "£10.50/m",
+                "24 Months": "£9.50/m",
+            },
+            badge: false,
+            features: BUNDLE_FEATURES,
+        },
+        {
+            name: "Z-Comfort",
+            data: "20GB",
+            prices: {
+                "30 Days": "£13.50/m",
+                "12 Months": "£12.00/m",
+                "24 Months": "£11.00/m",
+            },
+            badge: false,
+            features: BUNDLE_FEATURES,
+        },
         {
             name: "Z-Royal",
             data: "50GB",
-            price: "£15.00/m",
+            prices: {
+                "30 Days": "£18.00/m",
+                "12 Months": "£16.50/m",
+                "24 Months": "£15.00/m",
+            },
             badge: false,
-            features: [
-                "No Long-Term Contracts",
-                "Unlimited Data Pass Available",
-                "Affordable & Competitive Pricing",
-                "5G Ready SIMs",
-                "Inclusive EU Roaming",
-                "Exceptional Customer Support",
-            ],
+            features: BUNDLE_FEATURES,
         },
         {
             name: "Super-Z",
             data: "100GB",
-            price: "£23.00/m",
+            prices: {
+                "30 Days": "£30.00/m",
+                "12 Months": "£27.50/m",
+                "24 Months": "£25.00/m",
+            },
             badge: "MOST POPULAR",
             features: [
                 "No Long-Term Contracts",
@@ -102,7 +156,11 @@ const plansData = {
         {
             name: "Z-Unlimited",
             data: "Unlimited",
-            price: "£29.00/m",
+            prices: {
+                "30 Days": "£35.00/m",
+                "12 Months": "£32.00/m",
+                "24 Months": "£29.00/m",
+            },
             badge: false,
             features: [
                 "No Long-Term Contracts",
@@ -115,48 +173,37 @@ const plansData = {
         },
     ],
 
+    // Ordered cheapest → most expensive.
     "EE Mobile Broadband Plans": [
         {
-            name: "ZB-Bliss",
-            data: "200GB",
-            price: "£30.00/m",
+            name: "ZB-Velocity",
+            data: "30GB",
+            prices: {
+                "12 Months": "£13.00/m",
+                "24 Months": "£12.00/m",
+            },
             badge: false,
-            features: [
-                "Unlimited Data Options",
-                "Nationwide 5G Coverage",
-                "Portable Wi-Fi Hotspot",
-                "Affordable Plans",
-                "Roaming Included",
-                "Free SIM & Free Delivery",
-            ],
+            features: BROADBAND_FEATURES,
         },
         {
             name: "ZB-Unlimited",
             data: "Unlimited",
-            price: "£16.50/m",
+            prices: {
+                "12 Months": "£16.50/m",
+                "24 Months": "£15.00/m",
+            },
             badge: false,
-            features: [
-                "Unlimited Data Options",
-                "Nationwide 5G Coverage",
-                "Portable Wi-Fi Hotspot",
-                "Affordable Plans",
-                "Roaming Included",
-                "Free SIM & Free Delivery",
-            ],
+            features: BROADBAND_FEATURES,
         },
         {
-            name: "ZB-Velocity",
-            data: "30GB",
-            price: "£13.00/m",
+            name: "ZB-Bliss",
+            data: "200GB",
+            prices: {
+                "12 Months": "£30.00/m",
+                "24 Months": "£27.00/m",
+            },
             badge: false,
-            features: [
-                "Unlimited Data Options",
-                "Nationwide 5G Coverage",
-                "Portable Wi-Fi Hotspot",
-                "Affordable Plans",
-                "Roaming Included",
-                "Free SIM & Free Delivery",
-            ],
+            features: BROADBAND_FEATURES,
         },
     ],
 
@@ -523,6 +570,7 @@ export default function page() {
     const [activeDuration, setActiveDuration] = useState("12 Months");
 
     // The plan whose SIM-type popup is currently open (null = closed).
+    // price is resolved for the active duration at the moment "Buy Now" is clicked.
     const [pendingPlan, setPendingPlan] = useState<{
         name: string;
         data: string;
@@ -530,21 +578,29 @@ export default function page() {
         features: string[];
     } | null>(null);
 
-    const currentPlans =
-        plansData[activeCategory as keyof typeof plansData];
+    const currentPlans = plansData[activeCategory];
 
     const [openZone, setOpenZone] = useState<number | null>(1);
 
     const router = useRouter();
 
-    // Buy Now just opens the SIM-type popup for the chosen plan.
-    const handleBuyNow = (plan: {
-        name: string;
-        data: string;
-        price: string;
-        features: string[];
-    }) => {
-        setPendingPlan(plan);
+    // Resolve the price to show/charge for a plan under the active duration.
+    // Duration-based categories read from plan.prices; others use plan.price.
+    const resolvePrice = (plan: Plan): string => {
+        if (plan.prices) {
+            return plan.prices[activeDuration] ?? Object.values(plan.prices)[0] ?? "";
+        }
+        return plan.price ?? "";
+    };
+
+    // Buy Now opens the SIM-type popup, capturing the current duration's price.
+    const handleBuyNow = (plan: Plan) => {
+        setPendingPlan({
+            name: plan.name,
+            data: plan.data,
+            price: resolvePrice(plan),
+            features: plan.features,
+        });
     };
 
     // Called from the popup once the user picks eSIM or pSIM.
@@ -585,7 +641,7 @@ export default function page() {
         const cart = readCart();
         cart.push(item);
 
-        
+
         writeCart(cart);
 
         setPendingPlan(null);
@@ -729,7 +785,7 @@ export default function page() {
                                     </h2>
 
                                     <p className="mt-2 text-2xl font-semibold text-gray-800 dark:text-white">
-                                        {plan.price}
+                                        {resolvePrice(plan)}
                                     </p>
                                 </div>
 
