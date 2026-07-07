@@ -46,6 +46,10 @@ interface RawCartItem {
   simType?: string;             // e.g. "eSIM" | "pSIM"
   billingPeriod?: "monthly" | "one-off";
 
+  // ── Quantity — only accessories / phone_equipment honour this ──
+  qty?: number;
+  quantity?: number;
+
   [key: string]: any;
 }
 
@@ -68,6 +72,7 @@ interface CartItem {
   dataAllowance?: string;
   categoryLabel?: string;
   simType?: string;
+  quantity: number;
   _raw: RawCartItem;
   bt_plan_id?: string | null;
 }
@@ -111,6 +116,14 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
   const price =
     typeof rawPrice === "number" ? rawPrice : parseFloat(String(rawPrice)) || 0;
 
+  // Quantity only applies to accessories / phone_equipment; every other plan
+  // type is always a single line (quantity 1) regardless of any stored qty.
+  const rawQty = raw.qty ?? raw.quantity ?? 1;
+  const quantity =
+    isAccessories || isPhoneEquipment
+      ? Math.max(1, Math.floor(Number(rawQty) || 1))
+      : 1;
+
   // Validity: landline / EE broadband store a label like "36 Months"; broadband
   // stores a bare number of months that needs the suffix appended. One-off EE
   // passes (roaming / voice) have no contract, so this stays blank.
@@ -144,6 +157,7 @@ function normalizeCartItem(raw: RawCartItem): CartItem {
     categoryLabel: isEEMobile ? raw.eeCategory : undefined,
     // SIM delivery type (eSIM / pSIM) — only EE mobile items carry this.
     simType:     isEEMobile ? raw.simType : undefined,
+    quantity,
     _raw:        raw,
   };
 }
@@ -424,11 +438,40 @@ export default function CheckoutPage() {
     newCart.splice(index, 1);
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart.map((i) => i._raw)));
+    // Notify the header CartIcon (same-tab "storage" doesn't fire).
+    window.dispatchEvent(new Event("cart-updated"));
+  };
+
+  // Adjust quantity for a single line. Only accessories / phone_equipment are
+  // quantity-adjustable; other plan types ignore this and stay at 1. Persists
+  // the raw cart to localStorage and fires "cart-updated" so the header badge
+  // (and any other listener) refreshes.
+  const handleQuantityChange = (index: number, nextQty: number) => {
+    const qty = Math.max(1, Math.floor(nextQty) || 1);
+    setCart((prev) => {
+      const next = prev.map((item, i) => {
+        if (i !== index) return item;
+        if (!item.isAccessories && !item.isPhoneEquipment) return item;
+        return {
+          ...item,
+          quantity: qty,
+          _raw: { ...item._raw, qty, quantity: qty },
+        };
+      });
+      try {
+        localStorage.setItem("cart", JSON.stringify(next.map((i) => i._raw)));
+        window.dispatchEvent(new Event("cart-updated"));
+      } catch {
+        /* ignore storage errors */
+      }
+      return next;
+    });
   };
 
   const handleClearCart = () => {
     setCart([]);
     localStorage.removeItem("cart");
+    window.dispatchEvent(new Event("cart-updated"));
   };
 
   // ── Coupon ────────────────────────────────────────────────────────────────
@@ -484,7 +527,7 @@ export default function CheckoutPage() {
   // ── Totals ────────────────────────────────────────────────────────────────
 
   const subtotal = cart.reduce((acc, item) => {
-    return acc + (item.price || 0);
+    return acc + (item.price || 0) * item.quantity;
   }, 0);
 
   const discountAmount = discountData
@@ -556,13 +599,16 @@ export default function CheckoutPage() {
     cart.map((item) => {
       // We ensure the price is a valid number first
       const unitPrice = Number(item.price ?? 0);
+      // Quantity is only > 1 for accessories / phone_equipment (set in
+      // normalizeCartItem); all other plan types stay at 1.
+      const quantity = item.quantity;
 
       return {
         id: item.id,
         name: item.title,
         pricePerUnit: unitPrice,
-        quantity: 1, // Fixed at 1 as per your requirement
-        totalPrice: unitPrice, // No multiplication needed since qty is 1
+        quantity,
+        totalPrice: unitPrice * quantity,
         description: item.description,
         validity: item.validity,
         speed: item.speed,
@@ -859,14 +905,52 @@ export default function CheckoutPage() {
                       {/* 💰 Price Display */}
                       <div className="text-right shrink-0">
                         <p className="font-bold dark:text-white text-lg">
-                          ${item.price.toFixed(2)}
+                          ${(item.price * item.quantity).toFixed(2)}
                         </p>
-                        <button
-                          onClick={() => handleRemove(idx)}
-                          className="text-xs text-red-500 hover:underline mt-1"
-                        >
-                          Remove
-                        </button>
+                        {item.quantity > 1 && (
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            ${item.price.toFixed(2)} × {item.quantity}
+                          </p>
+                        )}
+                        {/* 🔢 Quantity stepper — accessories / phone & equipment only */}
+                        {(item.isAccessories || item.isPhoneEquipment) && (
+                          <div className="mt-2 inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange(idx, item.quantity - 1)}
+                              disabled={loading || item.quantity <= 1}
+                              aria-label="Decrease quantity"
+                              className="px-2.5 py-1 text-base leading-none text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            >
+                              −
+                            </button>
+                            <input
+                              type="number"
+                              min={1}
+                              value={item.quantity}
+                              disabled={loading}
+                              onChange={(e) => handleQuantityChange(idx, parseInt(e.target.value, 10))}
+                              className="w-10 py-1 text-center text-sm font-semibold bg-transparent text-gray-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange(idx, item.quantity + 1)}
+                              disabled={loading}
+                              aria-label="Increase quantity"
+                              className="px-2.5 py-1 text-base leading-none text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
+                        )}
+                        <div>
+                          <button
+                            onClick={() => handleRemove(idx)}
+                            className="text-xs text-red-500 hover:underline mt-1"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -965,6 +1049,11 @@ export default function CheckoutPage() {
                   <div key={idx} className="flex items-start justify-between gap-2 text-sm">
                     <div className="min-w-0">
                       <p className="font-medium text-gray-900 dark:text-white truncate">{item.title}</p>
+                      {item.quantity > 1 && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          ${item.price.toFixed(2)} × {item.quantity}
+                        </span>
+                      )}
                       {item.simType && (
                         <span className="text-xs text-teal-600 dark:text-teal-400 font-medium">
                           {item.simType}
@@ -977,7 +1066,7 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <span className="font-semibold text-gray-900 dark:text-white shrink-0">
-                       ${item.price.toFixed(2)}
+                       ${(item.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
