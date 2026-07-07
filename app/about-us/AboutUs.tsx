@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function AboutUs() {
+  const router = useRouter();
+
   const whyChooseUs = [
     {
       title: "Innovative Solutions",
@@ -292,4 +294,3 @@ export default function AboutUs() {
     </div>
   );
 }
-
