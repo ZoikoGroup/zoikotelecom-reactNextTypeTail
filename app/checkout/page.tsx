@@ -905,11 +905,11 @@ export default function CheckoutPage() {
                       {/* 💰 Price Display */}
                       <div className="text-right shrink-0">
                         <p className="font-bold dark:text-white text-lg">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          £{(item.price * item.quantity).toFixed(2)}
                         </p>
                         {item.quantity > 1 && (
                           <p className="text-xs text-gray-400 mt-0.5">
-                            ${item.price.toFixed(2)} × {item.quantity}
+                            £{item.price.toFixed(2)} × {item.quantity}
                           </p>
                         )}
                         {/* 🔢 Quantity stepper — accessories / phone & equipment only */}
@@ -1051,7 +1051,7 @@ export default function CheckoutPage() {
                       <p className="font-medium text-gray-900 dark:text-white truncate">{item.title}</p>
                       {item.quantity > 1 && (
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          ${item.price.toFixed(2)} × {item.quantity}
+                          £{item.price.toFixed(2)} × {item.quantity}
                         </span>
                       )}
                       {item.simType && (
@@ -1066,7 +1066,7 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <span className="font-semibold text-gray-900 dark:text-white shrink-0">
-                       ${(item.price * item.quantity).toFixed(2)}
+                       £{(item.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -1084,14 +1084,14 @@ export default function CheckoutPage() {
                     )
                   </span>
                   <span className="font-medium text-green-600">
-                    −${discountAmount.toFixed(2)}
+                    −£{discountAmount.toFixed(2)}
                   </span>
                 </div>
               )}
 
               <div className="flex justify-between font-bold text-base mt-4 pt-4 border-t border-gray-100">
                 <span>Total</span>
-                <span className="text-red-500">${total.toFixed(2)}</span>
+                <span className="text-red-500">£{total.toFixed(2)}</span>
               </div>
             </div>
 
