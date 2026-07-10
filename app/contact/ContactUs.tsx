@@ -1,367 +1,326 @@
 "use client";
+import { useState } from "react";
 
-import Image from "next/image";
-import ContactForm from "./ContactForm";
+interface FormData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
 
-export default function ContactSection() {
+interface FormErrors {
+  first_name?: string;
+  email?: string;
+  phone?: string;
+  message?: string;
+}
 
-  // CONTACT INFO CARDS
-  const contactCards = [
-    {
-      title: "CALL US",
-      value: "+44 207 164 6399",
-      icon: "/image/ion_call.png",
-    },
-    {
-      title: "EMAIL US",
-      value: "info@zoikotelecom.com",
-      icon: "/image/tabler_mail-filled.png",
-    },
-    {
-      title: "WORKING HOURS",
-      value: "Mon - Fri, 9:00 - 18:00",
-      icon: "/image/lsicon_time-one-filled.png",
-    },
-  ];
+type TouchedFields = Partial<Record<keyof FormErrors, boolean>>;
 
-  // OFFICE LOCATIONS
-  const offices = [
-    {
-      city: "London",
-      badge: "HEAD OFFICE",
-      desktopImage: "/image/londondesktop.png",
-      mobileImage: "/image/londonmobile.png",
-      address: "35 Berkeley Square, Mayfair, London W1J 5BF",
-      phone: "+44 (0) 207 164 6399",
-      email: "info@zoikotelecom.com",
-    },
-    {
-      city: "Glasgow",
-      desktopImage: "/image/glasgowdesktop.png",
-      mobileImage: "/image/glasgowmobile.png",
-      address: "2nd Floor, 48 West George Street, Glasgow G2 1BP",
-      phone: "+44 141 530 1560",
-      email: "glasgow@zoikotelecom.com",
-    },
-    {
-      city: "Cardiff",
-      desktopImage: "/image/cardiffdesktop.png",
-      mobileImage: "/image/cardiffmobile.png",
-      address: "113-116 Blue Street, Cardiff CF10 5EQ",
-      phone: "+44 292 000 1374",
-      email: "cardiff@zoikotelecom.com",
-    },
-  ];
+// Proper structure: local@domain.tld — rejects bare words / no-TLD strings.
+const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const EMAIL_MAX = 30;
+const PHONE_MAX_DIGITS = 15;
+
+function validateField(name: keyof FormErrors, value: string): string {
+  const v = value.trim();
+
+  switch (name) {
+    case "first_name":
+      if (!v) return "First name is required.";
+      return "";
+
+    case "email":
+      if (!v) return "Email is required.";
+      if (v.length > EMAIL_MAX) return `Email must be at most ${EMAIL_MAX} characters.`;
+      if (/\.\./.test(v) || v.startsWith(".") || v.startsWith("@"))
+        return "Enter a valid email address.";
+      if (!EMAIL_RE.test(v)) return "Enter a valid email address.";
+      return "";
+
+    case "phone": {
+      if (!v) return "Phone number is required.";
+      // Allow leading + and spaces/dashes/parentheses as separators; count digits only.
+      const digits = v.replace(/[^\d]/g, "");
+      if (!/^\+?[\d\s()-]+$/.test(v)) return "Phone can only contain digits and + ( ) - spaces.";
+      if (digits.length < 7 || digits.length > PHONE_MAX_DIGITS)
+        return `Enter a valid phone number (max ${PHONE_MAX_DIGITS} digits).`;
+      return "";
+    }
+
+    case "message":
+      if (!v) return "Message is required.";
+      return "";
+
+    default:
+      return "";
+  }
+}
+
+const REQUIRED_FIELDS: (keyof FormErrors)[] = ["first_name", "email", "phone", "message"];
+
+export function ContactForm() {
+  const [formData, setFormData] = useState<FormData>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<TouchedFields>({});
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name } = e.target;
+    let { value } = e.target;
+
+    // Hard-cap phone at PHONE_MAX_DIGITS digits (separators don't count).
+    if (name === "phone") {
+      const digits = value.replace(/[^\d]/g, "");
+      if (digits.length > PHONE_MAX_DIGITS) return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (REQUIRED_FIELDS.includes(name as keyof FormErrors) && touched[name as keyof FormErrors]) {
+      const msg = validateField(name as keyof FormErrors, value);
+      setErrors((prev) => ({ ...prev, [name]: msg || undefined }));
+    }
+  };
+
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    if (!REQUIRED_FIELDS.includes(name as keyof FormErrors)) return;
+
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const msg = validateField(name as keyof FormErrors, value);
+    setErrors((prev) => ({ ...prev, [name]: msg || undefined }));
+  };
+
+  const validateAll = (): boolean => {
+    const nextErrors: FormErrors = {};
+    for (const field of REQUIRED_FIELDS) {
+      const msg = validateField(field, formData[field]);
+      if (msg) nextErrors[field] = msg;
+    }
+    setErrors(nextErrors);
+    setTouched({ first_name: true, email: true, phone: true, message: true });
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateAll()) return;
+
+    setLoading(true);
+
+    try {
+      const payload = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message,
+      };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/contact/contact-us/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Thank you for contacting Zoiko Telecom. We will reach out soon.");
+
+        setFormData({
+          first_name: "",
+          last_name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+        setErrors({});
+        setTouched({});
+      } else {
+        alert("Something went wrong");
+        console.log(data);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit form");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const inputBase =
+    "w-full h-[51px] bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl px-4 text-[14px] outline-none border-2 transition-colors";
+  const borderNormal = "border-[#CBD5E0] dark:border-gray-700 focus:border-[#C12172]";
+  const borderError = "border-red-500 focus:border-red-500";
+
+  const fieldBorder = (field: keyof FormErrors) => (errors[field] ? borderError : borderNormal);
 
   return (
-    <>
-      {/* ================= CONTACT SECTION ================= */}
+    <div className="w-full max-w-[520px] bg-white dark:bg-gray-900 border border-[#C12172] rounded-[24px] p-6 md:p-10 shadow-xl">
 
-      <section className="w-full relative overflow-hidden dark:bg-gray-900 dark:text-white">
+      {/* FORM TITLE */}
+      <h2 className="text-[#2D3748] dark:text-white text-[24px] font-bold leading-[40px] mb-8">
+        Send Us a Message
+      </h2>
 
-        {/* BACKGROUND IMAGE */}
-        <div className="absolute inset-0">
-          <Image
-            src="/image/portrait-of-classy-team.png"
-            alt="contact"
-            fill
-            priority
-            className="object-cover"
+      {/* FORM */}
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+
+        {/* FIRST NAME */}
+        <div>
+          <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
+            First Name
+          </label>
+
+          <input
+            type="text"
+            name="first_name"
+            value={formData.first_name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            aria-invalid={!!errors.first_name}
+            placeholder="John"
+            className={`${inputBase} ${fieldBorder("first_name")}`}
+          />
+          {errors.first_name && (
+            <p className="mt-1 text-[13px] text-red-500">{errors.first_name}</p>
+          )}
+        </div>
+
+        {/* LAST NAME */}
+        <div>
+          <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
+            Last Name
+          </label>
+
+          <input
+            type="text"
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
+            placeholder="Doe"
+            className={`${inputBase} ${borderNormal}`}
           />
         </div>
 
-        {/* CONTENT */}
-        <div className="relative z-10 max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10 py-14 md:py-8">
+        {/* EMAIL */}
+        <div>
+          <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
+            Your Email
+          </label>
 
-          <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start justify-between">
-
-            {/* LEFT SIDE */}
-            <div className="w-full max-w-[520px]">
-
-              {/* HEADING */}
-              <h1 className="text-white dark:text-white text-[38px] md:text-[48px] font-extrabold leading-[52px] md:leading-[67px]">
-                Get in Touch
-              </h1>
-
-              {/* DESCRIPTION */}
-              <p className="text-white/90 dark:text-white text-[16px] md:text-[18px] leading-[30px] mt-3 max-w-[486px]">
-                We're here to help with any questions about our telecom
-                solutions. Reach out to our team and we'll respond within
-                24 hours.
-              </p>
-
-              {/* CONTACT CARDS */}
-              <div className="mt-10 flex flex-col gap-4">
-
-                {contactCards.map((item, index) => (
-                  <div
-                    key={index}
-                    className="w-full max-w-[520px] min-h-[96px] bg-white dark:bg-gray-900 border border-[#C12172] rounded-2xl px-5 py-5 flex items-center gap-5"
-                  >
-
-                    {/* ICON BOX */}
-                    <div className="w-[56px] h-[56px] rounded-2xl bg-gradient-to-r from-[#C12172] to-[#782984] flex items-center justify-center flex-shrink-0">
-
-                      <Image
-                        src={item.icon}
-                        alt={item.title}
-                        width={24}
-                        height={24}
-                        className="object-contain"
-                      />
-
-                    </div>
-
-                    {/* TEXT */}
-                    <div>
-
-                      <h4 className="text-[#718096] dark:text-white text-[13px] font-medium uppercase tracking-[0.5px] leading-[22px]">
-                        {item.title}
-                      </h4>
-
-                      <p className="text-[#2D3748] dark:text-white text-[16px] md:text-[18px] font-semibold leading-[27px] mt-1">
-                        {item.value}
-                      </p>
-
-                    </div>
-                  </div>
-                ))}
-
-              </div>
-            </div>
-
-            {/* RIGHT SIDE FORM */}
-            <ContactForm />
-
-          </div>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            aria-invalid={!!errors.email}
+            placeholder="john@example.com"
+            maxLength={EMAIL_MAX}
+            className={`${inputBase} ${fieldBorder("email")}`}
+          />
+          {errors.email && (
+            <p className="mt-1 text-[13px] text-red-500">{errors.email}</p>
+          )}
         </div>
-      </section>
 
-     {/* ================= OFFICE LOCATIONS SECTION ================= */}
+        {/* PHONE */}
+        <div>
+          <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
+            Phone Number
+          </label>
 
-<section className="w-full bg-white dark:bg-gray-900 dark:text-white py-[80px] md:py-[50px]">
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            aria-invalid={!!errors.phone}
+            placeholder="+44 123 456 7890"
+            className={`${inputBase} ${fieldBorder("phone")}`}
+          />
+          {errors.phone && (
+            <p className="mt-1 text-[13px] text-red-500">{errors.phone}</p>
+          )}
+        </div>
 
-  <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-22">
+        {/* SUBJECT */}
+        <div>
+          <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
+            Subject
+          </label>
 
-    {/* TOP CONTENT */}
-    <div className="flex flex-col items-center text-center">
+          <input
+            type="text"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            placeholder="Enter subject"
+            className={`${inputBase} ${borderNormal}`}
+          />
+        </div>
 
-      {/* LABEL */}
-      <div className="px-5 py-2 rounded-full border border-[#F6D5EA] bg-[#FFF5FC] dark:bg-gray-900">
+        {/* MESSAGE */}
+        <div>
+          <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
+            Your Message
+          </label>
 
-        <span className="text-[#C12172] text-[11px] md:text-[13px] font-semibold tracking-[1px] uppercase">
-          OUR OFFICES
-        </span>
+          <textarea
+            rows={2}
+            name="message"
+            placeholder="How can we help you?"
+            value={formData.message}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            aria-invalid={!!errors.message}
+            className={`w-full bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl p-4 text-[14px] outline-none resize-none border-2 transition-colors ${fieldBorder(
+              "message"
+            )}`}
+          ></textarea>
+          {errors.message && (
+            <p className="mt-1 text-[13px] text-red-500">{errors.message}</p>
+          )}
+        </div>
 
-      </div>
-
-      {/* TITLE */}
-      <h2 className="mt-5 text-[#2D3748] dark:text-white text-[34px] md:text-[42px] lg:text-[38px] font-semibold leading-tight">
-        Visit Us
-      </h2>
-
-      {/* SUBTITLE */}
-      <p className="mt-3 text-[#718096] dark:text-white text-[15px] md:text-[18px] leading-[28px]">
-        Find our offices across the UK
-      </p>
-
-    </div>
-
-    {/* OFFICE CARDS */}
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-7 mt-8">
-
-      {offices.map((office, index) => (
-        <div
-          key={index}
-          className="bg-white dark:bg-gray-900 border border-[#ECECEC] rounded-[28px] overflow-hidden"
+        {/* BUTTON */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full h-[56px] rounded-full bg-gradient-to-r from-[#C12172] to-[#782984] text-white text-[16px] font-semibold mt-2 hover:scale-[1.01] transition-all duration-300 disabled:opacity-50"
         >
+          {loading ? "Sending..." : "Send Message →"}
+        </button>
 
-          {/* IMAGE */}
-          <div className="relative">
-
-            {/* DESKTOP IMAGE */}
-            <Image
-              src={office.desktopImage}
-              alt={office.city}
-              width={420}
-              height={260}
-              className="hidden lg:block w-full h-[250px] object-cover"
-            />
-
-            {/* MOBILE IMAGE */}
-            <Image
-              src={office.mobileImage}
-              alt={office.city}
-              width={420}
-              height={260}
-              className="block lg:hidden w-full h-[220px] object-cover"
-            />
-
-            {/* BADGE */}
-            {office.badge && (
-              <div className="absolute bottom-[-16px] left-1/2 -translate-x-1/2 bg-white dark:bg-gray-900 border border-[#ECECEC] rounded-full px-5 py-2">
-
-                <span className="text-[#C12172]  text-[11px] font-semibold tracking-[0.8px] uppercase">
-                  {office.badge}
-                </span>
-
-              </div>
-            )}
-
-          </div>
-
-          {/* CONTENT */}
-          <div className="px-6 lg:px-7 pt-8 pb-7">
-
-            {/* CITY */}
-            <h3 className="text-[#2D3748] dark:text-white text-[28px] lg:text-[32px] font-bold">
-              {office.city}
-            </h3>
-
-            {/* DETAILS */}
-            <div className="mt-6 space-y-5">
-
-              {/* ADDRESS */}
-              <div className="flex items-start gap-4">
-
-                <Image
-                  src="/image/icon (2).png"
-                  alt="location"
-                  width={20}
-                  height={20}
-                  className="mt-1 flex-shrink-0"
-                />
-
-                <p className="text-[#718096] dark:text-white text-[14px] leading-[24px]">
-                  {office.address}
-                </p>
-
-              </div>
-
-              {/* PHONE */}
-              <div className="flex items-center gap-4">
-
-                <Image
-                  src="/image/icon1.png"
-                  alt="phone"
-                  width={20}
-                  height={20}
-                  className="flex-shrink-0"
-                />
-
-                <p className="text-[#718096] dark:text-white text-[14px]">
-                  {office.phone}
-                </p>
-
-              </div>
-
-              {/* EMAIL */}
-              <div className="flex items-center gap-4">
-
-                <Image
-                  src="/image/icon2.png"
-                  alt="mail"
-                  width={20}
-                  height={20}
-                  className="flex-shrink-0"
-                />
-
-                <p className="text-[#718096] dark:text-white text-[14px] break-all">
-                  {office.email}
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* BUTTON */}
-            <button className="mt-7 flex items-center gap-2 text-[#C12172]  text-[15px] font-semibold">
-
-              Get Directions →
-
-            </button>
-
-          </div>
-
-        </div>
-      ))}
-
+      </form>
     </div>
-
-  </div>
-</section>
-
-<section className="w-full bg-[#F8F9FA] dark:bg-gray-900 dark:text-white py-[80px] md:py-[40px]">
-  <div className="max-w-[1440px] mx-auto px-5 md:px-20">
-
-    {/* Top Badge */}
-    <div className="flex justify-center mb-4">
-      <div className="bg-[#FFF4FD]  text-[#C12172] dark:bg-gray-900 text-[15px] font-semibold px-5 py-2 rounded-full uppercase tracking-wide">
-        FAQs
-      </div>
-    </div>
-
-    {/* Heading */}
-    <h2 className="text-center text-[#2D3748] dark:text-white text-[34px] md:text-[38px] font-bold leading-tight mb-9">
-      Common Questions
-    </h2>
-
-    {/* FAQ Grid */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-      {/* Card 1 */}
-      <div className="bg-white dark:bg-gray-900 border border-[#E2E8F0] rounded-[20px] p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-        <h3 className="text-[#2D3748] dark:text-white text-[18px] font-semibold leading-[30px] mb-4">
-          What services do you offer?
-        </h3>
-
-        <p className="text-[#718096] dark:text-white text-[16px] font-normal leading-[25px]">
-          We offer comprehensive telecom solutions including EE Mobile plans,
-          BT Broadband, IoT connectivity, VoIP services and enterprise business
-          solutions.
-        </p>
-      </div>
-
-      {/* Card 2 */}
-      <div className="bg-white dark:bg-gray-900 border border-[#E2E8F0] rounded-[20px] p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-        <h3 className="text-[#2D3748] dark:text-white text-[18px] font-semibold leading-[30px] mb-4">
-          How quickly can you set up service?
-        </h3>
-
-        <p className="text-[#718096] dark:text-white text-[16px] font-normal leading-[25px]">
-          Most services can be activated within 24–48 hours. Complex enterprise
-          solutions may take 3–5 business days depending on requirements.
-        </p>
-      </div>
-
-      {/* Card 3 */}
-      <div className="bg-white dark:bg-gray-900 border border-[#E2E8F0] rounded-[20px] p-8 ">
-        <h3 className="text-[#2D3748] dark:text-white text-[18px] font-semibold leading-[30px] mb-4">
-          Do you offer 24/7 support?
-        </h3>
-
-        <p className="text-[#718096] dark:text-white text-[16px] font-normal leading-[25px]">
-          Yes! Our customer support team is available 24/7 via phone, email and
-          live chat to assist with any issues or questions.
-        </p>
-      </div>
-
-      {/* Card 4 */}
-      <div className="bg-white dark:bg-gray-900 border border-[#E2E8F0] rounded-[20px] p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-        <h3 className="text-[#2D3748] dark:text-white text-[18px] font-semibold leading-[30px] mb-4">
-          What are your payment terms?
-        </h3>
-
-        <p className="text-[#718096] dark:text-white text-[16px] font-normal leading-[25px]">
-          We offer flexible payment options including monthly billing, annual
-          contracts and custom payment plans for enterprise customers.
-        </p>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-    </>
   );
 }
+
+export default ContactForm;

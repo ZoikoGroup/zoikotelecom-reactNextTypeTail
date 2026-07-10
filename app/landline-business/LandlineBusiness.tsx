@@ -253,11 +253,12 @@ export default function HeroSection() {
 
             {/* Buttons */}
             <div className="mt-8 flex flex-col items-start gap-4">
-              <button className="h-[46px] px-8 rounded-full bg-gradient-to-r from-[#7B1FA2] to-[#E91E8C] text-white text-[13px] font-bold flex items-center gap-2">
-                <Play size={16} fill="white" strokeWidth={0} />
-                Configure Your Plan
-              </button>
-
+              <Link href="" onClick={handleClick}>
+                <button className="h-[46px] px-8 rounded-full bg-gradient-to-r from-[#7B1FA2] to-[#E91E8C] text-white text-[13px] font-bold flex items-center gap-2">
+                  <Play size={16} fill="white" strokeWidth={0} />
+                  Configure Your Plan
+                </button>
+              </Link>
               <button className="h-[46px] px-[30px] rounded-full border border-[#7B1FA2] text-[#7B1FA2] dark:text-white text-[13px] font-bold">
                 See how it works
               </button>
