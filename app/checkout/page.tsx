@@ -5,7 +5,6 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import { usStates } from "../utils/usStates";
 import { processOrderStripe } from "../utils/stripeWebPaymentApi";
 import StripePaymentForm, { StripePaymentFormRef } from "../Components/StripePaymentForm";
-import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 // ── Stub data for standalone compilation ──────────────────────────────────────
@@ -306,8 +305,6 @@ export default function CheckoutPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showTermsPopup, setShowTermsPopup] = useState(false);
-  const { resolvedTheme } = useTheme();
-
   // The Stripe fields live in a cross-origin iframe that cannot inherit
   // Tailwind's `dark:` variants — it only obeys the `appearance` object handed
   // to it at creation. So we must detect dark mode ourselves and rebuild that
@@ -350,7 +347,7 @@ export default function CheckoutPage() {
       mq.removeEventListener("change", compute);
       observer.disconnect();
     };
-  }, [resolvedTheme]);
+  }, []);
 
   const stripeOptions: StripeElementsOptions = useMemo(() => {
   return {
