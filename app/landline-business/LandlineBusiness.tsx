@@ -98,7 +98,7 @@ export default function HeroSection() {
 
             {/* Paragraph */}
             <p className="mt-8 max-w-[560px] text-[18px] leading-[34px] text-[#6B6B8A] dark:text-gray-300">
-              Transform your business communications with Zoiko’s
+              Transform your business communications with Zoiko&rsquo;s
               next-generation digital landline. Crystal-clear calls,
               advanced features, and zero complexity — all in one place.
             </p>
@@ -246,7 +246,7 @@ export default function HeroSection() {
 
             {/* Paragraph */}
             <p className="mt-5 text-[16px] leading-[28px] text-[#6B6B8A] dark:text-gray-300 max-w-[352px]">
-              Transform your business communications with Zoiko’s
+              Transform your business communications with Zoiko&rsquo;s
               next-generation digital landline. Crystal-clear calls,
               advanced features, and zero complexity — all in one place.
             </p>
@@ -322,7 +322,7 @@ export default function HeroSection() {
 
         {/* DESCRIPTION */}
         <p className="mt-5 text-center text-[#667085] dark:text-gray-300 text-sm md:text-base leading-6 max-w-[760px] mx-auto">
-          Here's a bird's-eye view of your setup journey
+          Here&apos;s a bird&apos;s-eye view of your setup journey
           simple, guided and completed in minutes.
         </p>
 
@@ -391,12 +391,16 @@ export default function HeroSection() {
             {/* TEXT */}
             <p className="mt-5 max-w-[620px] text-white/90 text-sm md:text-lg leading-6 md:leading-7">
               Join thousands of UK businesses already
-              running on Zoiko's digital landline — no
+              running on Zoiko&apos;s digital landline — no
               engineer visit, no downtime.
             </p>
 
             {/* BUTTON */}
-            <button className="mt-7 h-10 px-5 rounded-full border-2 border-white text-white text-sm md:text-base font-bold tracking-wide hover:bg-white hover:text-[#E6007E] transition-all duration-300">
+            <button
+              type="button"
+              onClick={handleClick}
+              className="mt-7 h-10 px-5 rounded-full border-2 border-white text-white text-sm md:text-base font-bold tracking-wide hover:bg-white hover:text-[#E6007E] transition-all duration-300"
+            >
               Configure My Plan ›
             </button>
           </div>
@@ -437,7 +441,7 @@ export default function HeroSection() {
               {/* QUOTE */}
               <div>
                 <div className="text-[#5B1E96] text-5xl leading-none font-serif">
-                  "
+                  &quot;
                 </div>
 
                 <p className="mt-6 text-[#667085] dark:text-gray-300 text-sm leading-7">
@@ -478,3 +482,5 @@ export default function HeroSection() {
     </main>
   );
 }
+
+export { HeroSection };
