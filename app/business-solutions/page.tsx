@@ -2109,103 +2109,101 @@ const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     >
 
       {industries.map((item) => (
-        <div
-          key={item.id}
+  <Link
+    key={item.id}
+    href="/landline-business"
+    className="
+      group
+      bg-white dark:bg-[#111827]
+      border border-[#E7E2F0] dark:border-white/10
+      rounded-2xl
+      px-6 py-5
+      flex items-center justify-between
+      gap-5
+      transition-all duration-300
+      hover:-translate-y-1
+      hover:shadow-xl
+      hover:shadow-pink-500/10
+    "
+  >
+
+    {/* LEFT CONTENT */}
+    <div className="flex items-center gap-4 min-w-0">
+
+      {/* ICON */}
+      <div
+        className="
+          w-14 h-14
+          rounded-2xl
+          bg-pink-50 dark:bg-pink-500/10
+          flex items-center justify-center
+          shrink-0
+          transition-all duration-300
+          group-hover:scale-105
+        "
+      >
+        <Image
+          src={item.icon}
+          alt={item.title}
+          width={56}
+          height={56}
+          className="w-14 h-14 object-contain"
+        />
+      </div>
+
+      {/* TEXT CONTENT */}
+      <div className="min-w-0">
+        <h3
           className="
-            group
-            bg-white dark:bg-[#111827]
-            border border-[#E7E2F0] dark:border-white/10
-            rounded-2xl
-            px-6 py-5
-            flex items-center justify-between
-            gap-5
-            transition-all duration-300
-            hover:-translate-y-1
-            hover:shadow-xl
-            hover:shadow-pink-500/10
+            text-base sm:text-lg
+            font-bold
+            text-[#1A1831]
+            dark:text-white
+            truncate
           "
         >
+          {item.title}
+        </h3>
 
-          {/* LEFT CONTENT */}
-          <div className="flex items-center gap-4 min-w-0">
+        <p
+          className="
+            mt-1
+            text-sm
+            leading-6
+            text-gray-600 dark:text-slate-300
+          "
+        >
+          {item.description}
+        </p>
+      </div>
+    </div>
 
-            {/* ICON */}
-            <div
-              className="
-                w-14 h-14
-                rounded-2xl
-                bg-pink-50 dark:bg-pink-500/10
-                flex items-center justify-center
-                shrink-0
-                transition-all duration-300
-                group-hover:scale-105
-              "
-            >
-              <Image
-                src={item.icon}
-                alt={item.title}
-                width={56}
-                height={56}
-                className="w-14 h-14 object-contain"
-              />
-            </div>
-
-            {/* TEXT CONTENT */}
-            <div className="min-w-0">
-
-              {/* TITLE */}
-              <h3
-                className="
-                  text-base sm:text-lg
-                  font-bold
-                  text-[#1A1831]
-                  dark:text-white
-                  truncate
-                "
-              >
-                {item.title}
-              </h3>
-
-              {/* DESCRIPTION */}
-              <p
-                className="
-                  mt-1
-                  text-sm
-                  leading-6
-                  text-gray-600 dark:text-slate-300
-                "
-              >
-                {item.description}
-              </p>
-            </div>
-          </div>
-
-          {/* RIGHT ARROW */}
-          <button
-            className="
-              shrink-0
-              text-pink-600 dark:text-pink-400
-              transition-transform duration-300
-              group-hover:translate-x-1
-            "
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-              />
-            </svg>
-          </button>
-        </div>
-      ))}
+    {/* RIGHT ARROW */}
+    <span
+      className="
+        shrink-0
+        text-pink-600 dark:text-pink-400
+        transition-transform duration-300
+        group-hover:translate-x-1
+      "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={2}
+        stroke="currentColor"
+        className="w-5 h-5"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+        />
+      </svg>
+    </span>
+  </Link>
+))}
     </div>
   </div>
        </section>
