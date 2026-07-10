@@ -5,7 +5,6 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import { usStates } from "../utils/usStates";
 import { processOrderStripe } from "../utils/stripeWebPaymentApi";
 import StripePaymentForm, { StripePaymentFormRef } from "../Components/StripePaymentForm";
-import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 // ── Stub data for standalone compilation ──────────────────────────────────────
@@ -306,10 +305,59 @@ export default function CheckoutPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showTermsPopup, setShowTermsPopup] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const stripeOptions: StripeElementsOptions = useMemo(() => {
-  const isDark = resolvedTheme === "dark";
+  // The Stripe fields live in a cross-origin iframe that cannot inherit the
+  // page's dark styling — it only obeys the `appearance` object handed to it at
+  // creation. So we detect dark mode by MEASURING the actual payment card that
+  // is on screen (see paymentCardRef below) and matching Stripe to its real
+  // background colour. Reading the live element works no matter how dark mode is
+  // wired — Tailwind `dark:` class, `prefers-color-scheme` media query, a
+  // `data-theme` attribute, or hand-written CSS.
+  const paymentCardRef = useRef<HTMLDivElement>(null);
+  const [isDark, setIsDark] = useState(false);
 
+  useEffect(() => {
+    const compute = () => {
+      // Walk up from the payment card until we hit an element with an actually
+      // painted (non-transparent) background, falling back to <body>.
+      let el: HTMLElement | null = paymentCardRef.current;
+      let bg = "";
+      while (el) {
+        const c = getComputedStyle(el).backgroundColor;
+        if (c && c !== "transparent" && !c.startsWith("rgba(0, 0, 0, 0")) {
+          bg = c;
+          break;
+        }
+        el = el.parentElement;
+      }
+      if (!bg) bg = getComputedStyle(document.body).backgroundColor;
+
+      // bg is "rgb(r, g, b)" / "rgba(...)". Sum the channels; below the 384
+      // midpoint means a dark fill, so we render Stripe in dark mode.
+      const rgb = bg.match(/\d+/g);
+      setIsDark(
+        rgb ? Number(rgb[0]) + Number(rgb[1]) + Number(rgb[2]) < 384 : false,
+      );
+    };
+
+    compute();
+
+    // Re-measure on any theme switch: OS-level (media strategy) or a class /
+    // attribute toggle on <html> (next-themes, manual, data-theme).
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", compute);
+    const observer = new MutationObserver(compute);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme", "style"],
+    });
+
+    return () => {
+      mq.removeEventListener("change", compute);
+      observer.disconnect();
+    };
+  }, []);
+
+  const stripeOptions: StripeElementsOptions = useMemo(() => {
   return {
     clientSecret,
 
@@ -379,7 +427,7 @@ export default function CheckoutPage() {
       },
     },
   };
-}, [clientSecret, resolvedTheme]);
+}, [clientSecret, isDark]);
   const emptyAddress: Address = {
     firstName: "",
     lastName: "",
@@ -1096,11 +1144,15 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div
+              ref={paymentCardRef}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 p-6"
+            >
               <h2 className="font-bold text-gray-900 dark:text-white mb-4">Payment</h2>
 
               {clientSecret ? (
                 <Elements
+                  key={`${clientSecret}-${isDark ? "dark" : "light"}`}
                   stripe={stripePromise}
                   options={stripeOptions}
                 >
