@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Image from "next/image";
 import Link from "next/link";
 import { isValidPhoneNumber } from "libphonenumber-js";
@@ -329,6 +329,12 @@ const countries = [
 ];
 
 export default function page() {
+
+  const formRef = useRef<HTMLElement>(null);
+
+const scrollToForm = () => {
+  formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+};
 
   const [selectedService, setSelectedService] = useState("");
   const [formData, setFormData] = useState({
@@ -700,6 +706,7 @@ export default function page() {
         <div className="flex flex-col sm:flex-row gap-4 mt-10">
           <Link href="/ee-mobile-plans" passHref>
           <button
+          onClick={scrollToForm}
             className="
               h-14 px-8 rounded-full
               text-xs md:text-sm
@@ -719,6 +726,7 @@ export default function page() {
 
           <Link href="/contact" passHref>
           <button
+          
             className="
               h-14 px-8 rounded-full
               text-xs md:text-sm
@@ -2018,7 +2026,7 @@ export default function page() {
        </section>
 
        {/* INDUSTRIES */}
-       <section className="w-full bg-[#F7F5FA] dark:bg-[#0F172A] py-16 lg:py-24 transition-colors duration-300">
+       <section ref={formRef} className="w-full bg-[#F7F5FA] dark:bg-[#0F172A] py-16 lg:py-24 transition-colors duration-300">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
     {/* TOP CONTENT */}
