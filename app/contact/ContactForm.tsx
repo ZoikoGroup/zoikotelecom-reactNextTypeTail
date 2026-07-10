@@ -1,77 +1,169 @@
 "use client";
 import { useState } from "react";
 
-export default function ContactForm() {
-  const [formData, setFormData] = useState({
-  first_name: "",
-  last_name: "",
-  email: "",
-  phone: "",
-  subject: "",
-  message: "",
-});
+interface FormData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
 
-const [loading, setLoading] = useState(false);
+interface FormErrors {
+  first_name?: string;
+  email?: string;
+  phone?: string;
+  message?: string;
+}
 
-const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-) => {
-  setFormData({
-    ...formData,
-    [e.target.name]: e.target.value,
+type TouchedFields = Partial<Record<keyof FormErrors, boolean>>;
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateField(name: keyof FormErrors, value: string): string {
+  const v = value.trim();
+
+  switch (name) {
+    case "first_name":
+      if (!v) return "First name is required.";
+      return "";
+
+    case "email":
+      if (!v) return "Email is required.";
+      if (!EMAIL_RE.test(v)) return "Enter a valid email address.";
+      return "";
+
+    case "phone": {
+      if (!v) return "Phone number is required.";
+      // Allow leading + and spaces/dashes/parentheses as separators; count digits only.
+      const digits = v.replace(/[^\d]/g, "");
+      if (!/^\+?[\d\s()-]+$/.test(v)) return "Phone can only contain digits and + ( ) - spaces.";
+      if (digits.length < 7 || digits.length > 15) return "Enter a valid phone number.";
+      return "";
+    }
+
+    case "message":
+      if (!v) return "Message is required.";
+      return "";
+
+    default:
+      return "";
+  }
+}
+
+const REQUIRED_FIELDS: (keyof FormErrors)[] = ["first_name", "email", "phone", "message"];
+
+export function ContactForm() {
+  const [formData, setFormData] = useState<FormData>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
   });
-};
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<TouchedFields>({});
+  const [loading, setLoading] = useState(false);
 
-  setLoading(true);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-  try {
-     const payload = {
-    first_name:formData.first_name,
-    last_name:formData.last_name,
-    email: formData.email,
-    phone: formData.phone,
-    subject: formData.subject,
-    message: formData.message,
+    if (REQUIRED_FIELDS.includes(name as keyof FormErrors) && touched[name as keyof FormErrors]) {
+      const msg = validateField(name as keyof FormErrors, value);
+      setErrors((prev) => ({ ...prev, [name]: msg || undefined }));
+    }
   };
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/contact/contact-us/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    if (!REQUIRED_FIELDS.includes(name as keyof FormErrors)) return;
 
-    const data = await response.json();
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const msg = validateField(name as keyof FormErrors, value);
+    setErrors((prev) => ({ ...prev, [name]: msg || undefined }));
+  };
 
-    if (response.ok) {
-  alert("Thank you for contacting Zoiko Telecom. We will reach out soon.");
-
-      setFormData({
-        first_name: "",
-        last_name:"",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
-      });
-    } else {
-      alert("Something went wrong");
-      console.log(data);
+  const validateAll = (): boolean => {
+    const nextErrors: FormErrors = {};
+    for (const field of REQUIRED_FIELDS) {
+      const msg = validateField(field, formData[field]);
+      if (msg) nextErrors[field] = msg;
     }
-  } catch (error) {
-    console.error(error);
-    alert("Failed to submit form");
-  } finally {
-    setLoading(false);
-  }
-};
+    setErrors(nextErrors);
+    setTouched({ first_name: true, email: true, phone: true, message: true });
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateAll()) return;
+
+    setLoading(true);
+
+    try {
+      const payload = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message,
+      };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/contact/contact-us/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Thank you for contacting Zoiko Telecom. We will reach out soon.");
+
+        setFormData({
+          first_name: "",
+          last_name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+        setErrors({});
+        setTouched({});
+      } else {
+        alert("Something went wrong");
+        console.log(data);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit form");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const inputBase =
+    "w-full h-[51px] bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl px-4 text-[14px] outline-none border-2 transition-colors";
+  const borderNormal = "border-[#CBD5E0] dark:border-gray-700 focus:border-[#C12172]";
+  const borderError = "border-red-500 focus:border-red-500";
+
+  const fieldBorder = (field: keyof FormErrors) => (errors[field] ? borderError : borderNormal);
+
   return (
     <div className="w-full max-w-[520px] bg-white dark:bg-gray-900 border border-[#C12172] rounded-[24px] p-6 md:p-10 shadow-xl">
 
@@ -81,9 +173,9 @@ const handleSubmit = async (e: React.FormEvent) => {
       </h2>
 
       {/* FORM */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
 
-        {/* FIRSTNAME */}
+        {/* FIRST NAME */}
         <div>
           <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
             First Name
@@ -91,15 +183,20 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           <input
             type="text"
-              name="first_name"
-              value={formData.first_name}
-              onChange={handleChange}
-              required
+            name="first_name"
+            value={formData.first_name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            aria-invalid={!!errors.first_name}
             placeholder="John"
-            className="w-full h-[51px] border-2 border-[#CBD5E0] dark:border-gray-700 bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl px-4 text-[14px] outline-none focus:border-[#C12172]"
+            className={`${inputBase} ${fieldBorder("first_name")}`}
           />
+          {errors.first_name && (
+            <p className="mt-1 text-[13px] text-red-500">{errors.first_name}</p>
+          )}
         </div>
-        {/*LAST NAME*/}
+
+        {/* LAST NAME */}
         <div>
           <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
             Last Name
@@ -107,14 +204,14 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           <input
             type="text"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleChange}
-              required
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
             placeholder="Doe"
-            className="w-full h-[51px] border-2 border-[#CBD5E0] dark:border-gray-700 bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl px-4 text-[14px] outline-none focus:border-[#C12172]"
+            className={`${inputBase} ${borderNormal}`}
           />
         </div>
+
         {/* EMAIL */}
         <div>
           <label className="text-[#2D3748] dark:text-white text-[14px] font-semibold leading-[24px] mb-2 block">
@@ -124,12 +221,16 @@ const handleSubmit = async (e: React.FormEvent) => {
           <input
             type="email"
             name="email"
-           value={formData.email}
+            value={formData.email}
             onChange={handleChange}
-            required
+            onBlur={handleBlur}
+            aria-invalid={!!errors.email}
             placeholder="john@example.com"
-            className="w-full h-[51px] border-2 border-[#CBD5E0] dark:border-gray-700 bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl px-4 text-[14px] outline-none focus:border-[#C12172]"
+            className={`${inputBase} ${fieldBorder("email")}`}
           />
+          {errors.email && (
+            <p className="mt-1 text-[13px] text-red-500">{errors.email}</p>
+          )}
         </div>
 
         {/* PHONE */}
@@ -139,14 +240,18 @@ const handleSubmit = async (e: React.FormEvent) => {
           </label>
 
           <input
-            type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            aria-invalid={!!errors.phone}
             placeholder="+44 123 456 7890"
-            className="w-full h-[51px] border-2 border-[#CBD5E0] dark:border-gray-700 bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl px-4 text-[14px] outline-none focus:border-[#C12172]"
+            className={`${inputBase} ${fieldBorder("phone")}`}
           />
+          {errors.phone && (
+            <p className="mt-1 text-[13px] text-red-500">{errors.phone}</p>
+          )}
         </div>
 
         {/* SUBJECT */}
@@ -155,18 +260,14 @@ const handleSubmit = async (e: React.FormEvent) => {
             Subject
           </label>
 
-          {/*<select className="w-full h-[51px] border-2 border-[#CBD5E0] dark:border-gray-700 bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl px-4 text-[14px] outline-none focus:border-[#C12172]">
-            <option>Select a subject</option>
-          </select>*/}
           <input
-              type="text"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              required
-              placeholder="Enter subject"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3"
-  />
+            type="text"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            placeholder="Enter subject"
+            className={`${inputBase} ${borderNormal}`}
+          />
         </div>
 
         {/* MESSAGE */}
@@ -181,9 +282,15 @@ const handleSubmit = async (e: React.FormEvent) => {
             placeholder="How can we help you?"
             value={formData.message}
             onChange={handleChange}
-            required
-            className="w-full border-2 border-[#CBD5E0] dark:border-gray-700 bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl p-4 text-[14px] outline-none resize-none focus:border-[#C12172]"
+            onBlur={handleBlur}
+            aria-invalid={!!errors.message}
+            className={`w-full bg-white dark:bg-gray-900 text-[#2D3748] dark:text-white rounded-xl p-4 text-[14px] outline-none resize-none border-2 transition-colors ${fieldBorder(
+              "message"
+            )}`}
           ></textarea>
+          {errors.message && (
+            <p className="mt-1 text-[13px] text-red-500">{errors.message}</p>
+          )}
         </div>
 
         {/* BUTTON */}
@@ -199,3 +306,5 @@ const handleSubmit = async (e: React.FormEvent) => {
     </div>
   );
 }
+
+export default ContactForm;
