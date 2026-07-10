@@ -5,7 +5,6 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import { usStates } from "../utils/usStates";
 import { processOrderStripe } from "../utils/stripeWebPaymentApi";
 import StripePaymentForm, { StripePaymentFormRef } from "../Components/StripePaymentForm";
-import { useTheme } from "next-themes";
 import { useMemo } from "react";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 // ── Stub data for standalone compilation ──────────────────────────────────────
@@ -306,10 +305,51 @@ export default function CheckoutPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showTermsPopup, setShowTermsPopup] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const stripeOptions: StripeElementsOptions = useMemo(() => {
-  const isDark = resolvedTheme === "dark";
+  // The Stripe fields live in a cross-origin iframe that cannot inherit
+  // Tailwind's `dark:` variants — it only obeys the `appearance` object handed
+  // to it at creation. So we must detect dark mode ourselves and rebuild that
+  // appearance. Rather than guess how dark mode is wired (next-themes class
+  // attribute, a manual `dark` class, or a pure `prefers-color-scheme` media
+  // query via Tailwind's `media` strategy — each of which reports differently),
+  // we measure what is actually rendered: probe a throwaway element styled with
+  // `dark:` and read back its computed colour. This reflects exactly what the
+  // user sees, whatever the config.
+  const [isDark, setIsDark] = useState(false);
 
+  useEffect(() => {
+    const compute = () => {
+      const probe = document.createElement("div");
+      probe.className = "bg-white dark:bg-gray-900";
+      probe.style.cssText =
+        "position:absolute;width:0;height:0;visibility:hidden;pointer-events:none";
+      document.body.appendChild(probe);
+      const bg = getComputedStyle(probe).backgroundColor;
+      document.body.removeChild(probe);
+      // bg comes back as "rgb(r, g, b)". gray-900 sums to 80, white to 765,
+      // so a channel sum under the 384 midpoint means the dark fill is active.
+      const rgb = bg.match(/\d+/g);
+      setIsDark(rgb ? Number(rgb[0]) + Number(rgb[1]) + Number(rgb[2]) < 384 : false);
+    };
+
+    compute();
+
+    // React to both OS-level (media strategy) and class-level (next-themes /
+    // manual) theme switches.
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", compute);
+    const observer = new MutationObserver(compute);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme", "style"],
+    });
+
+    return () => {
+      mq.removeEventListener("change", compute);
+      observer.disconnect();
+    };
+  }, []);
+
+  const stripeOptions: StripeElementsOptions = useMemo(() => {
   return {
     clientSecret,
 
@@ -379,7 +419,7 @@ export default function CheckoutPage() {
       },
     },
   };
-}, [clientSecret, resolvedTheme]);
+}, [clientSecret, isDark]);
   const emptyAddress: Address = {
     firstName: "",
     lastName: "",
@@ -1101,6 +1141,7 @@ export default function CheckoutPage() {
 
               {clientSecret ? (
                 <Elements
+                  key={`${clientSecret}-${isDark ? "dark" : "light"}`}
                   stripe={stripePromise}
                   options={stripeOptions}
                 >
