@@ -305,36 +305,44 @@ export default function CheckoutPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showTermsPopup, setShowTermsPopup] = useState(false);
-  // The Stripe fields live in a cross-origin iframe that cannot inherit
-  // Tailwind's `dark:` variants — it only obeys the `appearance` object handed
-  // to it at creation. So we must detect dark mode ourselves and rebuild that
-  // appearance. Rather than guess how dark mode is wired (next-themes class
-  // attribute, a manual `dark` class, or a pure `prefers-color-scheme` media
-  // query via Tailwind's `media` strategy — each of which reports differently),
-  // we measure what is actually rendered: probe a throwaway element styled with
-  // `dark:` and read back its computed colour. This reflects exactly what the
-  // user sees, whatever the config.
+  // The Stripe fields live in a cross-origin iframe that cannot inherit the
+  // page's dark styling — it only obeys the `appearance` object handed to it at
+  // creation. So we detect dark mode by MEASURING the actual payment card that
+  // is on screen (see paymentCardRef below) and matching Stripe to its real
+  // background colour. Reading the live element works no matter how dark mode is
+  // wired — Tailwind `dark:` class, `prefers-color-scheme` media query, a
+  // `data-theme` attribute, or hand-written CSS.
+  const paymentCardRef = useRef<HTMLDivElement>(null);
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     const compute = () => {
-      const probe = document.createElement("div");
-      probe.className = "bg-white dark:bg-gray-900";
-      probe.style.cssText =
-        "position:absolute;width:0;height:0;visibility:hidden;pointer-events:none";
-      document.body.appendChild(probe);
-      const bg = getComputedStyle(probe).backgroundColor;
-      document.body.removeChild(probe);
-      // bg comes back as "rgb(r, g, b)". gray-900 sums to 80, white to 765,
-      // so a channel sum under the 384 midpoint means the dark fill is active.
+      // Walk up from the payment card until we hit an element with an actually
+      // painted (non-transparent) background, falling back to <body>.
+      let el: HTMLElement | null = paymentCardRef.current;
+      let bg = "";
+      while (el) {
+        const c = getComputedStyle(el).backgroundColor;
+        if (c && c !== "transparent" && !c.startsWith("rgba(0, 0, 0, 0")) {
+          bg = c;
+          break;
+        }
+        el = el.parentElement;
+      }
+      if (!bg) bg = getComputedStyle(document.body).backgroundColor;
+
+      // bg is "rgb(r, g, b)" / "rgba(...)". Sum the channels; below the 384
+      // midpoint means a dark fill, so we render Stripe in dark mode.
       const rgb = bg.match(/\d+/g);
-      setIsDark(rgb ? Number(rgb[0]) + Number(rgb[1]) + Number(rgb[2]) < 384 : false);
+      setIsDark(
+        rgb ? Number(rgb[0]) + Number(rgb[1]) + Number(rgb[2]) < 384 : false,
+      );
     };
 
     compute();
 
-    // React to both OS-level (media strategy) and class-level (next-themes /
-    // manual) theme switches.
+    // Re-measure on any theme switch: OS-level (media strategy) or a class /
+    // attribute toggle on <html> (next-themes, manual, data-theme).
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     mq.addEventListener("change", compute);
     const observer = new MutationObserver(compute);
@@ -1136,7 +1144,10 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div
+              ref={paymentCardRef}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 p-6"
+            >
               <h2 className="font-bold text-gray-900 dark:text-white mb-4">Payment</h2>
 
               {clientSecret ? (
