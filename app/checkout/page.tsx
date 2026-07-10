@@ -307,27 +307,9 @@ export default function CheckoutPage() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showTermsPopup, setShowTermsPopup] = useState(false);
   const { resolvedTheme } = useTheme();
-
-  // next-themes reports resolvedTheme === undefined on the first client render
-  // (to avoid a hydration mismatch). Building the Stripe appearance during that
-  // render would create the Elements group with the *light* theme baked in, and
-  // Stripe's cross-origin iframes won't reliably repaint on a later in-place
-  // update — hence the invisible fields in dark mode. Gate on `mounted` so the
-  // very first appearance we hand Stripe is already correct.
-  const [stripeMounted, setStripeMounted] = useState(false);
-  useEffect(() => setStripeMounted(true), []);
-
-  // Derive dark from the actual signal the user sees. resolvedTheme covers the
-  // normal next-themes (class-attribute) setup; the classList check is a belt-
-  // and-suspenders fallback for any other mechanism that toggles the `dark`
-  // class on <html>.
-  const isDark =
-    stripeMounted &&
-    (resolvedTheme === "dark" ||
-      (typeof document !== "undefined" &&
-        document.documentElement.classList.contains("dark")));
-
   const stripeOptions: StripeElementsOptions = useMemo(() => {
+  const isDark = resolvedTheme === "dark";
+
   return {
     clientSecret,
 
@@ -397,7 +379,7 @@ export default function CheckoutPage() {
       },
     },
   };
-}, [clientSecret, isDark]);
+}, [clientSecret, resolvedTheme]);
   const emptyAddress: Address = {
     firstName: "",
     lastName: "",
@@ -1119,7 +1101,6 @@ export default function CheckoutPage() {
 
               {clientSecret ? (
                 <Elements
-                  key={`${clientSecret}-${isDark ? "dark" : "light"}`}
                   stripe={stripePromise}
                   options={stripeOptions}
                 >
