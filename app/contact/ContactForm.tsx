@@ -19,7 +19,10 @@ interface FormErrors {
 
 type TouchedFields = Partial<Record<keyof FormErrors, boolean>>;
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Proper structure: local@domain.tld — rejects bare words / no-TLD strings.
+const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const EMAIL_MAX = 30;
+const PHONE_MAX_DIGITS = 15;
 
 function validateField(name: keyof FormErrors, value: string): string {
   const v = value.trim();
@@ -31,6 +34,9 @@ function validateField(name: keyof FormErrors, value: string): string {
 
     case "email":
       if (!v) return "Email is required.";
+      if (v.length > EMAIL_MAX) return `Email must be at most ${EMAIL_MAX} characters.`;
+      if (/\.\./.test(v) || v.startsWith(".") || v.startsWith("@"))
+        return "Enter a valid email address.";
       if (!EMAIL_RE.test(v)) return "Enter a valid email address.";
       return "";
 
@@ -39,7 +45,8 @@ function validateField(name: keyof FormErrors, value: string): string {
       // Allow leading + and spaces/dashes/parentheses as separators; count digits only.
       const digits = v.replace(/[^\d]/g, "");
       if (!/^\+?[\d\s()-]+$/.test(v)) return "Phone can only contain digits and + ( ) - spaces.";
-      if (digits.length < 7 || digits.length > 15) return "Enter a valid phone number.";
+      if (digits.length < 7 || digits.length > PHONE_MAX_DIGITS)
+        return `Enter a valid phone number (max ${PHONE_MAX_DIGITS} digits).`;
       return "";
     }
 
@@ -71,7 +78,15 @@ export function ContactForm() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
+
+    // Hard-cap phone at PHONE_MAX_DIGITS digits (separators don't count).
+    if (name === "phone") {
+      const digits = value.replace(/[^\d]/g, "");
+      if (digits.length > PHONE_MAX_DIGITS) return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (REQUIRED_FIELDS.includes(name as keyof FormErrors) && touched[name as keyof FormErrors]) {
@@ -226,6 +241,7 @@ export function ContactForm() {
             onBlur={handleBlur}
             aria-invalid={!!errors.email}
             placeholder="john@example.com"
+            maxLength={EMAIL_MAX}
             className={`${inputBase} ${fieldBorder("email")}`}
           />
           {errors.email && (
