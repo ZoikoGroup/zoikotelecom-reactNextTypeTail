@@ -63,7 +63,7 @@ export default function StepFour({
               onClick={() => setSelectedContract(item.id)}
               className={`rounded-[24px] border p-5 text-left transition-all ${
                 active
-                  ? "border-[#FF1493] bg-[#FFF4FA] shadow-[0px_2px_20px_0px_rgba(123,31,162,0.09)]"
+                  ? "border-[#FF1493] shadow-[0px_2px_20px_0px_rgba(123,31,162,0.09)]"
                   : "border-[#ECEAF3] bg-white dark:bg-gray-900"
               }`}
             >

@@ -75,7 +75,7 @@ export default function StepTwo({
               onClick={() => setSelectedAllowance(item.id)}
               className={`grid grid-cols-3 items-center w-full px-3 sm:px-4 md:px-6 py-4 border-b border-[#EFEFEF] text-left transition-all duration-300 ${
                 active
-                  ? "bg-[#FFF4FA]"
+                  ? "bg-gray-800 dark:bg-gray-800"
                   : "bg-white dark:bg-gray-900"
               }`}
             >
