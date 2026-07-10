@@ -433,20 +433,41 @@ const scrollToForm = () => {
   // (correct length, valid area/operator prefixes, etc.), not just a
   // digit-count regex.
   const validatePhone = (value: string, countryCode: string) => {
-    const phone = value.trim();
+  const phone = value.trim();
 
-    if (!phone) return "Phone number is required";
+  if (!phone) return "Phone number is required";
 
-    try {
-      if (!isValidPhoneNumber(phone, countryCode as any)) {
-        return `Enter a valid ${countryCode} phone number`;
-      }
-    } catch {
-      return "Enter a valid phone number";
+  // Count actual digits (ignore spaces/formatting)
+  const digitsOnly = phone.replace(/\D/g, "");
+  if (digitsOnly.length > 15) return "Phone number cannot exceed 15 digits";
+  if (digitsOnly.length < 6) return "Phone number is too short";
+
+  try {
+    if (!isValidPhoneNumber(phone, countryCode as any)) {
+      return `Enter a valid ${countryCode} phone number`;
     }
+  } catch {
+    return "Enter a valid phone number";
+  }
 
-    return "";
-  };
+  return "";
+};
+
+const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Allow only digits and spaces; cap at 15 digits
+  const raw = e.target.value.replace(/[^\d\s]/g, "");
+  const digitCount = raw.replace(/\D/g, "").length;
+  if (digitCount > 15) return; // ignore input beyond 15 digits
+
+  setFormData((prev) => ({ ...prev, phone: raw }));
+
+  if (touched.phone) {
+    setErrors((prev) => ({
+      ...prev,
+      phone: validatePhone(raw, selectedCountry.code),
+    }));
+  }
+};
 
   const validateServiceInterest = (value: string) => {
     if (!value) return "Please select a service";
@@ -704,7 +725,7 @@ const scrollToForm = () => {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-10">
-          <Link href="/ee-mobile-plans" passHref>
+          {/* <Link href="/ee-mobile-plans" passHref> */}
           <button
           onClick={scrollToForm}
             className="
@@ -722,7 +743,7 @@ const scrollToForm = () => {
             </span>
             Request Business Consultation
           </button>
-          </Link>
+          {/* </Link> */}
 
           <Link href="/contact" passHref>
           <button
@@ -2506,7 +2527,7 @@ const scrollToForm = () => {
                         inputMode="tel"
                         name="phone"
                         value={formData.phone}
-                        onChange={handleChange}
+                        onChange={handlePhoneChange}
                         onBlur={handleBlur}
                         aria-invalid={!!errors.phone}
                         aria-describedby="phone-error"
