@@ -200,7 +200,7 @@ export default function Footer() {
             ESG Policy
           </Link>
 
-          <Link href="#">
+          <Link href="/privacy-policy">
             Zoiko Policies
           </Link>
         </div>
