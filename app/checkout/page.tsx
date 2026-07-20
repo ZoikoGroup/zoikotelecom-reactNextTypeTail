@@ -205,13 +205,54 @@ const billingFieldMeta: Record<string, { label: string; placeholder: string; dis
   city:        { label: "City",             placeholder: "Enter your city" },
   street:      { label: "Street Address",   placeholder: "Enter your street address" },
   houseNumber: { label: "Apt / Suite",      placeholder: "Apartment or suite" },
-  zip:         { label: "ZIP Code",         placeholder: "Enter ZIP code" },
+  zip:         { label: "ZIP Code( Max 12 characters)",         placeholder: "Enter ZIP code" },
   phone:       { label: "Phone Number",     placeholder: "Enter phone number" },
   email:       { label: "Email Address",    placeholder: "Enter email address" },
 };
 
 const requiredBillingFields = ["firstName", "lastName", "state", "city", "houseNumber", "zip", "email", "phone"];
 
+// const AddressForm = ({
+//   address,
+//   setAddress,
+//   prefix,
+//   errors,
+//   loading,
+//   includeShipping = false,
+// }: {
+//   address: Address;
+//   setAddress: (a: Address) => void;
+//   prefix: string;
+//   errors: FormErrors;
+//   loading: boolean;
+//   includeShipping?: boolean;
+// }) => (
+//   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
+//     {(Object.keys(address) as Array<keyof Address>).map((key) => {
+//       const meta = billingFieldMeta[key] || { label: key, placeholder: key };
+//       const errKey = `${prefix}${key.charAt(0).toUpperCase() + key.slice(1)}`;
+//       const isRequired =
+//         requiredBillingFields.includes(key) ||
+//         (includeShipping &&
+//           ["firstName", "lastName", "state", "city", "houseNumber", "zip", "email"].includes(key));
+
+//       return (
+//         <InputField key={key} label={meta.label} required={isRequired} error={errors[errKey]}>
+          
+//             <input
+//               type="text"
+//               className={inputClass(errors[errKey])}
+//               placeholder={meta.placeholder}
+//               value={address[key]}
+//               disabled={meta.disabled || loading}
+//               onChange={(e) => setAddress({ ...address, [key]: e.target.value })}
+//             />
+          
+//         </InputField>
+//       );
+//     })}
+//   </div>
+// );
 const AddressForm = ({
   address,
   setAddress,
@@ -219,6 +260,7 @@ const AddressForm = ({
   errors,
   loading,
   includeShipping = false,
+  onValidateField,
 }: {
   address: Address;
   setAddress: (a: Address) => void;
@@ -226,6 +268,7 @@ const AddressForm = ({
   errors: FormErrors;
   loading: boolean;
   includeShipping?: boolean;
+  onValidateField: (errKey: string, value: string, filterMsg?: string) => void;
 }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
     {(Object.keys(address) as Array<keyof Address>).map((key) => {
@@ -236,18 +279,63 @@ const AddressForm = ({
         (includeShipping &&
           ["firstName", "lastName", "state", "city", "houseNumber", "zip", "email"].includes(key));
 
+      const isPhone = key === "phone";
+      const isZip = key === "zip";
+
+      // Clean/cap the value at input time, then update state
+      // const handleChange = (raw: string) => {
+      //   let value = raw;
+      //   if (isPhone) {
+          
+      //     value = raw.replace(/\D/g, "").slice(0, 15);
+      //   } else if (isZip) {
+        
+      //     value = raw.slice(0, 12);
+      //   }
+      //   setAddress({ ...address, [key]: value });
+      // };
+      const handleChange = (raw: string) => {
+        let value = raw;
+        let filterMsg = "";
+
+        if (isPhone) {
+          const digitsOnly = raw.replace(/\D/g, "");
+          value = digitsOnly.slice(0, 15);
+
+          if (digitsOnly !== raw) {
+            // something non-digit was typed/pasted and removed
+            filterMsg = "Only numbers are allowed";
+          } else if (digitsOnly.length > 15) {
+            // they hit the 15-digit ceiling
+            filterMsg = "Phone number cannot exceed 15 digits";
+          }
+        } else if (isZip) {
+          value = raw.slice(0, 12);
+
+          if (raw.length > 12) {
+            filterMsg = "ZIP code cannot exceed 12 characters";
+          }
+        }
+
+        setAddress({ ...address, [key]: value });
+
+        // Show the "why it was blocked" message, or clear it if input was fine
+        onValidateField?.(errKey, value, filterMsg);
+      };
+
       return (
         <InputField key={key} label={meta.label} required={isRequired} error={errors[errKey]}>
-          
-            <input
-              type="text"
-              className={inputClass(errors[errKey])}
-              placeholder={meta.placeholder}
-              value={address[key]}
-              disabled={meta.disabled || loading}
-              onChange={(e) => setAddress({ ...address, [key]: e.target.value })}
-            />
-          
+          <input
+            type="text"
+            inputMode={isPhone ? "numeric" : undefined}
+            maxLength={isZip ? 12 : isPhone ? 15 : undefined}
+            className={inputClass(errors[errKey])}
+            placeholder={meta.placeholder}
+            value={address[key]}
+            disabled={meta.disabled || loading}
+            onChange={(e) => handleChange(e.target.value)}
+            onBlur={(e) => onValidateField?.(errKey, e.target.value)}
+          />
         </InputField>
       );
     })}
@@ -615,6 +703,22 @@ export default function CheckoutPage() {
   discountAmount,
   cart,]);
 
+    // ── field validators ──────────────────────────────
+  const validateZip = (zip: string) => {
+    const v = zip.trim();
+    if (!v) return "Required";
+    if (v.length > 12) return "ZIP code cannot exceed 12 characters";
+    return "";
+  };
+
+  const validatePhone = (phone: string) => {
+    const digits = phone.replace(/\D/g, "");
+    if (!digits) return "Required";
+    if (digits.length < 10) return "Phone number must be at least 10 digits";
+    if (digits.length > 15) return "Phone number cannot exceed 15 digits";
+    return "";
+  };
+
   // ── Validation ────────────────────────────────────────────────────────────
 
   const validateFields = (): boolean => {
@@ -626,21 +730,46 @@ export default function CheckoutPage() {
     newErrors.billingState = billingAddress.state ? "" : "Required";
     newErrors.billingCity = billingAddress.city ? "" : "Required";
     newErrors.billingHouseNumber = billingAddress.houseNumber ? "" : "Required";
-    newErrors.billingZip = billingAddress.zip ? "" : "Required";
+    newErrors.billingZip = validateZip(billingAddress.zip);
     newErrors.billingEmail = emailRx.test(billingAddress.email) ? "" : "Invalid email";
-    newErrors.billingPhone = phoneRx.test(billingAddress.phone) ? "" : "Invalid phone";
+    newErrors.billingPhone = validatePhone(billingAddress.phone);
     if (showShipping) {
       newErrors.shippingFirstName = shippingAddress.firstName ? "" : "Required";
       newErrors.shippingLastName = shippingAddress.lastName ? "" : "Required";
       newErrors.shippingState = shippingAddress.state ? "" : "Required";
       newErrors.shippingCity = shippingAddress.city ? "" : "Required";
       newErrors.shippingHouseNumber = shippingAddress.houseNumber ? "" : "Required";
-      newErrors.shippingZip = shippingAddress.zip ? "" : "Required";
+      newErrors.shippingZip = validateZip(shippingAddress.zip);
       newErrors.shippingEmail = emailRx.test(shippingAddress.email) ? "" : "Invalid email";
-      newErrors.shippingPhone = phoneRx.test(shippingAddress.phone) ? "" : "Invalid phone";
+      newErrors.shippingPhone = validatePhone(shippingAddress.phone);
     }
     setErrors(newErrors);
     return !Object.values(newErrors).some((e) => e.length > 0);
+  };
+
+  // Validate a single field live (used on blur from AddressForm)
+  const validateOneField = (errKey: string, value: string, filterMsg?: string) => {
+     // A filter message means the input was actively blocked — show that reason first.
+    if (filterMsg) {
+      setErrors((prev) => ({ ...prev, [errKey]: filterMsg }));
+      return;
+    }
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let msg = "";
+
+    if (errKey.endsWith("Zip")) {
+      msg = validateZip(value);
+    } else if (errKey.endsWith("Phone")) {
+      msg = validatePhone(value);
+    } else if (errKey.endsWith("Email")) {
+      msg = emailRx.test(value) ? "" : "Invalid email";
+    } else if (errKey.endsWith("CompanyName")) {
+      msg = ""; // optional field — never errors
+    } else {
+      msg = value.trim() ? "" : "Required";
+    }
+
+    setErrors((prev) => ({ ...prev, [errKey]: msg }));
   };
 
   const buildProducts = () =>
@@ -1056,6 +1185,7 @@ export default function CheckoutPage() {
                 prefix="billing"
                 errors={errors}
                 loading={loading}
+                onValidateField={validateOneField}
               />
 
               <label className="flex items-center gap-2.5 mt-5 cursor-pointer">
@@ -1079,6 +1209,7 @@ export default function CheckoutPage() {
                     errors={errors}
                     loading={loading}
                     includeShipping
+                    onValidateField={validateOneField}
                   />
                 </div>
               )}

@@ -725,7 +725,7 @@ const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-10">
-          {/* <Link href="/ee-mobile-plans" passHref> */}
+          {/* <Link href="#quote-form" passHref> */}
           <button
           onClick={scrollToForm}
             className="
@@ -2047,7 +2047,7 @@ const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
        </section>
 
        {/* INDUSTRIES */}
-       <section ref={formRef} className="w-full bg-[#F7F5FA] dark:bg-[#0F172A] py-16 lg:py-24 transition-colors duration-300">
+       <section  className="w-full bg-[#F7F5FA] dark:bg-[#0F172A] py-16 lg:py-24 transition-colors duration-300">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
     {/* TOP CONTENT */}
@@ -2209,7 +2209,7 @@ const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
        </section>
 
        {/* Request a Quote form */}
-       <section className="w-full bg-[#F7F5FA] dark:bg-[#0F172A] py-16 lg:py-24 transition-colors duration-300">
+       <section ref={formRef} className="w-full bg-[#F7F5FA] dark:bg-[#0F172A] py-16 lg:py-24 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* WRAPPER */}
@@ -2312,7 +2312,7 @@ const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             {/* FORM */}
             <div>
 
-              <form onSubmit={handleSubmit} noValidate className="  space-y-5">
+              <form id="quote-form" onSubmit={handleSubmit} noValidate className="  space-y-5">
 
                 {/* ROW */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
