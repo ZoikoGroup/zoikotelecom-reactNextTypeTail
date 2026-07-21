@@ -7,6 +7,7 @@ import { processOrderStripe } from "../utils/stripeWebPaymentApi";
 import StripePaymentForm, { StripePaymentFormRef } from "../Components/StripePaymentForm";
 import { useMemo } from "react";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
+import { isLoggedIn as checkIsLoggedIn, getUser } from "../utils/auth";
 // ── Stub data for standalone compilation ──────────────────────────────────────
 
 // const processOrderStripe = async (data: unknown) => ({ status: true, data });
@@ -390,6 +391,7 @@ export default function CheckoutPage() {
   const [discountData, setDiscountData] = useState<DiscountData | null>(null);
   const [couponMessage, setCouponMessage] = useState("");
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [loginPromptReason, setLoginPromptReason] = useState<"coupon" | "order">("order");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showTermsPopup, setShowTermsPopup] = useState(false);
@@ -544,8 +546,26 @@ export default function CheckoutPage() {
         normalizeCartItem
       );
       setCart(normalized);
-      if (typeof window !== "undefined" && localStorage.getItem("token")) {
+
+      if (checkIsLoggedIn()) {
         setIsLoggedIn(true);
+
+        // Prefill from the account so the order is reliably saved against the
+        // logged-in user — "My Orders" matches on this email server-side.
+        const user = getUser();
+        if (user) {
+          setBillingAddress((prev) => ({
+            ...prev,
+            firstName: prev.firstName || user.first_name || user.firstName || "",
+            lastName: prev.lastName || user.last_name || user.lastName || "",
+            email: user.email || prev.email,
+          }));
+        }
+      } else {
+        // Not logged in — surface the requirement immediately rather than
+        // waiting until the customer tries to pay.
+        setLoginPromptReason("order");
+        setShowLoginPopup(true);
       }
     } catch {
       setCart([]);
@@ -615,6 +635,7 @@ export default function CheckoutPage() {
   const handleApplyCoupon = async () => {
     const user = JSON.parse(localStorage.getItem("user") ?? "null");
     if (!user) {
+      setLoginPromptReason("coupon");
       setShowLoginPopup(true);
       return;
     }
@@ -797,6 +818,11 @@ export default function CheckoutPage() {
   // ── Place Order – Stripe ──────────────────────────────────────────────────
 
   const handlePlaceOrderStripe = async () => {
+  if (!checkIsLoggedIn()) {
+    setLoginPromptReason("order");
+    setShowLoginPopup(true);
+    return;
+  }
   if (!agreeTerms) { setShowTermsPopup(true); return; }
   if (!validateFields()) return;
 
@@ -1316,6 +1342,20 @@ export default function CheckoutPage() {
                 </span>
               </label>
 
+              {!isLoggedIn && (
+                <p className="mt-4 text-xs text-center text-[#10446c] dark:text-gray-400">
+                  You need to be logged in to place an order.{" "}
+                  <a
+                    href={`/login?redirect=${encodeURIComponent(
+                      typeof window !== "undefined" ? window.location.href : "/checkout"
+                    )}`}
+                    className="text-red-500 hover:underline font-semibold"
+                  >
+                    Log in
+                  </a>
+                </p>
+              )}
+
               <button
                 onClick={handlePlaceOrderStripe}
                 disabled={loading || !clientSecret}
@@ -1356,7 +1396,9 @@ export default function CheckoutPage() {
             </svg>
           </div>
           <p className="text-gray-600 mb-5 text-sm">
-            You need to log in to apply a coupon code.
+            {loginPromptReason === "order"
+              ? "You need to log in before you can place an order. Your cart will be waiting for you when you come back."
+              : "You need to log in to apply a coupon code."}
           </p>
           <a
             href={`/login?redirect=${encodeURIComponent(

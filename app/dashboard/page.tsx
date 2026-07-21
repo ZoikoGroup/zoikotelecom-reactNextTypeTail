@@ -123,6 +123,7 @@ function OrdersSection() {
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeType, setActiveType] = useState<string>("all");
 
   useEffect(() => {
     (async () => {
@@ -147,25 +148,64 @@ function OrdersSection() {
   if (error) return <p className="text-sm text-gray-500">{error}</p>;
   if (count === 0) return <p className="text-sm text-gray-500">You have no orders yet.</p>;
 
+  // Only offer tabs for order types the user actually has, in a stable order.
+  const availableTypes = TYPE_ORDER.filter((t) => grouped[t]?.length);
+  const currentType = availableTypes.includes(activeType) ? activeType : "all";
+  const visibleTypes = currentType === "all" ? availableTypes : [currentType];
+
+  const tabBtn = (key: string, label: string, badge: number) => (
+    <button
+      key={key}
+      onClick={() => setActiveType(key)}
+      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+        currentType === key
+          ? "bg-[#BC2273] text-white"
+          : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+      }`}
+    >
+      {label}
+      <span
+        className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+          currentType === key
+            ? "bg-white/20 text-white"
+            : "bg-[#BC2273]/10 text-[#BC2273]"
+        }`}
+      >
+        {badge}
+      </span>
+    </button>
+  );
+
   return (
-    <div className="space-y-8">
-      {TYPE_ORDER.filter((t) => grouped[t]?.length).map((type) => (
-        <div key={type}>
-          <div className="flex items-center gap-2 mb-3">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">
-              {TYPE_LABELS[type]}
-            </h3>
-            <span className="text-xs font-semibold bg-[#BC2273]/10 text-[#BC2273] rounded-full px-2 py-0.5">
-              {grouped[type].length}
-            </span>
+    <div>
+      <div className="flex flex-wrap gap-2 mb-6 overflow-x-auto pb-1">
+        {tabBtn("all", "All Orders", count)}
+        {availableTypes.map((type) =>
+          tabBtn(type, TYPE_LABELS[type] || type, grouped[type].length)
+        )}
+      </div>
+
+      <div className="space-y-8">
+        {visibleTypes.map((type) => (
+          <div key={type}>
+            {currentType === "all" && (
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                  {TYPE_LABELS[type]}
+                </h3>
+                <span className="text-xs font-semibold bg-[#BC2273]/10 text-[#BC2273] rounded-full px-2 py-0.5">
+                  {grouped[type].length}
+                </span>
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {grouped[type].map((o) => (
+                <OrderCard key={o.id} order={o} />
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {grouped[type].map((o) => (
-              <OrderCard key={o.id} order={o} />
-            ))}
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
