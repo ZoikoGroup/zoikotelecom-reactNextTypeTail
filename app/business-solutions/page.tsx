@@ -332,8 +332,17 @@ export default function page() {
 
   const formRef = useRef<HTMLElement>(null);
 
+// const scrollToForm = () => {
+//   formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+// };
 const scrollToForm = () => {
-  formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const el = formRef.current;
+  if (!el) return;
+  requestAnimationFrame(() => {
+    const headerOffset = 96; // ← your fixed/sticky header height in px (0 if you have none)
+    const y = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  });
 };
 
   const [selectedService, setSelectedService] = useState("");
