@@ -21,7 +21,8 @@ type TouchedFields = Partial<Record<keyof FormErrors, boolean>>;
 
 // Proper structure: local@domain.tld — rejects bare words / no-TLD strings.
 const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const EMAIL_MAX = 30;
+const EMAIL_MAX = 254;
+const PHONE_MIN_DIGITS = 10;
 const PHONE_MAX_DIGITS = 15;
 
 function validateField(name: keyof FormErrors, value: string): string {
@@ -42,11 +43,11 @@ function validateField(name: keyof FormErrors, value: string): string {
 
     case "phone": {
       if (!v) return "Phone number is required.";
-      // Allow leading + and spaces/dashes/parentheses as separators; count digits only.
-      const digits = v.replace(/[^\d]/g, "");
-      if (!/^\+?[\d\s()-]+$/.test(v)) return "Phone can only contain digits and + ( ) - spaces.";
-      if (digits.length < 7 || digits.length > PHONE_MAX_DIGITS)
-        return `Enter a valid phone number (max ${PHONE_MAX_DIGITS} digits).`;
+      const digits = v.replace(/\D/g, "");
+      if (digits.length < PHONE_MIN_DIGITS)
+        return `Phone number must be at least ${PHONE_MIN_DIGITS} digits.`;
+      if (digits.length > PHONE_MAX_DIGITS)
+        return `Phone number cannot exceed ${PHONE_MAX_DIGITS} digits.`;
       return "";
     }
 
@@ -82,12 +83,42 @@ export function ContactForm() {
     let { value } = e.target;
 
     // Hard-cap phone at PHONE_MAX_DIGITS digits (separators don't count).
+    // if (name === "phone") {
+    //   const digits = value.replace(/[^\d]/g, "");
+    //   if (digits.length > PHONE_MAX_DIGITS) return;
+    // }
+    // Phone: strip letters/invalid symbols instantly, keep + - ( ) spaces,
+    // cap at 15 digits, and show why input was blocked.
     if (name === "phone") {
-      const digits = value.replace(/[^\d]/g, "");
-      if (digits.length > PHONE_MAX_DIGITS) return;
+      const cleaned = value.replace(/[^\d+\-\s]/g, "");
+      const digits = cleaned.replace(/\D/g, "");
+      if (digits.length > PHONE_MAX_DIGITS) {
+        setErrors((prev) => ({
+          ...prev,
+          phone: `Phone number cannot exceed ${PHONE_MAX_DIGITS} digits.`,
+        }));
+        return;
+      }
+
+      if (cleaned !== value) {
+        setErrors((prev) => ({
+          ...prev,
+          phone: "Phone can only contain numbers and + - spaces.",
+        }));
+      } else if (touched.phone) {
+        setErrors((prev) => ({
+          ...prev,
+          phone: validateField("phone", cleaned) || undefined,
+        }));
+      }
+
+      setFormData((prev) => ({ ...prev, phone: cleaned }));
+      return;
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (REQUIRED_FIELDS.includes(name as keyof FormErrors) && touched[name as keyof FormErrors]) {
       const msg = validateField(name as keyof FormErrors, value);

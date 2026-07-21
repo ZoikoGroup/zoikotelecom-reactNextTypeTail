@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import ContactForm from "./ContactForm";
+import Link from "next/link";
 
 export default function ContactSection() {
 
@@ -34,6 +35,7 @@ export default function ContactSection() {
       address: "35 Berkeley Square, Mayfair, London W1J 5BF",
       phone: "+44 (0) 207 164 6399",
       email: "info@zoikotelecom.com",
+      directionsLink: "https://maps.app.goo.gl/p3nJrebFYCE1pTDk9",
     },
     {
       city: "Glasgow",
@@ -41,7 +43,8 @@ export default function ContactSection() {
       mobileImage: "/image/glasgowmobile.png",
       address: "2nd Floor, 48 West George Street, Glasgow G2 1BP",
       phone: "+44 141 530 1560",
-      email: "glasgow@zoikotelecom.com",
+      email: "info@zoikotelecom.com",
+      directionsLink: "https://maps.app.goo.gl/CGQqVnxdBWN46zc48",
     },
     {
       city: "Cardiff",
@@ -49,7 +52,8 @@ export default function ContactSection() {
       mobileImage: "/image/cardiffmobile.png",
       address: "113-116 Blue Street, Cardiff CF10 5EQ",
       phone: "+44 292 000 1374",
-      email: "cardiff@zoikotelecom.com",
+      email: "info@zoikotelecom.com",
+      directionsLink: "https://maps.app.goo.gl/AisuKtyJFys7sMRa7",
     },
   ];
 
@@ -250,7 +254,9 @@ export default function ContactSection() {
                 />
 
                 <p className="text-[#718096] dark:text-white text-[14px]">
-                  {office.phone}
+                  {/* <a href={`tel:${office.phone}`} className="hover:underline"> */}
+                    {office.phone}
+                  {/* </a> */}
                 </p>
 
               </div>
@@ -267,7 +273,9 @@ export default function ContactSection() {
                 />
 
                 <p className="text-[#718096] dark:text-white text-[14px] break-all">
-                  {office.email}
+                  {/* <a href={`mailto:${office.email}`} className="hover:underline"> */}
+                    {office.email}
+                  {/* </a> */}
                 </p>
 
               </div>
@@ -275,11 +283,13 @@ export default function ContactSection() {
             </div>
 
             {/* BUTTON */}
-            <button className="mt-7 flex items-center gap-2 text-[#C12172]  text-[15px] font-semibold">
+            <Link href={office.directionsLink} target="_blank" rel="noopener noreferrer">
+              <button className="mt-7 flex items-center gap-2 text-[#C12172]  text-[15px] font-semibold">
 
               Get Directions →
 
-            </button>
+              </button>
+            </Link>
 
           </div>
 
