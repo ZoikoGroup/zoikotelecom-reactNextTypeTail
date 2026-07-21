@@ -328,7 +328,7 @@ const AddressForm = ({
           <input
             type="text"
             inputMode={isPhone ? "numeric" : undefined}
-            maxLength={isZip ? 12 : isPhone ? 15 : undefined}
+            // maxLength={isZip ? 12 : isPhone ? 15 : undefined}
             className={inputClass(errors[errKey])}
             placeholder={meta.placeholder}
             value={address[key]}
