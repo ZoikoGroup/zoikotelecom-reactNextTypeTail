@@ -19,8 +19,9 @@ jobs:
             git pull origin main
             npm ci
             npm run build
-            pm2 restart zoikotelecom
-- name: Purge Cloudflare cache
+            sudo pm2 restart zoikotelecom
+
+      - name: Purge Cloudflare cache
         run: |
           curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CF_ZONE_ID }}/purge_cache" \
             -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
