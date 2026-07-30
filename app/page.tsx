@@ -2,6 +2,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaArrowRight, FaCheck, FaStar } from "react-icons/fa";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Leading Telecom Service Providers in UK | Zoiko Telecom ",
+  description:
+    "Leading Telecom Service Providers in UK | Zoiko Telecom",
+};
 
 type Feature = {
   title: string;

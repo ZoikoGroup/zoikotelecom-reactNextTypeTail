@@ -1,687 +1,129 @@
-"use client"
-import { useState, useEffect } from 'react'
-import Image from "next/image";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import ProductPage from "./ProductPage";
+import type { Metadata } from "next";
+
+const PRODUCT_META: Record<
+  string,
+  { title: string; description: string }
+> = {
+  "yealink-t31g": {
+    title: "Yealink T31G VoIP Phone with Dual Accounts | Zoiko Telecom",
+    description:
+      "Buy the Yealink T31G VoIP Phone at Zoiko Telecom. Experience high-quality audio, dual account support and easy setup for efficient business communication.",
+  },
+
+  "yealink-w73p": {
+    title: "Yealink W73P Cordless Phone | Zoiko Telecom",
+    description:
+      "Discover the Yealink W73P Cordless Phone with Noise Reduction at Zoiko Telecom. It offers clear calls, long battery life and advanced noise reduction features.",
+  },
+
+  "cisco-192-ata": {
+    title: "Buy Cisco 192 ATA | Reliable VoIP Adapter | Zoiko Telecom",
+    description:
+      "Buy the Cisco 192 ATA VoIP adapter from Zoiko Telecom. Reliable, easy-to-install and designed for high-quality VoIP calling from your analog phone.",
+  },
+
+  "yealink-w70b": {
+    title: "Shop Yealink W70B DECT Handset | Zoiko Telecom",
+    description:
+      "Get the Yealink W70B DECT Handset from Zoiko Telecom. Perfect for business environments, offering seamless calls, reliable coverage and ergonomic design.",
+  },
+
+  "cisco-191-ata": {
+    title: "Cisco 191 ATA | Affordable VOIP Adapter | Zoiko Telecom",
+    description:
+      "Looking for an affordable VOIP adapter? The Cisco 191 ATA from Zoiko Telecom offers seamless connectivity for analog phones to digital networks.",
+  },
+
+  "yealink-73h": {
+    title: "Buy Yealink 73H | High-Quality VoIP Headset | Zoiko Telecom",
+    description:
+      "Shop Yealink 73H VoIP headset at Zoiko Telecom. Designed for business professionals, it offers superior sound quality, noise cancellation and ergonomic comfort.",
+  },
+
+  "yealink-t31g-t43u-psu": {
+    title: "Yealink T31G/T43U PSU Power Adapter | Zoiko Telecom",
+    description:
+      "Power your Yealink T31G and T43U IP phones with the Yealink T31G/T43U PSU from Zoiko Telecom. Reliable, efficient & perfect for uninterrupted communication.",
+  },
+
+  "polycom-psu": {
+    title: "Polycom PSU | High-Quality Power Solutions | Zoiko Telecom",
+    description:
+      "Shop Polycom PSU at Zoiko Telecom for high-quality & reliable power solutions that ensure the performance and longevity of your Polycom communication equipment.",
+  },
+
+  "jabra-biz-2300-mono": {
+    title: "Zoiko Jabra BIZ 2300 Mono Noise Cancellation Microphone",
+    description:
+      "Experience superior sound quality with the Jabra Biz 2300 Mono headset. Its noise-cancelling microphone ensures your voice is heard loud and clear, every time.",
+  },
+
+  "jabra-biz-2300-duo": {
+    title: "Jabra BIZ 2300 Duo Noise Cancellation Phone | Zoiko Telecom",
+    description:
+      "Get the Jabra Biz 2300 Duo headset for exceptional noise cancellation and crisp audio quality at an affordable price. Boost your communication experience today!",
+  },
+
+  "yealink-cp700-speaker": {
+    title: "Yealink CP700 Speaker | Portable Bluetooth Speaker",
+    description:
+      "Looking for a high-quality portable speaker? The Yealink CP700 Speaker from Zoiko Telecom offers clear sound, Bluetooth pairing & easy setup for professional use.",
+  },
+
+  "jabra-speak-510": {
+    title: "Buy Jabra Speak 510 for Better Sound | Zoiko Telecom",
+    description:
+      "Upgrade your conference calls with Jabra Speak 510 from Zoiko Telecom. A compact, wireless speakerphone that delivers exceptional sound & seamless connectivity.",
+  },
+
+  "jabra-pro-920-polycom": {
+    title: "Buy Jabra PRO 920 - Mono for Polycom | Zoiko Telecom",
+    description:
+      "Buy Jabra Pro 920 Mono for Polycom from Zoiko Telecom to ensures crystal-clear audio. Enjoy exceptional audio and comfort for all your communication needs!",
+  },
+
+  "jabra-pro-920-mono-for-yealink": {
+    title: "Buy Jabra PRO 920 - Mono for Yealink | Zoiko Telecom",
+    description:
+      "Boost your communication setup with the Jabra Pro 920 Mono for Yealink from Zoiko Telecom. Elevate your calls with superior sound quality today. Shop Now!",
+  },
+
+  "jabra-pro-920-duo-for-yealink": {
+    title: "Zoiko Jabra Pro 920 Duo for Yealink | Dual Audio Headset",
+    description:
+      "Discover the Jabra Pro 920 Duo for Yealink at Zoiko Telecom. Experience crystal-clear calls and superior comfort for your communication needs. Shop Now!",
+  },
+
+  "polycom-calisto-5300-portable-bluetooth-usb-speakerphone": {
+    title: "Polycom Calisto 5300 Portable Bluetooth | Zoiko Telecom",
+    description:
+      "Shop Polycom Calisto 5300 portable Bluetooth & USB speakerphone at Zoiko Telecom. Clear office calls, 360° mic, full-duplex audio, and compact design.",
+  },
+
+  "jabra-pro-920-duo-for-polycom": {
+    title: "Jabra PRO 920 – Duo for Polycom | Zoiko Telecom",
+    description:
+      "Get professional-grade audio with Jabra Pro 920 Duo for Polycom from Zoiko Mobile. Wireless design, noise-cancelling mic & easy setup for better call quality.",
+  },
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+
+  const meta = PRODUCT_META[slug];
+
+  return {
+    title: meta?.title ?? "Product | Zoiko Telecom",
+    description:
+      meta?.description ?? "Browse telecom products from Zoiko Telecom.",
+  };
+}
 
 export default function Page() {
-  const [product, setProduct] = useState<any>(null);
-  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedVariant, setSelectedVariant] = useState<any>(null);
-  const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
-  const [activeTab, setActiveTab] = useState<"additional" | "reviews">("reviews");
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-
-  // Reviews
-  const [reviews, setReviews] = useState<any[]>([]);
-  const [reviewAvg, setReviewAvg] = useState(0);
-  const [reviewName, setReviewName] = useState("");
-  const [reviewEmail, setReviewEmail] = useState("");
-  const [reviewText, setReviewText] = useState("");
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [reviewError, setReviewError] = useState("");
-  const [reviewDone, setReviewDone] = useState(false);
-  const params = useParams();
-  const slug = params.slug as string;
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/products/`
-        );
-        const data = await response.json();
-        const foundProduct = data.results.find(
-          (item: any) => item.slug === slug
-        );
-        if (!foundProduct) {
-          setLoading(false);
-          return;
-        }
-        setProduct(foundProduct);
-        if (foundProduct.variants?.length) {
-          setSelectedVariant(foundProduct.variants[0]);
-        }
-        const related = data.results.filter(
-          (item: any) =>
-            item.id !== foundProduct.id &&
-            item.category.slug === foundProduct.category.slug
-        );
-        setRelatedProducts(related);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProduct();
-  }, [slug]);
-
-  const isPhoneEquipment = product?.category?.slug === "phone-equipment";
-
-  // Add to cart — the product detail page serves both "accessories" and
-  // "phone-equipment" products, so tag the cart row by the product's category
-  // slug. The checkout/splitter saves each as its own order type.
-  const handleAddToCart = () => {
-    if (!product) return;
-
-    const categorySlug: string = product?.category?.slug ?? "accessories";
-    const isPhoneEquip = categorySlug === "phone-equipment";
-    const planType = isPhoneEquip ? "phone_equipment" : "accessories";
-    const category = isPhoneEquip ? "phone-equipment" : "accessories";
-
-    const price = Number(
-      selectedVariant?.sale_price ??
-      selectedVariant?.regular_price ??
-      product?.variants?.[0]?.sale_price ??
-      product?.variants?.[0]?.regular_price ??
-      0
-    );
-
-    const image =
-      product.images?.find((img: any) => img.is_main)?.image ||
-      product.images?.[0]?.image ||
-      "/Images/placeholder.png";
-
-    const rawItem = {
-      id: selectedVariant?.id ?? product.id,
-      variantId: selectedVariant?.id ?? null,
-      planType,
-      category,
-      name: product.name,
-      planName: product.name,
-      slug: product.slug,
-      image,
-      price,
-      planDuration: selectedVariant?.duration_display ?? "",
-      quantity,
-      qty: quantity,
-    };
-
-    try {
-      const existing = JSON.parse(localStorage.getItem("cart") ?? "[]");
-      const cartArr = Array.isArray(existing) ? existing : [];
-      cartArr.push(rawItem);
-      localStorage.setItem("cart", JSON.stringify(cartArr));
-      window.dispatchEvent(new Event("cart-updated"));
-    } catch {
-      localStorage.setItem("cart", JSON.stringify([rawItem]));
-    }
-
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
-    console.log("Added to cart:", rawItem);
-  };
-
-  // Load reviews for this product
-  const loadReviews = async (productId: number, productSlug: string) => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/reviews/?product_id=${productId}&product_slug=${productSlug}`
-      );
-      // Guard against HTML error pages (500/404) that aren't JSON.
-      const ct = res.headers.get("content-type") || "";
-      if (!res.ok || !ct.includes("application/json")) {
-        setReviews([]);
-        setReviewAvg(0);
-        return;
-      }
-      const data = await res.json();
-      setReviews(data.results || []);
-      setReviewAvg(data.average || 0);
-    } catch (err) {
-      console.error("Failed to load reviews", err);
-      setReviews([]);
-      setReviewAvg(0);
-    }
-  };
-
-  useEffect(() => {
-    if (product?.id) loadReviews(product.id, product.slug);
-  }, [product?.id, product?.slug]);
-
-  const handleSubmitReview = async () => {
-    setReviewError("");
-    if (!rating) return setReviewError("Please select a rating.");
-    if (!reviewName.trim()) return setReviewError("Please enter your name.");
-    if (!reviewText.trim()) return setReviewError("Please write your review.");
-
-    try {
-      setReviewSubmitting(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/reviews/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            product_id: product.id,
-            product_slug: product.slug,
-            name: reviewName.trim(),
-            email: reviewEmail.trim(),
-            rating,
-            comment: reviewText.trim(),
-          }),
-        }
-      );
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data?.success) {
-        setReviewError(data?.message || "Could not submit your review.");
-        return;
-      }
-      setReviewName("");
-      setReviewEmail("");
-      setReviewText("");
-      setRating(0);
-      setReviewDone(true);
-      setTimeout(() => setReviewDone(false), 3000);
-      await loadReviews(product.id, product.slug);
-    } catch {
-      setReviewError("Network error. Please try again.");
-    } finally {
-      setReviewSubmitting(false);
-    }
-  };
-
-  const prices = product?.variants?.map((v: any) =>
-    Number(v.sale_price || v.regular_price)
-  ) || [];
-  const minPrice = prices.length ? Math.min(...prices) : 0;
-  const maxPrice = prices.length ? Math.max(...prices) : 0;
-
-  const displayPrice = isPhoneEquipment
-    ? selectedVariant
-      ? `£${Number(selectedVariant.sale_price || selectedVariant.regular_price).toFixed(2)}`
-      : `£${minPrice.toFixed(2)} – £${maxPrice.toFixed(2)}`
-    : `£${Number(product?.variants?.[0]?.sale_price || product?.variants?.[0]?.regular_price || 0).toFixed(2)}`;
-
-  const relatedDisplayPrice = (item: any) => {
-    const isPhone = item.category.slug === "phone-equipment";
-    const vPrices = item.variants?.map((v: any) => Number(v.sale_price || v.regular_price)) || [];
-    if (isPhone && vPrices.length > 1) {
-      return `£${Math.min(...vPrices).toFixed(2)} – £${Math.max(...vPrices).toFixed(2)}`;
-    }
-    return `£${Number(item.variants?.[0]?.sale_price || item.variants?.[0]?.regular_price || 0).toFixed(2)}`;
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-        <div className="text-gray-500 dark:text-gray-400 text-lg">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-        <div className="text-gray-500 dark:text-gray-400 text-lg">Product not found</div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen transition-colors duration-300">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
-        {/* ── TOP PRODUCT SECTION ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-
-          {/* LEFT: Product Image */}
-          <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-            <button className="absolute top-3 right-3 z-10 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.35-4.35m0 0A7.65 7.65 0 1 0 5.8 5.8a7.65 7.65 0 0 0 10.85 10.85Z" />
-              </svg>
-            </button>
-            <div className="relative aspect-square w-full">
-              <Image
-                src={product.images?.[0]?.image || "/placeholder.png"}
-                alt={product.name}
-                unoptimized
-                fill
-                className="object-contain p-6"
-              />
-            </div>
-          </div>
-
-          {/* RIGHT: Product Info */}
-          <div>
-            <nav className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-              <span>Home</span>
-              <span className="mx-1">/</span>
-              <span>{product.category.name}</span>
-              <span className="mx-1">/</span>
-              <span className="text-gray-800 dark:text-gray-200">{product.name}</span>
-            </nav>
-
-            <span className="text-sm text-[#BC2273] dark:text-[#e05fa0]">
-              {product.category.name}
-            </span>
-
-            <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
-              {product.name}
-            </h1>
-
-            {/* Rating summary (jumps to reviews) */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("reviews");
-                document.getElementById("reviews-tabs")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="mt-2 flex items-center gap-2 group"
-            >
-              <span className="text-base text-yellow-400">
-                {"★".repeat(Math.round(reviewAvg))}
-                <span className="text-orange-200 dark:text-gray-600">
-                  {"☆".repeat(5 - Math.round(reviewAvg))}
-                </span>
-              </span>
-              <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-[#BC2273] transition-colors">
-                {reviews.length > 0
-                  ? `${reviewAvg} (${reviews.length} review${reviews.length !== 1 ? "s" : ""})`
-                  : "No reviews yet"}
-              </span>
-            </button>
-
-            <div className="mt-3 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {displayPrice}
-            </div>
-
-            <p className="mt-4 text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-              {product.description}
-            </p>
-
-            {isPhoneEquipment && product.variants?.length > 0 && (
-              <div className="mt-5">
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                  Months
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedVariant?.id || ""}
-                    onChange={(e) => {
-                      const variant = product.variants.find(
-                        (v: any) => v.id === Number(e.target.value)
-                      );
-                      setSelectedVariant(variant || null);
-                    }}
-                    className="
-                      w-full h-11 border border-gray-300 dark:border-gray-600
-                      rounded-md px-3 pr-10
-                      bg-white dark:bg-gray-800
-                      text-gray-900 dark:text-white
-                      text-sm
-                      appearance-none
-                      focus:outline-none focus:ring-2 focus:ring-[#BC2273]
-                      cursor-pointer
-                    "
-                  >
-                    {product.variants.map((variant: any) => (
-                      <option key={variant.id} value={variant.id}>
-                        {variant.duration_display}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                    <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {isPhoneEquipment && selectedVariant && (
-              <div className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">
-                £{Number(selectedVariant.sale_price || selectedVariant.regular_price).toFixed(2)}
-              </div>
-            )}
-
-            {/* Quantity + Add to Cart */}
-            <div className="mt-5 flex items-center gap-3">
-              <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden h-11">
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  disabled={quantity <= 1}
-                  className="
-                    w-10 h-full flex items-center justify-center
-                    text-gray-600 dark:text-gray-300
-                    bg-white dark:bg-gray-800
-                    hover:bg-gray-100 dark:hover:bg-gray-700
-                    disabled:opacity-30 disabled:cursor-not-allowed
-                    transition-colors duration-150
-                    text-lg font-medium select-none
-                  "
-                >
-                  −
-                </button>
-                <span className="
-                  w-10 h-full flex items-center justify-center
-                  text-sm font-semibold
-                  text-gray-900 dark:text-white
-                  bg-white dark:bg-gray-800
-                  border-x border-gray-300 dark:border-gray-600
-                  select-none
-                ">
-                  {quantity}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="
-                    w-10 h-full flex items-center justify-center
-                    text-gray-600 dark:text-gray-300
-                    bg-white dark:bg-gray-800
-                    hover:bg-gray-100 dark:hover:bg-gray-700
-                    transition-colors duration-150
-                    text-lg font-medium select-none
-                  "
-                >
-                  +
-                </button>
-              </div>
-
-              <button
-                onClick={handleAddToCart}
-                className="
-                h-11 px-6
-                bg-[#BC2273] hover:bg-[#a51d63]
-                text-white text-sm font-semibold
-                rounded-md
-                transition-colors duration-200
-              ">
-                {added ? "Added ✓" : "Add to cart"}
-              </button>
-            </div>
-
-            <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-              <span>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Category:</span>{" "}
-                <span className="text-[#BC2273] dark:text-[#e05fa0]">
-                  {product.category.name}
-                </span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── TABS ── */}
-        <div id="reviews-tabs" className="mt-16 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex gap-0">
-            <button
-              onClick={() => setActiveTab("additional")}
-              className={`
-                px-5 py-3 text-sm font-semibold border-b-2 transition-colors duration-200
-                ${activeTab === "additional"
-                  ? "border-[#BC2273] text-[#BC2273] dark:text-[#e05fa0] dark:border-[#e05fa0]"
-                  : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                }
-              `}
-            >
-              Additional information
-            </button>
-            <button
-              onClick={() => setActiveTab("reviews")}
-              className={`
-                px-5 py-3 text-sm font-semibold border-b-2 transition-colors duration-200
-                ${activeTab === "reviews"
-                  ? "border-[#BC2273] text-[#BC2273] dark:text-[#e05fa0] dark:border-[#e05fa0]"
-                  : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                }
-              `}
-            >
-              Reviews ({reviews.length})
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="mt-6">
-          {activeTab === "additional" ? (
-            isPhoneEquipment && product.variants?.length > 0 ? (
-              <div className="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-md">
-                <table className="w-full text-sm">
-                  <tbody>
-                    <tr className="border-b border-gray-200 dark:border-gray-700">
-                      <td className="px-4 py-3 font-semibold text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-800 w-32">
-                        Months
-                      </td>
-                      <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                        {product.variants.map((v: any) => v.duration_display).join(", ")}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                No additional information available.
-              </p>
-            )
-          ) : (
-            /* Reviews Tab */
-            <div>
-              {reviews.length > 0 ? (
-                <div className="mb-8">
-                  <div className="flex items-center gap-2 mb-5">
-                    <span className="text-lg text-yellow-400">
-                      {"★".repeat(Math.round(reviewAvg))}
-                      <span className="text-orange-200 dark:text-gray-600">
-                        {"☆".repeat(5 - Math.round(reviewAvg))}
-                      </span>
-                    </span>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      {reviewAvg} out of 5 &middot; {reviews.length} review{reviews.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-
-                  <div className="space-y-4">
-                    {reviews.map((r: any) => (
-                      <div key={r.id} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{r.name}</span>
-                          <span className="text-xs text-gray-400">
-                            {new Date(r.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="text-sm text-yellow-400 mb-1">
-                          {"★".repeat(r.rating)}
-                          <span className="text-orange-200 dark:text-gray-600">{"☆".repeat(5 - r.rating)}</span>
-                        </div>
-                        {r.comment && (
-                          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{r.comment}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-8">
-                  There are no reviews yet.
-                </p>
-              )}
-
-              {/* Review Form */}
-              <div className="border border-gray-200 dark:border-gray-700 rounded-md p-6">
-                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">
-                  {reviews.length > 0 ? "Add a review" : `Be the first to review “${product.name}”`}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-                  Your email address will not be published. Required fields are marked *
-                </p>
-
-                <div className="mb-5">
-                  <label className="block text-sm font-semibold text-gray-800 dark:text-white mb-2">
-                    Your rating *
-                  </label>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setRating(star)}
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        className={`text-2xl transition-colors duration-150 ${
-                          star <= (hoverRating || rating)
-                            ? "text-yellow-400"
-                            : "text-orange-200 dark:text-gray-600"
-                        }`}
-                      >
-                        {star <= (hoverRating || rating) ? "★" : "☆"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mb-5">
-                  <label className="block text-sm font-semibold text-gray-800 dark:text-white mb-2">
-                    Your review *
-                  </label>
-                  <textarea
-                    rows={6}
-                    value={reviewText}
-                    onChange={(e) => setReviewText(e.target.value)}
-                    className="
-                      w-full border border-gray-300 dark:border-gray-600
-                      rounded-md p-3 text-sm
-                      bg-white dark:bg-gray-800
-                      text-gray-900 dark:text-white
-                      outline-none resize-none
-                      focus:ring-2 focus:ring-[#BC2273]
-                    "
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-800 dark:text-white mb-2">
-                      Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={reviewName}
-                      onChange={(e) => setReviewName(e.target.value)}
-                      className="
-                        w-full h-10 border border-gray-300 dark:border-gray-600
-                        rounded-md px-3 text-sm
-                        bg-white dark:bg-gray-800
-                        text-gray-900 dark:text-white
-                        outline-none
-                        focus:ring-2 focus:ring-[#BC2273]
-                      "
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-800 dark:text-white mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      value={reviewEmail}
-                      onChange={(e) => setReviewEmail(e.target.value)}
-                      className="
-                        w-full h-10 border border-gray-300 dark:border-gray-600
-                        rounded-md px-3 text-sm
-                        bg-white dark:bg-gray-800
-                        text-gray-900 dark:text-white
-                        outline-none
-                        focus:ring-2 focus:ring-[#BC2273]
-                      "
-                    />
-                  </div>
-                </div>
-
-                {reviewError && <p className="text-sm text-red-600 mb-3">{reviewError}</p>}
-                {reviewDone && (
-                  <p className="text-sm text-green-600 mb-3">
-                    Thank you! Your review has been submitted.
-                  </p>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleSubmitReview}
-                  disabled={reviewSubmitting}
-                  className="
-                    h-10 px-6
-                    bg-[#BC2273] hover:bg-[#a51d63]
-                    text-white text-sm font-semibold
-                    rounded-md
-                    transition-colors duration-200
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                  "
-                >
-                  {reviewSubmitting ? "Submitting…" : "Submit"}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── RELATED PRODUCTS ── */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-16">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              Related products
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {relatedProducts.slice(0, 4).map((item: any) => (
-                <Link
-                  key={item.id}
-                  href={`/product/${item.slug}`}
-                  className="group block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 hover:shadow-md transition-shadow duration-200"
-                >
-                  <div className="relative h-52 bg-gray-100 dark:bg-gray-700">
-                    <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <div className="w-8 h-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full flex items-center justify-center shadow-sm">
-                        <svg className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                      </div>
-                    </div>
-                    <Image
-                      src={item.images?.[0]?.image || "/placeholder.png"}
-                      alt={item.name}
-                      unoptimized
-                      fill
-                      className="object-contain p-4"
-                    />
-                  </div>
-
-                  <div className="p-4 border-t border-gray-100 dark:border-gray-700">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                      {item.category.name}
-                    </p>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 leading-snug">
-                      {item.name}
-                    </h3>
-                    <p className="text-sm font-bold text-gray-900 dark:text-white mb-3">
-                      {relatedDisplayPrice(item)}
-                    </p>
-                    <span className="
-                      inline-block w-full md:w-auto px-6 py-3
-                      bg-[#BC2273] hover:bg-[#a51d63]
-                      text-white text-xs md:text-sm font-semibold text-center
-                      rounded-md
-                      transition-colors duration-200
-                    ">
-                      View Details
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-      </div>
-    </div>
-  );
+  return <ProductPage />;
 }
