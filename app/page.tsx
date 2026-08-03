@@ -5,9 +5,9 @@ import { FaArrowRight, FaCheck, FaStar } from "react-icons/fa";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Leading Telecom Service Providers in UK | Zoiko Telecom ",
+  title: "Leading Telecom Services Provider UK | Zoiko Telecom",
   description:
-    "Leading Telecom Service Providers in UK | Zoiko Telecom",
+    "Zoiko Telecom, a leading telecom services provider, delivers fast broadband, EE SIM plans, VoIP, and IoT solutions tailored for home and business users.",
 };
 
 type Feature = {

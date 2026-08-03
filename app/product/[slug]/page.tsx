@@ -83,7 +83,7 @@ const PRODUCT_META: Record<
       "Buy Jabra Pro 920 Mono for Polycom from Zoiko Telecom to ensures crystal-clear audio. Enjoy exceptional audio and comfort for all your communication needs!",
   },
 
-  "jabra-pro-920-mono-for-yealink": {
+  "jabra-pro-920-yealink": {
     title: "Buy Jabra PRO 920 - Mono for Yealink | Zoiko Telecom",
     description:
       "Boost your communication setup with the Jabra Pro 920 Mono for Yealink from Zoiko Telecom. Elevate your calls with superior sound quality today. Shop Now!",
@@ -105,6 +105,24 @@ const PRODUCT_META: Record<
     title: "Jabra PRO 920 – Duo for Polycom | Zoiko Telecom",
     description:
       "Get professional-grade audio with Jabra Pro 920 Duo for Polycom from Zoiko Mobile. Wireless design, noise-cancelling mic & easy setup for better call quality.",
+  },
+
+  "cisco-ip-phone-adapter": {
+    title: "Buy Cisco IP Phone Adapter Online | Zoiko Telecom",
+    description:
+      "Buy Cisco IP phone adapter online from Zoiko Telecom for reliable VoIP communication, easy installation, trusted Cisco quality & fast delivery across the UK.",
+  },
+
+  "business-conference-speaker": {
+    title: "Buy Business Conference Speaker | Zoiko Telecom",
+    description:
+      "Buy a business conference speaker from Zoiko Telecom for crystal-clear meetings, HD audio, seamless connectivity, and fast delivery across the UK.",
+  },
+
+  "wireless-office-headset": {
+    title: "Shop Wireless Office Headset | Zoiko Telecom",
+    description:
+      "Shop a wireless office headset from Zoiko Telecom for crystal-clear business calls, all-day comfort, wireless freedom, and fast delivery across the UK.",
   },
 };
 
