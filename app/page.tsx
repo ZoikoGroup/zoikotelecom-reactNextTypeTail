@@ -4,6 +4,39 @@ import Link from "next/link";
 import { FaArrowRight, FaCheck, FaStar } from "react-icons/fa";
 import type { Metadata } from "next";
 
+const homepageSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://zoikotelecom.com/#organization",
+      "name": "Zoiko Telecom Ltd",
+      "url": "https://zoikotelecom.com/",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://zoikotelecom.com/#website",
+      "name": "Zoiko Telecom",
+      "url": "https://zoikotelecom.com/",
+      "publisher": {
+        "@id": "https://zoikotelecom.com/#organization",
+      },
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://zoikotelecom.com/#webpage",
+      "url": "https://zoikotelecom.com/",
+      "name": "Zoiko Telecom | UK Telecoms Provider",
+      "isPartOf": {
+        "@id": "https://zoikotelecom.com/#website",
+      },
+      "about": {
+        "@id": "https://zoikotelecom.com/#organization",
+      },
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   title: "Leading Telecom Services Provider UK | Zoiko Telecom",
   description:
@@ -404,6 +437,65 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FAQ / AEO & GEO ANSWER BLOCKS ─────────────────── */}
+      <section className="bg-neutral-50 py-20 dark:bg-neutral-900 lg:py-28">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageSchema) }}
+        />
+        <div className="mx-auto max-w-[1320px] px-5">
+          <div className="mx-auto mb-14 max-w-2xl text-center">
+            <span className="text-sm font-bold uppercase tracking-[0.15em] text-[#C12172] dark:text-pink-400">
+              FAQs
+            </span>
+            <h2 className="mt-3 text-3xl font-bold text-neutral-900 dark:text-white sm:text-4xl lg:text-5xl">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-4 text-base text-neutral-600 dark:text-neutral-400">
+              Clear answers about Zoiko Telecom services, partner networks, and connectivity solutions across the UK.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <section className="aeo-answer-block rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#C12172] hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 sm:p-7">
+              <h2 className="mb-2 text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">
+                What is Zoiko Telecom?
+              </h2>
+              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
+                Zoiko Telecom is a UK telecoms provider offering broadband, mobile connectivity, landlines, VoIP, IoT connectivity and business communication solutions for individuals and organisations.
+              </p>
+            </section>
+
+            <section className="aeo-answer-block rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#C12172] hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 sm:p-7">
+              <h2 className="mb-2 text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">
+                What does Zoiko Telecom do?
+              </h2>
+              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
+                Zoiko Telecom provides connectivity and communications services including EE Mobile plans, BT Broadband, landlines, VoIP solutions, IoT connectivity and business-focused telecoms services.
+              </p>
+            </section>
+
+            <section className="aeo-answer-block rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#C12172] hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 sm:p-7">
+              <h2 className="mb-2 text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">
+                Who is Zoiko Telecom for?
+              </h2>
+              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
+                Zoiko Telecom serves home users, mobile customers, remote workers, small and medium-sized businesses, enterprises and organisations requiring connectivity or communications services.
+              </p>
+            </section>
+
+            <section className="geo-answer-block rounded-2xl border border-neutral-200 border-l-4 border-l-[#C12172] bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md dark:border-neutral-800 dark:border-l-pink-400 dark:bg-neutral-900 sm:p-7">
+              <h2 className="mb-2 text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">
+                Why use Zoiko Telecom?
+              </h2>
+              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
+                Zoiko Telecom brings broadband, mobile, landline, VoIP, IoT and business connectivity services together within one broader UK telecoms portfolio, supported by partner networks and customer service.
+              </p>
+            </section>
           </div>
         </div>
       </section>
