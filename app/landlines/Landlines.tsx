@@ -51,11 +51,35 @@ const testimonials = [
 ];
 const faqData = [
   {
+    question: "Does Zoiko Telecom offer landline services?",
+    answer:
+      "Zoiko Telecom offers landline services designed for business communications, with flexible plans and business-oriented calling capabilities.",
+    isAeo: true,
+  },
+  {
+    question: "What features are available with Zoiko Telecom landline plans?",
+    answer:
+      "Features can include voicemail transcription, call queuing, multi-level IVR, video conferencing, team messaging, advanced call management and CRM integration, depending on the selected plan.",
+    isAeo: true,
+  },
+  {
+    question: "Can Zoiko Telecom landline plans include international calls?",
+    answer:
+      "Certain Zoiko Telecom landline plans include international call allowances, subject to the applicable fair usage policies and plan terms.",
+    isAeo: true,
+  },
+  {
+    question: "Zoiko Telecom business voice services",
+    answer:
+      "Zoiko Telecom provides business landline and voice options for organisations requiring scalable communications, remote working support and advanced call-management features.",
+    isGeo: true,
+  },
+  {
     question:
       "What is Business Landline, and how can it benefit my company?",
     answer:
         "Business landline is a technology that allows you to make and receive phone calls over the internet rather than through traditional phone lines. Benefits include reduced costs, advanced communication features, support for remote work, enhanced productivity, and scalable communication solutions tailored to your business needs."
-},  
+  },  
   {
   question: "Which Zoiko Telecom Landline plan is best for my business?",
   answer: (
@@ -142,17 +166,6 @@ const faqData = [
     question: "What happens if I exceed the inclusive minutes?",
     answer:
       "If you exceed the inclusive minutes, additional charges will apply based on Zoiko Telecom’s standard rates for extra minutes.",
-  },
-  {
-    question: "Are there any international call allowances included?",
-    answer:
-      "Yes, certain plans, such as Zoiko FlexiTalk, Zoiko SyncVoice, and Zoiko MegaCall, include international call allowances. These are subject to fair usage policies.",
-  },
-  {
-    question:
-      "What features are available with Zoiko Telecom's Landline plans?",
-    answer:
-      "Each plan comes with a range of features, including voicemail transcription, call queuing, multi-level IVR, video conferencing, team messaging, advanced call management, CRM integration, and more. Features vary depending on the selected plan.",
   },
   {
     question: "Can I customise the Landline plans?",
@@ -389,41 +402,53 @@ export default function Landlinefun() {
         {/* FAQ Container */}
         <div className="w-full max-w-[900px] mt-[48px]">
 
-          {faqData.map((item, index) => (
-            <div
-              key={index}
-              className="border-b border-[#E5E5E5] dark:border-gray-700"
-            >
-              
-              {/* Question */}
-              <button
-                onClick={() => toggleFAQ(index)}
-                className="w-full flex items-center justify-between gap-4 py-[24px] text-left"
-              >
-                <span className="text-black dark:text-white text-[16px] sm:text-[18px] md:text-[20px] font-medium leading-[30px]">
-                  {item.question}
-                </span>
+          {faqData.map((item, index) => {
+            const blockClass = item.isGeo
+              ? "geo-answer-block"
+              : item.isAeo
+              ? "aeo-answer-block"
+              : "";
 
-                <span className="flex-shrink-0 text-[#525252] dark:text-gray-300 text-[20px]">
-                            {openIndex === index ? "▲" : "▼"}
-                </span>
-              </button>
-
-              {/* Answer */}
-              <div
-                className={`overflow-hidden transition-all duration-300 ${
-                  openIndex === index
-                    ? "max-h-[500px] pb-[24px]"
-                    : "max-h-0"
-                }`}
+            return (
+              <section
+                key={index}
+                className={`border-b border-[#E5E5E5] dark:border-gray-700 ${blockClass}`}
               >
-                <div className="text-[#525252] dark:text-gray-300 text-[14px] sm:text-[16px] leading-[28px] pr-4">
-                  {item.answer}
+                
+                {/* Question */}
+                <button
+                  onClick={() => toggleFAQ(index)}
+                  className="w-full flex items-center justify-between gap-4 py-[24px] text-left"
+                >
+                  <h2 className="text-black dark:text-white text-[16px] sm:text-[18px] md:text-[20px] font-medium leading-[30px] m-0">
+                    {item.question}
+                  </h2>
+
+                  <span className="flex-shrink-0 text-[#525252] dark:text-gray-300 text-[20px]">
+                    {openIndex === index ? "▲" : "▼"}
+                  </span>
+                </button>
+
+                {/* Answer */}
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openIndex === index
+                      ? "max-h-[500px] pb-[24px]"
+                      : "max-h-0"
+                  }`}
+                >
+                  <div className="text-[#525252] dark:text-gray-300 text-[14px] sm:text-[16px] leading-[28px] pr-4">
+                    {typeof item.answer === "string" ? (
+                      <p className="m-0 leading-[28px]">{item.answer}</p>
+                    ) : (
+                      item.answer
+                    )}
+                  </div>
                 </div>
-              </div>
 
-            </div>
-          ))}
+              </section>
+            );
+          })}
 
         </div>
       </div>
