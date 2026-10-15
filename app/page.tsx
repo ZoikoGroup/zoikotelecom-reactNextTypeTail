@@ -41,6 +41,9 @@ export const metadata: Metadata = {
   title: "Leading Telecom Services Provider UK | Zoiko Telecom",
   description:
     "Zoiko Telecom, a leading telecom services provider, delivers fast broadband, EE SIM plans, VoIP, and IoT solutions tailored for home and business users.",
+    verification: {
+      google:'43qQmyFkZminjSsB7aQVoirVS_cJIxJWuSiLtLWY3s4',
+    },
 };
 
 type Feature = {
