@@ -50,7 +50,7 @@ export default function WhyChooseZoiko() {
             {/* Image Card */}
             <div className="relative mt-8 h-64 w-full overflow-hidden sm:h-72">
               <Image
-                src="/images/home/5.png"
+                src="/images/black/5.png"
                 alt="Professional team member standing in office"
                 fill
                 className="object-cover"

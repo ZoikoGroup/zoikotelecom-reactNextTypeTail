@@ -23,7 +23,7 @@ const DEALS: readonly Deal[] = [
     title: "Digital Phone Lines",
     description: "20% off the monthly charge for 6 months",
     cta: "Get digital lines",
-    href: "/business/digital-phone-lines",
+    href: "/login",
     icon: Phone,
     hero: true,
   },
