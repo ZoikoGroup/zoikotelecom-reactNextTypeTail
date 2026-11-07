@@ -13,7 +13,6 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-
 const forYouLinks = [
   {
     href: "/business-solutions",
@@ -56,12 +55,12 @@ function DropdownLink({
     <Link
       href={item.href}
       onClick={onClick}
-      className="group/item mb-0.5 block rounded-xl px-3 py-2.5 transition-colors hover:bg-[#C12172]/10 dark:hover:bg-[#C12172]/20"
+      className="group/item mb-1 block rounded-xl px-3 py-2.5 transition-colors hover:bg-[#C12172]/10 dark:hover:bg-[#C12172]/20"
     >
-      <h4 className="text-[15px] font-semibold leading-tight text-[#111] group-hover/item:text-[#C12172] dark:text-neutral-100 dark:group-hover/item:text-[#e94196]">
+      <h4 className="text-sm font-semibold leading-tight text-[#111] group-hover/item:text-[#C12172] dark:text-neutral-100 dark:group-hover/item:text-[#e94196] sm:text-[15px]">
         {item.title}
       </h4>
-      <p className="mt-1 text-[12.5px] leading-snug text-[#888] dark:text-neutral-400">
+      <p className="mt-0.5 text-xs leading-snug text-[#888] dark:text-neutral-400 sm:text-[12.5px]">
         {item.desc}
       </p>
     </Link>
@@ -83,7 +82,6 @@ export default function Header() {
       const token = localStorage.getItem("token");
       setIsLoggedIn(!!token);
 
-      // Derive a display name from the stored user object.
       let name = "";
       try {
         const raw = localStorage.getItem("user");
@@ -144,8 +142,8 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-[9999] w-full bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:bg-neutral-900 dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
-      <div className="mx-auto max-w-[1320px] px-5">
-        <nav className="flex h-[95px] items-center justify-between">
+      <div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
+        <nav className="flex h-20 items-center justify-between lg:h-[95px]">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" onClick={closeAll}>
@@ -155,7 +153,7 @@ export default function Header() {
                 width={180}
                 height={50}
                 priority
-                className="w-[140px] sm:w-[180px]"
+                className="w-[130px] sm:w-[150px] lg:w-[180px]"
               />
             </Link>
           </div>
@@ -164,13 +162,13 @@ export default function Header() {
           <ul
             className={`
               ${menuOpen ? "flex" : "hidden"}
-              absolute left-0 right-0 top-[95px] flex-col items-start gap-0
-              border-t border-[#eee] bg-white px-5 pb-5 pt-2.5
+              absolute left-0 right-0 top-20 max-h-[calc(100vh-80px)] flex-col items-start gap-0
+              overflow-y-auto border-t border-[#eee] bg-white px-5 pb-6 pt-3
               shadow-[0_12px_30px_rgba(0,0,0,0.08)]
               dark:border-neutral-700 dark:bg-neutral-900
               dark:shadow-[0_12px_30px_rgba(0,0,0,0.4)]
-              lg:static lg:flex lg:flex-row lg:items-center lg:gap-11
-              lg:border-0 lg:p-0 lg:shadow-none dark:lg:bg-transparent
+              lg:static lg:flex lg:max-h-none lg:flex-row lg:items-center lg:gap-8 lg:overflow-visible
+              lg:border-0 lg:p-0 lg:shadow-none dark:lg:bg-transparent xl:gap-11
             `}
           >
             {[
@@ -185,7 +183,7 @@ export default function Header() {
                 <Link
                   href={item.href}
                   onClick={closeAll}
-                  className="block py-3.5 text-[17px] font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:py-0 lg:text-base"
+                  className="block py-3.5 text-base font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:py-0"
                 >
                   {item.label}
                 </Link>
@@ -196,7 +194,7 @@ export default function Header() {
             <li className="group relative w-full border-b border-[#f5f5f5] dark:border-neutral-800 lg:w-auto lg:border-0">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex w-full items-center gap-2 py-3.5 text-left text-[17px] font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:w-auto lg:py-0 lg:text-base"
+                className="flex w-full items-center justify-between py-3.5 text-left text-base font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:w-auto lg:justify-start lg:gap-2 lg:py-0"
               >
                 Business
                 <FaChevronDown
@@ -210,9 +208,9 @@ export default function Header() {
                 className={`
                   ${dropdownOpen ? "block" : "hidden"}
                   relative w-full overflow-hidden rounded-2xl border border-[#f0f0f0]
-                  bg-white pb-3 dark:border-neutral-700 dark:bg-neutral-800
+                  bg-white pb-3 pl-2 dark:border-neutral-700 dark:bg-neutral-800
                   lg:invisible lg:absolute lg:left-1/2 lg:top-[150%]
-                  lg:block lg:w-[340px] lg:-translate-x-1/2
+                  lg:block lg:w-[340px] lg:-translate-x-1/2 lg:pl-0
                   lg:opacity-0 lg:shadow-[0_20px_60px_rgba(0,0,0,0.12)]
                   lg:transition-all lg:duration-300
                   lg:group-hover:visible lg:group-hover:top-[135%]
@@ -246,20 +244,31 @@ export default function Header() {
               <Link
                 href="/about-us"
                 onClick={closeAll}
-                className="block py-3.5 text-[17px] font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:py-0 lg:text-base"
+                className="block py-3.5 text-base font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:py-0"
               >
                 About Us
+              </Link>
+            </li>
+
+            {/* Mobile Contact Button Link inside menu list */}
+            <li className="mt-3 w-full lg:hidden">
+              <Link
+                href="/contact"
+                onClick={closeAll}
+                className="flex w-full items-center justify-center rounded-full border-2 border-[#C12172] py-2.5 text-center text-sm font-semibold text-[#C12172] transition-all hover:bg-[#C12172] hover:text-white"
+              >
+                Contact Us
               </Link>
             </li>
           </ul>
 
           {/* Right Side */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <CartIcon />
             <Link
               href="/contact"
               onClick={closeAll}
-              className="hidden whitespace-nowrap rounded-full border-2 border-[#C12172] px-5 py-2 text-base font-semibold text-[#C12172] transition-all duration-300 hover:bg-[#C12172] hover:text-white lg:inline-block"
+              className="hidden whitespace-nowrap rounded-full border-2 border-[#C12172] px-4 py-2 text-sm font-semibold text-[#C12172] transition-all duration-300 hover:bg-[#C12172] hover:text-white lg:inline-block xl:px-5 xl:text-base"
             >
               Contact Us
             </Link>
@@ -269,11 +278,11 @@ export default function Header() {
                 <button
                   onClick={() => setUserMenuOpen((o) => !o)}
                   aria-label="Account menu"
-                  className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] px-3 py-2.5 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px]"
+                  className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] px-3 py-2 text-xs font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px] sm:px-3.5 sm:py-2.5 sm:text-sm"
                 >
-                  <FaUserCircle className="text-lg" />
+                  <FaUserCircle className="text-base sm:text-lg" />
                   {userName && (
-                    <span className="hidden max-w-[120px] truncate lg:inline">
+                    <span className="hidden max-w-[100px] truncate sm:inline lg:max-w-[120px]">
                       {userName}
                     </span>
                   )}
@@ -285,7 +294,7 @@ export default function Header() {
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-[calc(100%+10px)] w-56 overflow-hidden rounded-2xl border border-[#f0f0f0] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.14)] dark:border-neutral-700 dark:bg-neutral-800">
+                  <div className="absolute right-0 top-[calc(100%+10px)] w-52 overflow-hidden rounded-2xl border border-[#f0f0f0] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.14)] dark:border-neutral-700 dark:bg-neutral-800 sm:w-56">
                     {/* Name header */}
                     <div className="border-b border-[#f0f0f0] px-4 py-3 dark:border-neutral-700">
                       <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#aaa] dark:text-neutral-500">
@@ -317,15 +326,15 @@ export default function Header() {
               </div>
             ) : (
               <Link href="/login">
-                <button className="flex items-center gap-2 rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] px-3 py-3 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px]">
-                  <FaUserCircle />
+                <button aria-label="Login" className="flex items-center justify-center rounded-full bg-gradient-to-br from-[#C12172] to-[#d63d88] p-2.5 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(193,33,114,0.3)] transition-transform hover:-translate-y-[2px] sm:px-3 sm:py-2.5">
+                  <FaUserCircle className="text-lg" />
                 </button>
               </Link>
             )}
 
             {/* Mobile Menu Button */}
             <button
-              className="flex h-11 w-11 items-center justify-center rounded-[10px] border-2 border-[#eee] bg-white text-lg text-[#111] hover:border-[#C12172] hover:text-[#C12172] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-[10px] border-2 border-[#eee] bg-white text-base text-[#111] hover:border-[#C12172] hover:text-[#C12172] dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 sm:h-11 sm:w-11 sm:text-lg lg:hidden"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
