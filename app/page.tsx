@@ -10,27 +10,27 @@ const homepageSchema = {
     {
       "@type": "Organization",
       "@id": "https://zoikotelecom.com/#organization",
-      "name": "Zoiko Telecom Ltd",
-      "url": "https://zoikotelecom.com/",
+      name: "Zoiko Telecom Ltd",
+      url: "https://zoikotelecom.com/",
     },
     {
       "@type": "WebSite",
       "@id": "https://zoikotelecom.com/#website",
-      "name": "Zoiko Telecom",
-      "url": "https://zoikotelecom.com/",
-      "publisher": {
+      name: "Zoiko Telecom",
+      url: "https://zoikotelecom.com/",
+      publisher: {
         "@id": "https://zoikotelecom.com/#organization",
       },
     },
     {
       "@type": "WebPage",
       "@id": "https://zoikotelecom.com/#webpage",
-      "url": "https://zoikotelecom.com/",
-      "name": "Zoiko Telecom | UK Telecoms Provider",
-      "isPartOf": {
+      url: "https://zoikotelecom.com/",
+      name: "Zoiko Telecom | UK Telecoms Provider",
+      isPartOf: {
         "@id": "https://zoikotelecom.com/#website",
       },
-      "about": {
+      about: {
         "@id": "https://zoikotelecom.com/#organization",
       },
     },
@@ -41,9 +41,9 @@ export const metadata: Metadata = {
   title: "Leading Telecom Services Provider UK | Zoiko Telecom",
   description:
     "Zoiko Telecom, a leading telecom services provider, delivers fast broadband, EE SIM plans, VoIP, and IoT solutions tailored for home and business users.",
-    verification: {
-      google:'43qQmyFkZminjSsB7aQVoirVS_cJIxJWuSiLtLWY3s4',
-    },
+  verification: {
+    google: "43qQmyFkZminjSsB7aQVoirVS_cJIxJWuSiLtLWY3s4",
+  },
 };
 
 type Feature = {
@@ -153,96 +153,94 @@ export default function Home() {
     <div className="">
       {/* ─── HERO ───────────────────────────────────────────── */}
       <section className="relative min-h-[520px] overflow-hidden py-10 md:py-16 ">
-      {/* Background image */}
-      <Image
-        src="/Images/Homepage/Hero-Section.webp"
-        alt="hero-bg"
-        fill
-        priority
-        sizes="100vw"
-        className="absolute inset-0 -z-20 object-cover object-center"
-      />
- 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 -z-10 bg-black/55 dark:bg-black/70" />
- 
-      {/* Pink gradient accent — top-right glow to hint the brand colour */}
-      {/* <div className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[500px] w-[500px] rounded-full bg-[#C12172]/20 blur-3xl" /> */}
- 
-      <div className="relative mx-auto max-w-[1320px] px-5 md:px-10">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-12">
- 
-          {/* ── Left Content ── */}
-          <div className="text-white">
-            <h1 className="text-2xl font-extrabold uppercase leading-[1.1] tracking-tight md:text-3xl lg:text-5xl">
-              Empowering Your Digital
-              <span className="block text-3xl md:text-5xl">Connections</span>
-            </h1>
- 
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-white/80 sm:text-lg lg:text-2xl">
-              Lightning-fast broadband, seamless mobile connectivity, and
-              enterprise solutions all under one roof with best-in-class
-              customer service.
-            </p>
- 
-            {/* CTA Buttons */}
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/ee-mobile-plans" passHref>
-                <button
-                type="button"
-                className="rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#C12172] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:px-8 sm:py-3.5 sm:text-base"
-              >
-                Explore Services
-              </button>
-              </Link>
-              
-              <Link href="/contact" passHref>
-                <button
-                  type="button"
-                  className="rounded-full border-2 border-white px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white hover:text-[#C12172] sm:px-8 sm:py-3.5 sm:text-base"
-                >
-                  Contact Us
-                </button>
-              </Link>
+        {/* Background image */}
+        <Image
+          src="/Images/Homepage/Hero-Section.webp"
+          alt="hero-bg"
+          fill
+          priority
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center"
+        />
+
+        {/* Dark overlay */}
+        <div className="absolute inset-0 -z-10 bg-black/55 dark:bg-black/70" />
+
+        {/* Pink gradient accent — top-right glow to hint the brand colour */}
+        {/* <div className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[500px] w-[500px] rounded-full bg-[#C12172]/20 blur-3xl" /> */}
+
+        <div className="relative mx-auto max-w-[1320px] px-5 md:px-10">
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-12">
+            {/* ── Left Content ── */}
+            <div className="text-white">
+              <h1 className="text-2xl font-extrabold uppercase leading-[1.1] tracking-tight md:text-3xl lg:text-5xl">
+                Empowering Your Digital
+                <span className="block text-3xl md:text-5xl">Connections</span>
+              </h1>
+
+              <p className="mt-5 max-w-lg text-base leading-relaxed text-white/80 sm:text-lg lg:text-2xl">
+                Lightning-fast broadband, seamless mobile connectivity, and
+                enterprise solutions all under one roof with best-in-class
+                customer service.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link href="/ee-mobile-plans" passHref>
+                  <button
+                    type="button"
+                    className="rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#C12172] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:px-8 sm:py-3.5 sm:text-base"
+                  >
+                    Explore Services
+                  </button>
+                </Link>
+
+                <Link href="/contact" passHref>
+                  <button
+                    type="button"
+                    className="rounded-full border-2 border-white px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white hover:text-[#C12172] sm:px-8 sm:py-3.5 sm:text-base"
+                  >
+                    Contact Us
+                  </button>
+                </Link>
+              </div>
+
+              {/* Stats — flat, no card, matching screenshot */}
+              <div className="mt-12 flex flex-wrap gap-x-10 gap-y-6 sm:gap-x-14">
+                {[
+                  { value: "99.9%", label: "Uptime" },
+                  { value: "24/7", label: "Support" },
+                  { value: "50K+", label: "Happy Customers" },
+                ].map((stat) => (
+                  <div key={stat.label} className="flex flex-col">
+                    <span className="text-2xl font-extrabold text-white sm:text-3xl">
+                      {stat.value}
+                    </span>
+                    <span className="mt-0.5 text-xs font-medium text-white/70 sm:text-sm">
+                      {stat.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
- 
-            {/* Stats — flat, no card, matching screenshot */}
-            <div className="mt-12 flex flex-wrap gap-x-10 gap-y-6 sm:gap-x-14">
-              {[
-                { value: "99.9%", label: "Uptime" },
-                { value: "24/7",  label: "Support" },
-                { value: "50K+",  label: "Happy Customers" },
-              ].map((stat) => (
-                <div key={stat.label} className="flex flex-col">
-                  <span className="text-2xl font-extrabold text-white sm:text-3xl">
-                    {stat.value}
-                  </span>
-                  <span className="mt-0.5 text-xs font-medium text-white/70 sm:text-sm">
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
- 
-          {/* ── Right: Hero Card with floating badges ── */}
-          <div className="relative flex justify-center lg:justify-end">
- 
-            {/* Main card image */}
-            <div className="relative w-full max-w-[340px] overflow-hidden rounded-3xl shadow-2xl sm:max-w-[400px] lg:max-w-[500px]">
-              <Image
-                src="/Images/Homepage/hero-card.webp"
-                alt="Hero Card"
-                width={800}
-                height={500}
-                priority
-                className="h-auto w-full object-cover"
-              />
+
+            {/* ── Right: Hero Card with floating badges ── */}
+            <div className="relative flex justify-center lg:justify-end">
+              {/* Main card image */}
+              <div className="relative w-full max-w-[340px] overflow-hidden rounded-3xl shadow-2xl sm:max-w-[400px] lg:max-w-[500px]">
+                <Image
+                  src="/Images/Homepage/hero-card.webp"
+                  alt="Hero Card"
+                  width={800}
+                  height={500}
+                  priority
+                  className="h-auto w-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
       {/* ─── SERVICES ───────────────────────────────────────── */}
       <section className="bg-neutral-50 py-20 dark:bg-neutral-900 lg:py-28">
@@ -283,7 +281,9 @@ export default function Home() {
                   {service.description}
                 </p>
 
-                <Link href={service.btnLink} passHref
+                <Link
+                  href={service.btnLink}
+                  passHref
                   type="button"
                   className="inline-flex items-center gap-2 text-sm font-semibold text-[#C12172] transition-all hover:gap-3 dark:text-pink-400"
                 >
@@ -335,12 +335,12 @@ export default function Home() {
               </div>
 
               <Link href="/ee-mobile-plans" passHref>
-              <button
-                type="button"
-                className="mt-8 rounded-full bg-[#C12172] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#C12172]/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#a01a60] hover:shadow-xl dark:bg-pink-500 dark:shadow-pink-500/30 dark:hover:bg-pink-600"
-              >
-                Get Started Today
-              </button>
+                <button
+                  type="button"
+                  className="mt-8 rounded-full bg-[#C12172] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#C12172]/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#a01a60] hover:shadow-xl dark:bg-pink-500 dark:shadow-pink-500/30 dark:hover:bg-pink-600"
+                >
+                  Get Started Today
+                </button>
               </Link>
             </div>
 
@@ -373,25 +373,25 @@ export default function Home() {
                 Ready to Transform Your Connectivity?
               </h2>
               <p className="mt-4 text-base text-white/90 sm:text-lg">
-                Join thousands of satisfied customers enjoying seamless
-                digital experiences.
+                Join thousands of satisfied customers enjoying seamless digital
+                experiences.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-4">
                 <Link href="/ee-mobile-plans" passHref>
-                <button
-                  type="button"
-                  className="rounded-full bg-white px-8 py-3.5 text-base font-semibold text-[#C12172] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
-                >
-                  Get Started
-                </button>
+                  <button
+                    type="button"
+                    className="rounded-full bg-white px-8 py-3.5 text-base font-semibold text-[#C12172] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+                  >
+                    Get Started
+                  </button>
                 </Link>
                 <Link href="/ee-mobile-plans" passHref>
-                <button
-                  type="button"
-                  className="rounded-full border-2 border-white px-8 py-3.5 text-base font-semibold text-white transition-all duration-300 hover:bg-white hover:text-[#C12172]"
-                >
-                  View All Services
-                </button>
+                  <button
+                    type="button"
+                    className="rounded-full border-2 border-white px-8 py-3.5 text-base font-semibold text-white transition-all duration-300 hover:bg-white hover:text-[#C12172]"
+                  >
+                    View All Services
+                  </button>
                 </Link>
               </div>
             </div>
@@ -459,7 +459,8 @@ export default function Home() {
               Frequently Asked Questions
             </h2>
             <p className="mt-4 text-base text-neutral-600 dark:text-neutral-400">
-              Clear answers about Zoiko Telecom services, partner networks, and connectivity solutions across the UK.
+              Clear answers about Zoiko Telecom services, partner networks, and
+              connectivity solutions across the UK.
             </p>
           </div>
 
@@ -469,7 +470,10 @@ export default function Home() {
                 What is Zoiko Telecom?
               </h2>
               <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
-                Zoiko Telecom is a UK telecoms provider offering broadband, mobile connectivity, landlines, VoIP, IoT connectivity and business communication solutions for individuals and organisations.
+                Zoiko Telecom is a UK telecoms provider offering broadband,
+                mobile connectivity, landlines, VoIP, IoT connectivity and
+                business communication solutions for individuals and
+                organisations.
               </p>
             </section>
 
@@ -478,7 +482,10 @@ export default function Home() {
                 What does Zoiko Telecom do?
               </h2>
               <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
-                Zoiko Telecom provides connectivity and communications services including EE Mobile plans, BT Broadband, landlines, VoIP solutions, IoT connectivity and business-focused telecoms services.
+                Zoiko Telecom provides connectivity and communications services
+                including EE Mobile plans, BT Broadband, landlines, VoIP
+                solutions, IoT connectivity and business-focused telecoms
+                services.
               </p>
             </section>
 
@@ -487,7 +494,9 @@ export default function Home() {
                 Who is Zoiko Telecom for?
               </h2>
               <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
-                Zoiko Telecom serves home users, mobile customers, remote workers, small and medium-sized businesses, enterprises and organisations requiring connectivity or communications services.
+                Zoiko Telecom serves home users, mobile customers, remote
+                workers, small and medium-sized businesses, enterprises and
+                organisations requiring connectivity or communications services.
               </p>
             </section>
 
@@ -496,7 +505,10 @@ export default function Home() {
                 Why use Zoiko Telecom?
               </h2>
               <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300 sm:text-base">
-                Zoiko Telecom brings broadband, mobile, landline, VoIP, IoT and business connectivity services together within one broader UK telecoms portfolio, supported by partner networks and customer service.
+                Zoiko Telecom brings broadband, mobile, landline, VoIP, IoT and
+                business connectivity services together within one broader UK
+                telecoms portfolio, supported by partner networks and customer
+                service.
               </p>
             </section>
           </div>

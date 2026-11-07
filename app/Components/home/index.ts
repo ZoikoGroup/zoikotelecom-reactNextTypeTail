@@ -1,0 +1,11 @@
+export { default as BlackFridayHero } from "./BlackFridayHero";
+export { default as BlackFridaySale } from "./BlackFridaySale";
+export { default as DigitalPhoneLines } from "./DigitalPhoneLines";
+export { default as BroadbandDeals } from "./BroadbandDeals";
+export { default as ESIMPlans } from "./ESIMPlans";
+export { default as OfferingComparison } from "./OfferingComparison";
+export { default as WhyChooseZoiko } from "./WhyChooseZoiko";
+export { default as RequestQuote } from "./RequestQuote";
+export { default as BlackFridayFaqs } from "./BlackFridayFaqs";
+export { default as BlackFridayCta } from "./BlackFridayCta";
+export { default as NewsletterSubscribe } from "./NewsletterSubscribe";
