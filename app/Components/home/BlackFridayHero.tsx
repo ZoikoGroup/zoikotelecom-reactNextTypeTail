@@ -202,7 +202,7 @@ export default function BlackFridayHero() {
             <div className="rounded-3xl  p-0.5">
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl sm:aspect-[4/5] lg:aspect-[8/7]">
                 <Image
-                  src="/images/black-friday/b2.png"
+                  src="/images/sale/hero.png"
                   alt="Smiling businessman in a suit holding a phone"
                   fill
                   sizes="(min-width: 1024px) 45vw, (min-width: 640px) 80vw, 100vw"

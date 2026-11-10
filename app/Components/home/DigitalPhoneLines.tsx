@@ -35,7 +35,7 @@ export default function DigitalPhoneLines() {
           {/* Image Container */}
           <div className="relative min-h-[260px] w-full overflow-hidden rounded-3xl shadow-xl sm:min-h-[320px] md:min-h-[360px]">
             <Image
-              src="/images/black-friday/b3.png"
+              src="/images/sale/call.png"
               alt="Smiling businessman talking on a phone in an open-plan office"
               fill
               sizes="(min-width: 768px) 50vw, 100vw"

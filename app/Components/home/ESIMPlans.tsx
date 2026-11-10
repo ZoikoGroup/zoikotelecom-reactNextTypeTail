@@ -70,7 +70,7 @@ export default function ESIMPlans() {
           {/* Header Image */}
           <div className="relative h-40 w-full max-w-[320px] shrink-0 overflow-hidden rounded-2xl shadow-sm sm:h-48 sm:w-80 lg:-mt-4">
             <Image
-              src="/images/black-friday/b4.png"
+              src="/images/sale/show.png"
               alt="Team member outdoors using mobile device"
               fill
               sizes="(min-width: 640px) 320px, 100vw"
