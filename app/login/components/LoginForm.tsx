@@ -1,9 +1,19 @@
-import Image from "next/image";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight } from "react-icons/fi";
 import SocialButtons from "./SocialButtons";
+import {
+  headerClass,
+  headingClass,
+  subheadingClass,
+  labelClass,
+  inputClass,
+  inputIconClass,
+  eyeButtonClass,
+  primaryButtonClass,
+  linkClass,
+} from "./ui";
 
 
 type Tab = "login" | "register" | "reset-password";
@@ -18,7 +28,6 @@ export default function LoginForm({ setActiveTab }: Props) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -65,123 +74,110 @@ export default function LoginForm({ setActiveTab }: Props) {
   };
 
   return (
-    <section className="w-full dark:bg-gray-950 dark:text-white">
+    <section className="w-full">
       {/* HEADER */}
-      <header className="mb-9">
-        <h3 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
-          Welcome back!
-        </h3>
-
-        <p className="text-gray-600 mt-2 dark:text-gray-300">
-          Enter your credentials to access your account.
-        </p>
+      <header className={headerClass}>
+        <h2 className={headingClass}>Welcome back</h2>
+        <p className={subheadingClass}>Sign in to your MyZoiko account.</p>
       </header>
 
       {/* FORM */}
       <form onSubmit={handleLogin} autoComplete="off" className="flex flex-col gap-5">
         {/* EMAIL */}
         <div>
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Username or Email Address
+          <label htmlFor="email" className={labelClass}>
+            Email address
           </label>
-
-          <input
-            id="email"
-            type="email"
-            autoComplete="new-email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-lg
-                       focus:ring-2 focus:ring-[#10446C] focus:outline-none
-                       dark:bg-gray-900 dark:border-gray-700 dark:text-white"
-          />
+          <div className="relative">
+            <FiMail size={20} className={inputIconClass} aria-hidden="true" />
+            <input
+              id="email"
+              type="email"
+              autoComplete="new-email"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className={inputClass}
+            />
+          </div>
         </div>
 
         {/* PASSWORD */}
         <div>
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label htmlFor="password" className={labelClass}>
             Password
           </label>
-        <div className="relative mt-1">
-          <input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            autoComplete="new-password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-lg
-                       focus:ring-2 focus:ring-[#10446C] focus:outline-none
-                       dark:bg-gray-900 dark:border-gray-700 dark:text-white"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
-          >
-            {showPassword ? <FiEyeOff /> : <FiEye />}
-          </button>
+          <div className="relative">
+            <FiLock size={20} className={inputIconClass} aria-hidden="true" />
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className={`${inputClass} pr-12`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className={eyeButtonClass}
+            >
+              {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+            </button>
           </div>
         </div>
 
-        {/* GOOGLE + REMEMBER */}
-        <div className="flex flex-col gap-3">
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+        {/* REMEMBER + FORGOT */}
+        <div className="flex items-center justify-between gap-3 text-[15px]">
+          <label className="flex cursor-pointer items-center gap-2.5 text-gray-800 dark:text-gray-300">
             <input
               type="checkbox"
-              className="accent-[#10446C] dark:accent-blue-500"
+              className="h-5 w-5 rounded accent-[#B21F97]"
             />
-            Remember for 30 days
+            Remember this device
           </label>
-        </div>
-
-        {/* LOGIN BUTTON */}
-        <button
-          type="submit"
-          className="w-full bg-[#B21F97] text-white py-3 rounded-lg font-semibold
-                     hover:bg-[#B21F97] transition
-                     dark:bg-blue-600 dark:hover:bg-blue-700"
-        >
-            {loading ? "Logging in..." : "Log In"}
-        </button>
-      </form>
-
-      {/* FOOTER */}
-      <footer className="text-sm text-center text-gray-600 dark:text-gray-400 mt-6">
-        {/* Forgot password | create account */}
-        <p className="mt-4">
           <button
             type="button"
             onClick={() => setActiveTab("reset-password")}
-            className="text-[#10446C] dark:text-blue-400 hover:underline"
+            className={linkClass}
           >
-            Forgot Password?
+            Forgot password?
           </button>
-
-          <span className="mx-1">|</span>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("register")}
-            className="text-[#10446C] dark:text-blue-400 hover:underline"
-          >
-            Create Account
-          </button>
-        </p>
-      {/* Social login (Google + Facebook) */}
-        <div className="mt-4">
-          <SocialButtons redirectTo="/dashboard" />
         </div>
-      </footer>
+
+        {/* LOGIN BUTTON */}
+        <button type="submit" className={primaryButtonClass}>
+          {loading ? "Logging in..." : "Log in"}
+          {!loading && (
+            <FiArrowRight
+              size={22}
+              className="transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          )}
+        </button>
+      </form>
+
+      {/* Social login (Google + Facebook) */}
+      <div className="mt-6">
+        <SocialButtons redirectTo="/dashboard" />
+      </div>
+
+      {/* FOOTER */}
+      <p className="mt-6 text-center text-base text-gray-700 dark:text-gray-300">
+        New to Zoiko Telecom?{" "}
+        <button
+          type="button"
+          onClick={() => setActiveTab("register")}
+          className={`${linkClass} ml-1`}
+        >
+          Register
+        </button>
+      </p>
     </section>
   );
 }

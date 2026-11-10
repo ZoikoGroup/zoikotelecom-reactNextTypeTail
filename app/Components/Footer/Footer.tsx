@@ -211,7 +211,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="pt-4 text-center">
           <p className="text-[14px] leading-8 text-white/60">
-            © 2024 Zoiko Telecom Ltd is Registered in England and Wales
+            © 2026 Zoiko Telecom Ltd is Registered in England and Wales
             (No. 15021457) | Information Commissioner's Office
             Registration Number ZB585887
           </p>

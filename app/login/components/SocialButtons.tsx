@@ -45,43 +45,49 @@ export default function SocialButtons({ redirectTo = "/dashboard" }: Props) {
   };
 
   const baseBtn =
-    "w-full flex items-center justify-center gap-3 py-2.5 border rounded-lg text-sm font-medium " +
-    "transition disabled:opacity-60 disabled:cursor-not-allowed";
+    "w-full h-12 flex items-center justify-center gap-3 px-3 rounded-xl border border-gray-300 bg-white " +
+    "text-[15px] font-medium text-gray-900 shadow-sm transition hover:bg-gray-50 hover:border-gray-400 " +
+    "disabled:opacity-60 disabled:cursor-not-allowed " +
+    "dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800";
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       {/* OR continue with */}
-      <div className="flex items-center gap-4 my-2">
+      <div className="flex items-center gap-4">
         <div className="flex-1 border-t border-gray-300 dark:border-gray-700" />
-        <span className="text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
-          Or continue with
+        <span className="text-[15px] text-gray-600 whitespace-nowrap dark:text-gray-400">
+          or continue with
         </span>
         <div className="flex-1 border-t border-gray-300 dark:border-gray-700" />
       </div>
 
-      {/* Google */}
-      <button
-        type="button"
-        onClick={() => handleSocial("google")}
-        disabled={pending !== null}
-        className={`${baseBtn} border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800`}
-      >
-        <FcGoogle size={20} />
-        <span>{pending === "google" ? "Connecting..." : "Continue with Google"}</span>
-      </button>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {/* Google */}
+        <button
+          type="button"
+          onClick={() => handleSocial("google")}
+          disabled={pending !== null}
+          className={baseBtn}
+        >
+          <FcGoogle size={22} className="shrink-0" />
+          <span className="truncate">
+            {pending === "google" ? "Connecting..." : "Continue with Google"}
+          </span>
+        </button>
 
-      {/* Facebook */}
-      <button
-        type="button"
-        onClick={() => handleSocial("facebook")}
-        disabled={pending !== null}
-        className={`${baseBtn} border-[#1877F2] bg-[#1877F2] text-white hover:bg-[#166fe0]`}
-      >
-        <FaFacebookF size={18} />
-        <span>
-          {pending === "facebook" ? "Connecting..." : "Continue with Facebook"}
-        </span>
-      </button>
+        {/* Facebook */}
+        <button
+          type="button"
+          onClick={() => handleSocial("facebook")}
+          disabled={pending !== null}
+          className={baseBtn}
+        >
+          <FaFacebookF size={20} className="shrink-0 text-[#1877F2]" />
+          <span className="truncate">
+            {pending === "facebook" ? "Connecting..." : "Continue with Facebook"}
+          </span>
+        </button>
+      </div>
     </div>
   );
 }
