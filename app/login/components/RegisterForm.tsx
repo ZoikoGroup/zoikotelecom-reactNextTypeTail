@@ -2,8 +2,19 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiMail, FiLock, FiUser, FiArrowRight } from "react-icons/fi";
 import SocialButtons from "./SocialButtons";
+import {
+  headerClass,
+  headingClass,
+  subheadingClass,
+  labelClass,
+  inputClass,
+  inputIconClass,
+  eyeButtonClass,
+  primaryButtonClass,
+  linkClass,
+} from "./ui";
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function RegisterForm() {
@@ -36,11 +47,6 @@ export default function RegisterForm() {
 
       const data = await res.json();
 
-      // if (!res.ok) {
-      //   console.error("Backend Error:", data);
-      //   toast.error(JSON.stringify(data));
-      //   return;
-      // }
       if (!res.ok) {
         console.error("Backend Error:", data);
 
@@ -78,26 +84,22 @@ export default function RegisterForm() {
   };
 
   return (
-    <section className="w-full dark:bg-gray-950 dark:text-white">
+    <section className="w-full">
       {/* Header */}
-      <header className="mb-6">
-        <h3 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">
-          Create Account
-        </h3>
-
-        <p className="text-gray-600 mt-2 dark:text-gray-300">
-          Fill in your details to get started.
-        </p>
+      <header className={headerClass}>
+        <h2 className={headingClass}>Create your account</h2>
+        <p className={subheadingClass}>Fill in your details to get started.</p>
       </header>
+
       {showVerificationMessage && (
-        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
-          <h4 className="font-semibold text-green-700">
+        <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950/40">
+          <h4 className="font-semibold text-green-700 dark:text-green-400">
             Verify Your Email
           </h4>
 
-          <p className="mt-2 text-sm text-green-600">
+          <p className="mt-2 text-sm text-green-600 dark:text-green-300">
             A verification link has been sent to your email address.
-            If you don't see the email, check your Spam or Junk folder.
+            If you don&apos;t see the email, check your Spam or Junk folder.
           </p>
         </div>
       )}
@@ -112,62 +114,53 @@ export default function RegisterForm() {
       >
         {/* Username */}
         <div>
-          <label
-            htmlFor="username"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label htmlFor="username" className={labelClass}>
             Username *
           </label>
-
-          <input
-            id="username"
-            type="text"
-            autoComplete="username"
-            placeholder="Choose a username"
-            required
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-            }}
-            className="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-lg
-                       focus:ring-2 focus:ring-[#10446C] focus:outline-none
-                       dark:bg-gray-900 dark:border-gray-700 dark:text-white"
-          />
+          <div className="relative">
+            <FiUser size={20} className={inputIconClass} aria-hidden="true" />
+            <input
+              id="username"
+              type="text"
+              autoComplete="username"
+              placeholder="Choose a username"
+              required
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+              className={inputClass}
+            />
+          </div>
         </div>
 
         {/* Email */}
         <div>
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Email *
+          <label htmlFor="email" className={labelClass}>
+            Email address *
           </label>
-
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="your@email.com"
-            required
-            className="w-full mt-1 px-4 py-2.5 border border-gray-300 rounded-lg
-                       focus:ring-2 focus:ring-[#10446C] focus:outline-none
-                       dark:bg-gray-900 dark:border-gray-700 dark:text-white"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <div className="relative">
+            <FiMail size={20} className={inputIconClass} aria-hidden="true" />
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="name@example.com"
+              required
+              className={inputClass}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* Password */}
         <div>
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label htmlFor="password" className={labelClass}>
             Password *
           </label>
-
-          <div className="relative mt-1">
+          <div className="relative">
+            <FiLock size={20} className={inputIconClass} aria-hidden="true" />
             <input
               id="password"
               type={showPassword ? "text" : "password"}
@@ -176,32 +169,26 @@ export default function RegisterForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg
-               focus:ring-2 focus:ring-[#10446C] focus:outline-none
-               dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+              className={`${inputClass} pr-12`}
             />
-
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className={eyeButtonClass}
             >
               {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </button>
           </div>
-
         </div>
 
         {/* Confirm Password */}
         <div>
-          <label
-            htmlFor="confirmPassword"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Confirm Password *
+          <label htmlFor="confirmPassword" className={labelClass}>
+            Confirm password *
           </label>
-
-          <div className="relative mt-1">
+          <div className="relative">
+            <FiLock size={20} className={inputIconClass} aria-hidden="true" />
             <input
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
@@ -210,15 +197,13 @@ export default function RegisterForm() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg
-                       focus:ring-2 focus:ring-[#10446C] focus:outline-none
-                       dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+              className={`${inputClass} pr-12`}
             />
-
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400"
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              className={eyeButtonClass}
             >
               {showConfirmPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </button>
@@ -226,28 +211,30 @@ export default function RegisterForm() {
         </div>
 
         {/* Submit */}
-        <button
-          type="submit"
-          className="w-full bg-[#B21F97] text-white py-3 rounded-lg font-semibold
-                     hover:bg-[#B21F97] transition
-                     dark:bg-blue-600 dark:hover:bg-blue-700"
-        >
+        <button type="submit" className={primaryButtonClass}>
           {loading ? "Creating Account..." : "Create Account"}
+          {!loading && (
+            <FiArrowRight
+              size={22}
+              className="transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
+          )}
         </button>
       </form>
 
+      {/* Social signup (Google + Facebook) */}
+      <div className="mt-6">
+        <SocialButtons redirectTo="/dashboard" />
+      </div>
+
       {/* Footer */}
-      <footer className="text-sm text-center text-gray-600 dark:text-gray-400 mt-6">
+      <p className="mt-6 text-center text-base text-gray-700 dark:text-gray-300">
         Already have an account?
-        <a
-          href="/login"
-          className="text-[#10446C] dark:text-blue-400 ml-1 hover:underline"
-        >
+        <a href="/login" className={`${linkClass} ml-1`}>
           Sign In
         </a>
-          {/* Social signup (Google + Facebook) */}
-        <SocialButtons redirectTo="/dashboard" />
-      </footer>
+      </p>
     </section>
   );
 }
