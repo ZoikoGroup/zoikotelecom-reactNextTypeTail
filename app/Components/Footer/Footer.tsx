@@ -1,123 +1,144 @@
-import Link from "next/link";
 import Image from "next/image";
-import type { ReactNode } from "react";
+import Link from "next/link";
+import {
+  Briefcase,
+  Handshake,
+  Headphones,
+  Info,
+  Laptop,
+  Layers,
+  Mail,
+  MapPin,
+  Network,
+  Phone,
+  Smartphone,
+  Wifi,
+  type LucideIcon,
+} from "lucide-react";
+import {
+  FOOTER_BOTTOM_SECTIONS,
+  FOOTER_CONTACT,
+  FOOTER_LEGAL,
+  FOOTER_POLICY_LINKS,
+  FOOTER_SOCIALS,
+  FOOTER_TAGLINE,
+  FOOTER_TOP_SECTIONS,
+  type NavSection,
+} from "@/lib/navigation";
 
-type FooterLink = {
-  id: string;
-  label: string;
-  href: string;
+const ICONS: Record<NavSection["icon"], LucideIcon> = {
+  smartphone: Smartphone,
+  wifi: Wifi,
+  phone: Phone,
+  briefcase: Briefcase,
+  network: Network,
+  laptop: Laptop,
+  headphones: Headphones,
+  info: Info,
+  handshake: Handshake,
+  layers: Layers,
 };
 
-type Social = {
-  id: string;
-  label: string;
-  href: string;
-  svg: ReactNode;
-};
-
-const servicesLinks: FooterLink[] = [
-  { id: "bt", label: "BT Broadband", href: "/bt-broadband" },
-  { id: "ee", label: "EE Mobile", href: "/ee-mobile-plans" },
-  { id: "iot", label: "IoT Services", href: "#" },
-  { id: "voip", label: "VoIP Solutions", href: "#" },
-];
-
-const companyLinks: FooterLink[] = [
-  { id: "about", label: "About Us", href: "/about-us" },
-  // { id: "careers", label: "Careers", href: "#" },
-  { id: "partner", label: "Partner Programme", href: "/become-a-reseller" },
-  { id: "newsblogs", label: "News & Blogs", href: "/blogs-news" },
-  
-];
-
-const quickLinks: FooterLink[] = [
-  
-  { id: "news", label: "News", href: "/blogs-news" },
-  { id: "blogs", label: "Blogs", href: "/blogs-news" },
-  { id: "faqs", label: "FAQs", href: "/faqs" },
-];
-
-const socials: Social[] = [
-  {
-    id: "facebook",
-    label: "Facebook",
-    href: "https://www.facebook.com/zoikotelecom/",
-    svg: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-      </svg>
-    ),
-  },
-  {
-    id: "instagram",
-    label: "Instagram",
-    href: "https://www.instagram.com/zoiko_telecom/",
-    svg: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        width="16"
-        height="16"
-      >
-        <rect x="2" y="2" width="20" height="20" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="18" cy="6" r="1" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    id: "twitter",
-    label: "Twitter",
-    href: "https://x.com/zoikotelecom",
-    svg: (
-  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53A4.48 4.48 0 0 0 22.43 1s-4.18 2.64-6.63 2.64A4.48 4.48 0 0 0 8.24 7.7C4.09 7.49 1 4 1 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
-  </svg>
-),
-  },
-  {
-    id: "youtube",
-    label: "YouTube",
-    href: "https://www.youtube.com/@zoikotelecom",
-    svg: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        width="22"
-        height="22"
-      >
-        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.97C5.12 20 12 20 12 20s6.88 0 8.59-.45a2.78 2.78 0 0 0 1.96-1.97A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-        <polygon
-          className="fill-[#7b2d8b] dark:fill-neutral-900"
-          points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"
-        />
-      </svg>
-    )
-  },
-];
-
-function FooterColumn({
-  heading,
-  links,
-}: {
-  heading: string;
-  links: FooterLink[];
-}) {
+function FacebookIcon({ className }: { className?: string }) {
   return (
-    <div>
-      <h3 className="mb-8 text-[18px] font-semibold text-white">
-        {heading}
-      </h3>
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
 
-      <ul className="space-y-5">
-        {links.map((link) => (
-          <li key={link.id}>
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  );
+}
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M18.244 2H21.5l-7.19 8.22L22.75 22h-6.62l-5.18-6.77L4.99 22H1.73l7.69-8.8L1.25 2h6.79l4.68 6.19L18.244 2Zm-1.16 18h1.83L6.99 3.9H5.03L17.084 20Z" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+    </svg>
+  );
+}
+
+function YoutubeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+    </svg>
+  );
+}
+
+const SOCIAL_ICONS = {
+  facebook: FacebookIcon,
+  instagram: InstagramIcon,
+  x: XIcon,
+  linkedin: LinkedinIcon,
+  youtube: YoutubeIcon,
+} as const;
+
+function FooterSection({ section }: { section: NavSection }) {
+  const Icon = ICONS[section.icon];
+  return (
+    <div className="px-6 pb-8 pt-6 sm:px-5 lg:pb-10">
+      <Link
+        href={section.href}
+        className="flex min-h-[40px] items-center gap-3 text-sm font-bold leading-tight text-white"
+      >
+        <Icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+        {section.title}
+      </Link>
+      <span
+        aria-hidden="true"
+        className="mt-3 block h-[3px] w-6 bg-[#e6007e]"
+      />
+      <ul className="mt-5 space-y-3">
+        {section.links.map((link) => (
+          <li key={link.label}>
             <Link
               href={link.href}
-              className="text-[16px] text-white/70 transition hover:text-white"
+              className="text-sm leading-5 text-white/75 transition-colors hover:text-white"
             >
               {link.label}
             </Link>
@@ -130,95 +151,155 @@ function FooterColumn({
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#7B2D8B] text-white">
-      <div className="mx-auto max-w-[1120px] px-6 pt-11 pb-4">
-        <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
-          {/* Left Side */}
-          <div className="lg:w-[320px]">
-            <Link href="/">
+    <footer className="relative w-full overflow-hidden bg-[#0a0e4a] text-white">
+      {/* Backgrounds */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_100%_45%,rgba(168,40,170,0.45),transparent_45%),radial-gradient(ellipse_at_0%_0%,rgba(40,50,170,0.45),transparent_50%),linear-gradient(180deg,#0b1050_0%,#0a0e4a_60%,#0c0f55_100%)]"
+      />
+      {/* Top glow line */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-8 h-px bg-gradient-to-r from-transparent via-[#6d5cff] to-transparent shadow-[0_0_14px_3px_rgba(109,92,255,0.7)]"
+      />
+      {/* Bottom wave */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 1440 140"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute inset-x-0 bottom-[110px] hidden h-[110px] w-full lg:block"
+        fill="none"
+      >
+        <path
+          d="M0 90 C240 20 420 20 700 80 C980 140 1180 80 1440 40"
+          stroke="#a855f7"
+          strokeWidth="2"
+          strokeOpacity="0.8"
+        />
+        <path
+          d="M0 100 C240 40 420 40 700 95 C980 150 1180 100 1440 58"
+          stroke="#ff2e93"
+          strokeWidth="2"
+          strokeOpacity="0.7"
+        />
+        <path
+          d="M0 80 C240 10 420 10 700 66 C980 126 1180 62 1440 24"
+          stroke="#4f8bff"
+          strokeWidth="1.5"
+          strokeOpacity="0.6"
+        />
+      </svg>
+
+      <div className="relative mx-auto max-w-[1300px] px-6 pt-14 sm:px-8 lg:px-10">
+        <div className="grid lg:grid-cols-[22%_78%]">
+          {/* Brand column */}
+          <div className="pb-10 lg:pr-8 lg:pt-2">
+            <Link href="/" aria-label="Zoiko Telecom home">
               <Image
-                src="/image/Frame 1707483043.png"
+                src="/image/logo.png"
                 alt="Zoiko Telecom"
                 width={282}
                 height={123}
-                className="h-auto w-[220px] lg:w-[282px]"
+                className="h-auto w-[170px]"
               />
             </Link>
 
-            <h3 className="mt-7 mb-4 text-[18px] font-semibold text-white">
-              Follow Us :
-            </h3>
+            <p className="mt-6 max-w-[170px] text-base leading-6 text-white">
+              {FOOTER_TAGLINE}
+            </p>
+            <span
+              aria-hidden="true"
+              className="mt-5 block h-0.5 w-full max-w-[155px] bg-gradient-to-r from-[#e6007e] via-[#8b5cf6] to-[#3b82f6]"
+            />
 
-            <div className="flex items-center gap-4">
-              {socials.map((social) => (
-                <a
-                  key={social.id}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-                >
-                  {social.svg}
-                </a>
-              ))}
+            <div className="mt-7 flex items-start gap-3">
+              <MapPin className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+              <address className="text-sm not-italic leading-6 text-white/85">
+                <strong className="block text-base font-bold text-white">
+                  {FOOTER_CONTACT.addressTitle}
+                </strong>
+                {FOOTER_CONTACT.addressLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+            </div>
+
+            <Link
+              href={FOOTER_CONTACT.phone.href}
+              className="mt-6 flex items-center gap-3 text-sm text-white/90"
+            >
+              <Phone className="h-5 w-5 shrink-0" aria-hidden="true" />
+              {FOOTER_CONTACT.phone.label}
+            </Link>
+
+            <Link
+              href={FOOTER_CONTACT.email.href}
+              className="mt-5 flex items-center gap-3 text-sm text-white/90"
+            >
+              <Mail className="h-5 w-5 shrink-0" aria-hidden="true" />
+              {FOOTER_CONTACT.email.label}
+            </Link>
+
+            <div className="mt-6 w-full max-w-[155px] border-t border-white/15 pt-6">
+              <ul className="flex max-w-[155px] flex-wrap gap-3">
+                {FOOTER_SOCIALS.map((social) => {
+                  const Icon = SOCIAL_ICONS[social.id];
+                  return (
+                    <li key={social.id}>
+                      <a
+                        href={social.href}
+                        aria-label={social.label}
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 text-white transition-colors hover:bg-white/10"
+                      >
+                        <Icon className="h-4 w-4" aria-hidden="true" />
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </div>
 
-          {/* Columns */}
-          <div className="grid flex-1 grid-cols-1 gap-10 sm:grid-cols-3 lg:pl-10">
-            <FooterColumn
-              heading="Services"
-              links={servicesLinks}
-            />
-
-            <FooterColumn
-              heading="Company"
-              links={companyLinks}
-            />
-
-            <FooterColumn
-              heading="Quick Links"
-              links={quickLinks}
-            />
+          {/* Link grid */}
+          <div className="border-white/15 lg:border-l">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-5 lg:divide-x lg:divide-white/15">
+              {FOOTER_TOP_SECTIONS.map((section) => (
+                <FooterSection key={section.id} section={section} />
+              ))}
+            </div>
+            <div className="grid border-t border-white/15 sm:grid-cols-2 lg:grid-cols-5 lg:divide-x lg:divide-white/15">
+              {FOOTER_BOTTOM_SECTIONS.map((section) => (
+                <FooterSection key={section.id} section={section} />
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Policy Row */}
-        <div className="mt-16 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[15px] text-white/60">
-          <Link href="/terms-and-conditions">
-            Terms and Conditions
-          </Link>
-
-          <Link href="/vulnerability-policy">
-            Vulnerability Policy
-          </Link>
-
-          <Link href="/modern-slavery-policy">
-            Modern Slavery Policy
-          </Link>
-
-          <Link href="/esg-policy">
-            ESG Policy
-          </Link>
-
-          <Link href="/privacy-policy">
-            Zoiko Policies
-          </Link>
+        {/* Policies */}
+        <div className="mt-24 border-t border-white/15 lg:mt-36">
+          <ul className="flex flex-wrap items-center justify-center py-5">
+            {FOOTER_POLICY_LINKS.map((link) => (
+              <li
+                key={link.label}
+                className="border-white/20 px-5 py-1 text-sm text-white/85 lg:border-r lg:last:border-r-0"
+              >
+                <Link href={link.href} className="hover:text-white">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Divider */}
-        <div className="mt-8 h-px w-full bg-white/10" />
-
-        {/* Copyright */}
-        <div className="pt-4 text-center">
-          <p className="text-[14px] leading-8 text-white/60">
-            © 2026 Zoiko Telecom Ltd is Registered in England and Wales
-            (No. 15021457) | Information Commissioner's Office
-            Registration Number ZB585887
-          </p>
-
-          <p className="text-[14px] leading-8 text-white/60">
-            All rights reserved | VAT Registration Number: 465 1110 23
-          </p>
+        {/* Legal */}
+        <div className="border-t border-white/15 pb-8 pt-5 text-center">
+          {FOOTER_LEGAL.map((line) => (
+            <p key={line} className="text-sm leading-6 text-white/60">
+              {line}
+            </p>
+          ))}
         </div>
       </div>
     </footer>
