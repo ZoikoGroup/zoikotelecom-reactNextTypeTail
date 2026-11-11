@@ -170,7 +170,7 @@ export default function BlackFridayPopup({
 
           {/* CTA */}
           <Link
-            href="/contact"
+            href="/black-friday"
             onClick={() => setIsOpen(false)}
             className="mt-4 inline-flex w-full max-w-[380px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#E6007E] via-[#B0138F] to-[#0A8CFF] px-6 py-3 text-[15px] font-bold text-white shadow-[0_10px_24px_rgba(230,0,126,0.35)] transition-all hover:-translate-y-0.5"
           >
