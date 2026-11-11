@@ -4,6 +4,18 @@ import Link from "next/link";
 import { FaArrowRight, FaCheck, FaStar } from "react-icons/fa";
 import type { Metadata } from "next";
 
+import {
+  ChevronRight,
+  Cloud,
+  Laptop,
+  MapPin,
+  Network,
+  Phone,
+  Smartphone,
+  Wifi,
+  type LucideIcon,
+} from "lucide-react";
+
 const homepageSchema = {
   "@context": "https://schema.org",
   "@graph": [
@@ -148,97 +160,147 @@ const testimonials: Testimonial[] = [
   },
 ];
 
+type HeroService = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  ring: string;
+};
+
+const HERO_SERVICES: readonly HeroService[] = [
+  {
+    label: "Mobile",
+    href: "/mobile",
+    icon: Smartphone,
+    ring: "border-[#ff2e93] shadow-[0_0_14px_rgba(255,46,147,0.55)]",
+  },
+  {
+    label: "Broadband",
+    href: "/broadband",
+    icon: Wifi,
+    ring: "border-[#3b82f6] shadow-[0_0_14px_rgba(59,130,246,0.6)]",
+  },
+  {
+    label: "Landlines & Voice",
+    href: "/landlines",
+    icon: Phone,
+    ring: "border-[#a855f7] shadow-[0_0_14px_rgba(168,85,247,0.6)]",
+  },
+  {
+    label: "Business Solutions",
+    href: "/business",
+    icon: Cloud,
+    ring: "border-[#3b82f6] shadow-[0_0_14px_rgba(59,130,246,0.6)]",
+  },
+  {
+    label: "IoT & Connectivity",
+    href: "/iot",
+    icon: Network,
+    ring: "border-[#ff2e93] shadow-[0_0_14px_rgba(255,46,147,0.55)]",
+  },
+  {
+    label: "Devices",
+    href: "/devices",
+    icon: Laptop,
+    ring: "border-[#3b82f6] shadow-[0_0_14px_rgba(59,130,246,0.6)]",
+  },
+] as const;
+
 export default function Home() {
   return (
     <div className="">
       {/* ─── HERO ───────────────────────────────────────────── */}
-      <section className="relative min-h-[520px] overflow-hidden py-10 md:py-16 ">
-        {/* Background image */}
+      <section className="relative min-h-[600px] w-full overflow-hidden bg-[#0b1040] text-white lg:min-h-[640px]">
         <Image
-          src="/Images/Homepage/Hero-Section.webp"
-          alt="hero-bg"
+          src="/images/homepage/background.png"
+          alt=""
           fill
           priority
           sizes="100vw"
-          className="absolute inset-0 -z-20 object-cover object-center"
+          className="object-cover object-[70%_center]"
         />
 
-        {/* Dark overlay */}
-        <div className="absolute inset-0 -z-10 bg-black/55 dark:bg-black/70" />
+        {/* Left readability gradient (mobile stronger) */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-r from-[#0b1040]/80 via-[#0b1040]/30 to-transparent lg:from-[#0b1040]/40 lg:via-transparent"
+        />
+        {/* Bottom fade */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0b1040]/90 to-transparent"
+        />
 
-        {/* Pink gradient accent — top-right glow to hint the brand colour */}
-        {/* <div className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[500px] w-[500px] rounded-full bg-[#C12172]/20 blur-3xl" /> */}
+        <div className="relative mx-auto flex min-h-[600px] max-w-[1360px] flex-col justify-between px-5 pb-6 pt-12 md:px-10 lg:min-h-[640px] lg:pt-16">
+          <div className="flex max-w-[520px] gap-5">
+            <span
+              aria-hidden="true"
+              className="w-1 shrink-0 self-stretch rounded-full max-h-47 bg-gradient-to-b from-[#ff2e93] to-[#c12172]"
+            />
 
-        <div className="relative mx-auto max-w-[1320px] px-5 md:px-10">
-          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-12">
-            {/* ── Left Content ── */}
-            <div className="text-white">
-              <h1 className="text-2xl font-extrabold uppercase leading-[1.1] tracking-tight md:text-3xl lg:text-5xl">
-                Empowering Your Digital
-                <span className="block text-3xl md:text-5xl">Connections</span>
+            <div>
+              <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+                The UK&rsquo;s
+                <span className="block">Connected</span>
+                <span className="block font-medium italic text-[#ff2e93]">
+                  Lifestyle
+                </span>
               </h1>
 
-              <p className="mt-5 max-w-lg text-base leading-relaxed text-white/80 sm:text-lg lg:text-2xl">
-                Lightning-fast broadband, seamless mobile connectivity, and
-                enterprise solutions all under one roof with best-in-class
-                customer service.
+              <p className="mt-6 max-w-[430px] text-base leading-7 text-white/95 sm:text-lg">
+                Mobile, broadband, landlines and smart connectivity for homes,
+                businesses and a more connected UK.
               </p>
 
-              {/* CTA Buttons */}
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link href="/ee-mobile-plans" passHref>
-                  <button
-                    type="button"
-                    className="rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#C12172] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:px-8 sm:py-3.5 sm:text-base"
-                  >
-                    Explore Services
-                  </button>
+              <div className="mt-8 flex flex-col items-start gap-4">
+                <Link
+                  href="/ee-mobile-plans"
+                  className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-[#e6007e] to-[#c12172] px-8 py-3.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(230,0,126,0.4)] transition-opacity hover:opacity-95 sm:text-base"
+                >
+                  Explore Our Services
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
 
-                <Link href="/contact" passHref>
-                  <button
-                    type="button"
-                    className="rounded-full border-2 border-white px-7 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white hover:text-[#C12172] sm:px-8 sm:py-3.5 sm:text-base"
-                  >
-                    Contact Us
-                  </button>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2.5 rounded-full border border-white/60 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/15 sm:text-base"
+                >
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
+                  Check Availability
                 </Link>
-              </div>
-
-              {/* Stats — flat, no card, matching screenshot */}
-              <div className="mt-12 flex flex-wrap gap-x-10 gap-y-6 sm:gap-x-14">
-                {[
-                  { value: "99.9%", label: "Uptime" },
-                  { value: "24/7", label: "Support" },
-                  { value: "50K+", label: "Happy Customers" },
-                ].map((stat) => (
-                  <div key={stat.label} className="flex flex-col">
-                    <span className="text-2xl font-extrabold text-white sm:text-3xl">
-                      {stat.value}
-                    </span>
-                    <span className="mt-0.5 text-xs font-medium text-white/70 sm:text-sm">
-                      {stat.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ── Right: Hero Card with floating badges ── */}
-            <div className="relative flex justify-center lg:justify-end">
-              {/* Main card image */}
-              <div className="relative w-full max-w-[340px] overflow-hidden rounded-3xl shadow-2xl sm:max-w-[400px] lg:max-w-[500px]">
-                <Image
-                  src="/Images/Homepage/hero-card.webp"
-                  alt="Hero Card"
-                  width={800}
-                  height={500}
-                  priority
-                  className="h-auto w-full object-cover"
-                />
               </div>
             </div>
           </div>
+
+          {/* Services strip */}
+          <nav
+            aria-label="Services"
+            className="mt-12 border-t border-white/10 pt-5"
+          >
+            <ul className="grid grid-cols-2 gap-y-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-y-0">
+              {HERO_SERVICES.map((service) => {
+                const Icon = service.icon;
+                return (
+                  <li
+                    key={service.label}
+                    className="lg:border-l lg:border-white/20 lg:first:border-l-0"
+                  >
+                    <Link
+                      href={service.href}
+                      className="flex items-center gap-3 px-2 py-1 text-sm font-semibold leading-5 text-white lg:justify-center lg:px-3"
+                    >
+                      <span
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 bg-[#0b1040]/60 ${service.ring}`}
+                      >
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <span className="max-w-[110px]">{service.label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         </div>
       </section>
 
