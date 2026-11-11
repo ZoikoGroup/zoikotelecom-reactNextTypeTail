@@ -12,7 +12,7 @@ export default function Navbar() {
 
   return (
     <header
-      className="relative z-50 w-full bg-white"
+      className="sticky top-0 z-50 w-full bg-white"
       onMouseLeave={scheduleClose}
     >
       <TopBar />

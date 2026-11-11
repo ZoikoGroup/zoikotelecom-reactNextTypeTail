@@ -15,14 +15,12 @@ export default function MegaMenu({ menu, onNavigate, onEnter }: MegaMenuProps) {
   const rows = Math.ceil(menu.items.length / 2);
 
   return (
-    <div
-      className="absolute inset-x-0 top-full z-50 hidden px-6 xl:block"
-      onMouseEnter={onEnter}
-    >
+    <div className="pointer-events-none absolute inset-x-0 top-full z-50 hidden px-6 xl:block">
       <div
         role="region"
         aria-label={`${menu.eyebrow} menu`}
-        className="mx-auto w-[90%] max-w-[1300px] overflow-hidden rounded-b-2xl border-t-2 border-[#7b2d8b] bg-white shadow-[0_20px_50px_rgba(15,27,61,0.18)]"
+        onMouseEnter={onEnter}
+        className="pointer-events-auto mx-auto w-[90%] max-w-[1300px] overflow-hidden rounded-b-2xl border-t-2 border-[#7b2d8b] bg-white shadow-[0_20px_50px_rgba(15,27,61,0.18)]"
       >
         <div className="grid grid-cols-[25%_75%]">
           {/* Image panel */}

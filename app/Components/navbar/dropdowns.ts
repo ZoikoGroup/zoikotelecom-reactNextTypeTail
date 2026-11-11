@@ -14,7 +14,7 @@ export const MOBILE_MENU: NavDropdown = {
   eyebrow: "Mobile",
   seeAll: { label: "See all Mobile →", href: "/ee-mobile-plans" },
   image: {
-    src: "/images/navbar/1.png",
+    src: "/Images/navbar/1.png",
     alt: "Woman smiling at her phone on a city street",
     title: ["Mobile Plans for", "Every Lifestyle"],
     cta: { label: "View Mobile Plans", href: "/ee-mobile-plans" },
@@ -69,7 +69,7 @@ export const BROADBAND_MENU: NavDropdown = {
   eyebrow: "Broadband & Fibre",
   seeAll: { label: "See all Broadband & Fibre →", href: "/bt-broadband" },
   image: {
-    src: "/images/navbar/2.png",
+    src: "/Images/navbar/2.png",
     alt: "Wi-Fi routers beside a plant in a softly lit room",
     title: ["Fast, Reliable", "Broadband for", "Home and Work"],
     cta: { label: "View Mobile Plans", href: "/bt-broadband" },
@@ -124,7 +124,7 @@ export const LANDLINES_MENU: NavDropdown = {
   eyebrow: "Landlines & Voice",
   seeAll: { label: "See all Landlines & Voice →", href: "#" },
   image: {
-    src: "/images/navbar/3.png",
+    src: "/Images/navbar/3.png",
     alt: "Desk phone in a modern office",
     title: ["Clear, Flexible", "Voice Solutions"],
     cta: { label: "Explore Voice", href: "#" },
@@ -173,7 +173,7 @@ export const BUSINESS_MENU: NavDropdown = {
   eyebrow: "Business",
   seeAll: { label: "See all Business →", href: "#" },
   image: {
-    src: "/images/navbar/4.png",
+    src: "/Images/navbar/4.png",
     alt: "Colleagues reviewing work together on a laptop",
     title: ["Connectivity and", "Solutions for", "Business"],
     cta: { label: "Explore Business", href: "#" },
@@ -228,7 +228,7 @@ export const IOT_MENU: NavDropdown = {
   eyebrow: "IoT & Connectivity",
   seeAll: { label: "See all IoT & Connectivity →", href: "#" },
   image: {
-    src: "/images/navbar/5.png",
+    src: "/Images/navbar/5.png",
     alt: "Woman smiling at her phone near a red London bus",
     title: ["Connected", "Solutions for", "People, Vehicles", "and Things"],
     cta: { label: "Explore IoT", href: "#" },
@@ -277,7 +277,7 @@ export const DEVICES_MENU: NavDropdown = {
   eyebrow: "Devices",
   seeAll: { label: "See all Devices →", href: "#" },
   image: {
-    src: "/images/navbar/6.png",
+    src: "/Images/navbar/6.png",
     alt: "Laptop, tablet and phone glowing with neon colours",
     title: ["The Latest", "Devices, Built for", "Connectivity"],
     cta: { label: "Shop Devices", href: "#" },
@@ -326,7 +326,7 @@ export const SUPPORT_MENU: NavDropdown = {
   eyebrow: "Support",
   seeAll: { label: "See all Support →", href: "/faqs" },
   image: {
-    src: "/images/navbar/7.png",
+    src: "/Images/navbar/7.png",
     alt: "Smiling support agent wearing a headset",
     title: ["We’re Here to", "Help"],
     cta: { label: "Get Support", href: "/faqs" },
@@ -375,7 +375,7 @@ export const ABOUT_MENU: NavDropdown = {
   eyebrow: "About Zoiko",
   seeAll: { label: "See all About Zoiko →", href: "/about-us" },
   image: {
-    src: "/images/navbar/8.png",
+    src: "/Images/navbar/8.png",
     alt: "Engineer in a hard hat holding a tablet in a warehouse",
     title: ["A Modern UK", "Telecoms", "Company"],
     cta: { label: "About Zoiko", href: "/about-us" },

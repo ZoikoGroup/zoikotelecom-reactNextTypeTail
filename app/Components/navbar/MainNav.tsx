@@ -38,6 +38,7 @@ export default function MainNav({ openId, onOpen, onNavigate }: MainNavProps) {
               >
                 <Link
                   href={item.href}
+                  onClick={onNavigate}
                   aria-haspopup={item.dropdown ? "true" : undefined}
                   aria-expanded={item.dropdown ? isOpen : undefined}
                   className={
