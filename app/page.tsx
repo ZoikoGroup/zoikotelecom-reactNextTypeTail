@@ -214,7 +214,7 @@ export default function Home() {
         {/* ─── HERO ───────────────────────────────────────────── */}
         <section className="relative min-h-[600px] w-full overflow-hidden bg-[#0b1040] text-white lg:min-h-[640px]">
           <Image
-            src="/Images/homepage/background.png"
+            src="/Images/Homepage/background.png"
             alt="hero image"
             fill
             priority
