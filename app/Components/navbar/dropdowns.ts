@@ -96,13 +96,13 @@ export const BROADBAND_MENU: NavDropdown = {
     {
       label: "Check Availability",
       description: "See what's available at your address",
-      href: "/contact",
+      href: "/broadband",
       icon: "pin",
     },
     {
       label: "Full Fibre",
       description: "Fibre all the way to your door",
-      href: "#",
+      href: "/fibre-packages",
       icon: "zap",
     },
     {
@@ -122,12 +122,12 @@ export const BROADBAND_MENU: NavDropdown = {
 
 export const LANDLINES_MENU: NavDropdown = {
   eyebrow: "Landlines & Voice",
-  seeAll: { label: "See all Landlines & Voice →", href: "#" },
+  seeAll: { label: "See all Landlines & Voice →", href: "/landlines" },
   image: {
     src: "/Images/navbar/3.png",
     alt: "Desk phone in a modern office",
     title: ["Clear, Flexible", "Voice Solutions"],
-    cta: { label: "Explore Voice", href: "#" },
+    cta: { label: "Explore Voice", href: "/landlines" },
   },
   items: [
     {
@@ -151,7 +151,7 @@ export const LANDLINES_MENU: NavDropdown = {
     {
       label: "Business Voice (VoIP)",
       description: "Internet calling for your team",
-      href: "#",
+      href: "/landline-business",
       icon: "cloud",
     },
     {
@@ -171,12 +171,12 @@ export const LANDLINES_MENU: NavDropdown = {
 
 export const BUSINESS_MENU: NavDropdown = {
   eyebrow: "Business",
-  seeAll: { label: "See all Business →", href: "#" },
+  seeAll: { label: "See all Business →", href: "/business-solutions" },
   image: {
     src: "/Images/navbar/4.png",
     alt: "Colleagues reviewing work together on a laptop",
     title: ["Connectivity and", "Solutions for", "Business"],
-    cta: { label: "Explore Business", href: "#" },
+    cta: { label: "Explore Business", href: "/business-solutions" },
   },
   items: [
     {
@@ -275,12 +275,12 @@ export const IOT_MENU: NavDropdown = {
 
 export const DEVICES_MENU: NavDropdown = {
   eyebrow: "Devices",
-  seeAll: { label: "See all Devices →", href: "#" },
+  seeAll: { label: "See all Devices →", href: "/phone-equipment" },
   image: {
     src: "/Images/navbar/6.png",
     alt: "Laptop, tablet and phone glowing with neon colours",
     title: ["The Latest", "Devices, Built for", "Connectivity"],
-    cta: { label: "Shop Devices", href: "#" },
+    cta: { label: "Shop Devices", href: "/phone-equipment" },
   },
   items: [
     {
@@ -310,7 +310,7 @@ export const DEVICES_MENU: NavDropdown = {
     {
       label: "Accessories",
       description: "Cases, chargers and audio",
-      href: "#",
+      href: "/accessories",
       icon: "headphones",
     },
     {
@@ -404,6 +404,12 @@ export const ABOUT_MENU: NavDropdown = {
       description: "Information for investors",
       href: "#",
       icon: "chart",
+    },
+    {
+      label: "Why Zoiko",
+      description: "Why customers choose Zoiko",
+      href: "/why-zoiko",
+      icon: "star",
     },
     {
       label: "Our Purpose & Values",

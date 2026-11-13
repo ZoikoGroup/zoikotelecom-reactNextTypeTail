@@ -1,15 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, ShoppingCart } from "lucide-react";
+import { ChevronDown, Menu, ShoppingCart, X } from "lucide-react";
 import { NAV_LOGO, NAV_MAIN } from "./data";
 
 type MainNavProps = {
   openId: string | null;
   onOpen: (id: string) => void;
   onNavigate: () => void;
+  mobileOpen: boolean;
+  onToggleMobile: () => void;
 };
 
-export default function MainNav({ openId, onOpen, onNavigate }: MainNavProps) {
+export default function MainNav({
+  openId,
+  onOpen,
+  onNavigate,
+  mobileOpen,
+  onToggleMobile,
+}: MainNavProps) {
   return (
     <div className="border-b border-[#eceef3]">
       <nav
@@ -83,6 +91,20 @@ export default function MainNav({ openId, onOpen, onNavigate }: MainNavProps) {
               0
             </span>
           </Link>
+          <button
+            type="button"
+            onClick={onToggleMobile}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-menu"
+            className="flex h-10 w-10 items-center justify-center rounded-[10px] border-2 border-[#eceef3] text-[#0f1b3d] hover:border-[#c4237f] hover:text-[#c4237f] xl:hidden"
+          >
+            {mobileOpen ? (
+              <X className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            )}
+          </button>
         </div>
       </nav>
     </div>

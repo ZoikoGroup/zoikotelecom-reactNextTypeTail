@@ -1,7 +1,18 @@
 "use client"
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { Check, ChevronDown, Plus, X } from 'lucide-react'
+import {
+    Faqs,
+    HEADING,
+    HelpChoosing,
+    Hero,
+    HowItWorks,
+    KeepYourNumber,
+    SectionHeading,
+    WhatsIncluded,
+} from './sections'
 
 
 // ─── Cart wiring ────────────────────────────────────────────────────────────────
@@ -63,13 +74,6 @@ interface Plan {
   badge: string | false;
   features: string[];
 }
-
-const categories = [
-    "EE Mobile Bundles",
-    "EE Mobile Broadband Plans",
-    "Day Pass Roaming Plans",
-    "Voice and Text Plans",
-];
 
 // Duration tabs are category-specific. Bundles expose three terms; broadband keeps two.
 const durationTabsByCategory: Record<string, string[]> = {
@@ -289,286 +293,36 @@ const plansData: Record<string, Plan[]> = {
     ],
 };
 
-const zonesData = [
-  {
-    id: 1,
-    title: "Chat Connect",
-    price: "£0.10",
-    countries: [
-      "Alaska",
-      "Bangladesh",
-      "Belgium",
-      "Bermuda",
-      "Bhutan",
-      "Brazil",
-      "Brunei Darussalam",
-      "Bulgaria",
-      "Cambodia",
-      "Canada",
-      "Chile",
-      "China",
-      "Colombia",
-      "Croatia",
-      "Cyprus",
-      "Czech Republic",
-      "Denmark",
-      "Estonia",
-      "Faroe Islands",
-      "Finland",
-      "France",
-      "French Guiana",
-      "Germany",
-      "Greece",
-      "Greenland",
-      "Guam",
-      "Hawaii",
-      "Hong Kong",
-      "Hungary",
-      "Iceland",
-      "India",
-      "Indonesia",
-      "Ireland",
-      "Israel",
-      "Japan",
-      "Kuwait",
-      "Laos",
-      "Latvia",
-      "Liechtenstein",
-      "Lithuania",
-      "Luxembourg",
-      "Malta",
-      "Martinique",
-      "Mexico",
-      "Mongolia",
-      "Netherlands",
-      "New Zealand",
-      "North Mariana",
-      "Norway",
-      "Pakistan",
-      "Paraguay",
-      "Peru",
-      "Poland",
-      "Portugal",
-      "Puerto Rico",
-      "Romania",
-      "Singapore",
-      "Slovakia",
-      "Slovenia",
-      "South Korea",
-      "Spain",
-      "Sweden",
-      "Thailand",
-      "United States",
-      "USA Virgin Islands",
-      "Vatican",
-      "Vietnam",
-    ],
-  },
+// Display-only subtitles shown in each plan card header (not sent to the cart).
+const planTaglines: Record<string, string> = {
+    "Z-Essentials": "Everyday basics",
+    "Z-Comfort": "More room for data",
+    "Z-Royal": "For heavier use",
+    "Super-Z": "Big data allowance",
+    "Z-Unlimited": "Unlimited data*",
+};
 
-  {
-    id: 2,
-    title: "World Connect",
-    price: "£0.30",
-    countries: [
-      "Argentina",
-      "Austria",
-      "Dominican Republic",
-      "Egypt",
-      "Gibraltar",
-      "Guatemala",
-      "Iran",
-      "Macao",
-      "Malaysia",
-      "Mauritius",
-      "Mayotte Island",
-      "Nepal",
-      "Norfolk",
-      "Netherlands",
-      "Nigeria",
-      "Panama",
-      "Philippines",
-      "Reunion",
-      "San Marino",
-      "Saudi Arabia",
-      "Sri Lanka",
-      "Sudan",
-      "Swaziland",
-      "Taiwan",
-      "Turkmenistan",
-      "United Arab Emirates",
-      "Uruguay",
-      "Uzbekistan",
-      "Venezuela",
-      "Yemen",
-    ],
-  },
-
-  {
-    id: 3,
-    title: "Global Link",
-    price: "£0.38",
-    countries: [
-      "Afghanistan",
-      "Andorra",
-      "Angola",
-      "Armenia",
-      "Aruba",
-      "Barbados",
-      "Belize",
-      "Bolivia",
-      "Botswana",
-      "British Virgin Islands",
-      "Cayman Islands",
-      "Costa Rica",
-      "Ecuador",
-      "El Salvador",
-      "Eritrea",
-      "Ethiopia",
-      "Grenada",
-      "Guadeloupe",
-      "Guyana",
-      "Jamaica",
-      "Jordan",
-      "Kazakhstan",
-      "Kenya",
-      "Kyrgyzstan",
-      "Lebanon",
-      "Marshall Islands",
-      "Montserrat",
-      "Oman",
-      "Palau",
-      "Palestine",
-      "Qatar",
-      "Saint Kitts",
-      "Saint Lucia",
-      "Saint Vincent",
-      "South Africa",
-      "Switzerland",
-      "Tajikistan",
-      "Trinidad and Tobago",
-      "Turkey",
-      "Turks and Caicos Islands",
-      "Ukraine",
-    ],
-  },
-
-  {
-    id: 4,
-    title: "Talk Expert",
-    price: "£0.37",
-    countries: [
-      "Albania",
-      "Antigua and Barbuda",
-      "Azerbaijan",
-      "Bahamas",
-      "Bahrain",
-      "Benin",
-      "Bosnia and Herzegovina",
-      "Burkina Faso",
-      "Cameroon",
-      "Cape Verde",
-      "Djibouti",
-      "Fiji",
-      "French Polynesia",
-      "Ghana",
-      "Guinea",
-      "Haiti",
-      "Liberia",
-      "Libya",
-      "Macedonia",
-      "Russia",
-      "Rwanda",
-      "Senegal",
-      "Serbia",
-      "Suriname",
-      "Syria",
-      "Tanzania",
-      "Togo",
-      "Uganda",
-    ],
-  },
-
-  {
-    id: 5,
-    title: "Global Traveller",
-    price: "£0.60",
-    countries: [
-      "Algeria",
-      "Burundi",
-      "Central African Republic",
-      "Comoros Islands",
-      "Congo",
-      "Cuba",
-      "Equatorial Guinea",
-      "Gabon",
-      "Gambia, Guinea-Bissau",
-      "Ivory Coast",
-      "Kosovo",
-      "Lesotho",
-      "Madagascar",
-      "Malawi",
-      "Mauritania",
-      "Micronesia",
-      "Morocco",
-      "Seychelles",
-      "Sierra Leone",
-      "Somalia",
-      "South Sudan",
-      "Tunisia",
-      "Zambia",
-      "Zimbabwe",
-    ],
-  },
-
-  {
-    id: 6,
-    title: "Global Specialist",
-    price: "£1.15",
-    countries: [
-      "Ascension",
-      "Chad",
-      "Diego Garcia",
-      "Falkland Islands",
-      "Maldives",
-      "Nauru",
-      "Papua New Guinea",
-      "Sao Tome and Principe",
-      "Tonga",
-    ],
-  },
-
-  {
-    id: 7,
-    title: "Connect Pro",
-    price: "£1.55",
-    countries: [
-      "Cook Islands",
-      "Kiribati",
-      "Niue",
-      "Saint Helena",
-      "Samoa",
-      "Tuvalu",
-      "Vanuatu",
-    ],
-  },
-
-  {
-    id: 8,
-    title: "Elite Connect",
-    price: "£3.30",
-    countries: ["Solomon Islands", "Tokelau"],
-  },
+// Display-only card content from the Figma design (not sent to the cart).
+const FEATURED_PLAN = "Z-Royal";
+const CARD_HIGHLIGHTS = [
+    "Unlimited UK minutes & texts [confirm]",
+    "Keep your current phone",
+    "eSIM on compatible devices [confirm]",
 ];
 
-
+/** "30 Days" → "30-day", "12 Months" → "12-month" */
+function termLabel(duration: string): string {
+    const [num, unit] = duration.split(" ");
+    return `${num}-${unit.toLowerCase().replace(/s$/, "")}`;
+}
 
 export default function EEmobileplans() {
 
-    const [activeCategory, setActiveCategory] = useState(
+    const [activeCategory] = useState(
         "EE Mobile Bundles"
     );
 
-    const [activeDuration, setActiveDuration] = useState("12 Months");
+    const [activeDuration, setActiveDuration] = useState("30 Days");
 
     // The plan whose SIM-type popup is currently open (null = closed).
     // price is resolved for the active duration at the moment "Buy Now" is clicked.
@@ -581,7 +335,6 @@ export default function EEmobileplans() {
 
     const currentPlans = plansData[activeCategory];
 
-    const [openZone, setOpenZone] = useState<number | null>(1);
 
     const router = useRouter();
 
@@ -651,444 +404,299 @@ export default function EEmobileplans() {
         router.push("/checkout");
     };
 
-    // Keep the selected duration valid when switching categories
-    // (e.g. "30 Days" doesn't exist for broadband).
-    const handleCategoryChange = (category: string) => {
-        setActiveCategory(category);
-        const tabs = durationTabsByCategory[category];
-        if (tabs && !tabs.includes(activeDuration)) {
-            setActiveDuration(tabs[0]);
-        }
+    // ─── UI-only state (filters, details, compare checkbox) ─────────────────
+    const [dataFilter, setDataFilter] = useState("all");
+    const [openDetails, setOpenDetails] = useState<string | null>(null);
+    const [compare, setCompare] = useState<string[]>([]);
+
+    const durationTabs = durationTabsByCategory[activeCategory];
+    const dataOptions = Array.from(new Set(currentPlans.map((p) => p.data)));
+    const visiblePlans = currentPlans.filter(
+        (p) => dataFilter === "all" || p.data === dataFilter
+    );
+
+    const resetFilters = () => {
+        setDataFilter("all");
+        if (durationTabs) setActiveDuration(durationTabs[0]);
     };
 
-    const toggleZone = (id: number) => {
-        setOpenZone(openZone === id ? null : id);
+    const toggleCompare = (name: string) => {
+        setCompare((list) =>
+            list.includes(name) ? list.filter((n) => n !== name) : [...list, name]
+        );
+    };
+
+    /** "£11.50/m" → { amount: "£11.50", monthly: true } */
+    const priceParts = (plan: Plan) => {
+        const raw = resolvePrice(plan);
+        return {
+            amount: raw.replace(/\/m\s*$/i, ""),
+            monthly: /\/m\s*$/i.test(raw.trim()),
         };
+    };
+
+    const termText = (plan: Plan) => {
+        const { monthly } = priceParts(plan);
+        if (!monthly) return "one-off price";
+        return durationTabs
+            ? `a month · ${termLabel(activeDuration)} term`
+            : "a month";
+    };
+
+    // Close the SIM popup with Escape.
+    useEffect(() => {
+        if (!pendingPlan) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setPendingPlan(null);
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [pendingPlan]);
+
+    const pill = (active: boolean) =>
+        `rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
+            active
+                ? "bg-gradient-to-r from-[#a3227f] to-[#8a2585] text-white shadow-[0_8px_20px_rgba(163,34,127,0.25)]"
+                : "border border-[#e3e5ec] bg-white text-[#1c1a33] hover:border-[#a3227f]"
+        }`;
 
     return (
-        <>
-            {/* Hero Section */}
-            <section className="bg-[#7B2983] dark:bg-[#3E1542] relative min-h-[220px] overflow-hidden py-8 md:py-12 ">
-                <div className="relative mx-auto max-w-[1200px] px-5 md:px-7">
-                    <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 lg:gap-16">
+        <div className="bg-white text-[#1c1a33]">
+            <Hero />
 
-                        {/* ── Left Content ── */}
-                        <div className="text-white">
-                            <h1 className="text-2xl font-bold uppercase leading-[1.1] tracking-tight md:text-3xl lg:text-5xl">
-                                EE SIM Only Deals:
-                            </h1>
-                            <p className="mt-3 max-w-lg font-semibold text-base leading-relaxed text-white/80 sm:text-lg lg:text-2xl">
-                                Unlimited • Pay As You Go • Connected
-                            </p>
-                            <p className="mt-3 max-w-lg text-base leading-relaxed text-white/80 sm:text-lg lg:text-xl">
-                                Experience unparalleled connectivity with our flexible EE SIM plans
-                            </p>
-                        </div>
-
-                        {/* ── Right: sim ── */}
-                        <div className="relative flex justify-center lg:justify-end">
-
-                            {/* Main card image */}
-                            <div className="relative w-full max-w-[240px] overflow-hidden rounded-3xl sm:max-w-[350px] lg:max-w-[450px]">
-                                <Image
-                                    src="/Images/ee-sim.png"
-                                    alt="Hero Card"
-                                    width={600}
-                                    height={400}
-                                    priority
-                                    className="h-auto w-full object-cover"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Plans Section */}
-            <section className="w-full bg-[#faf6f9] dark:bg-[#0f0f14] py-16 transition-colors duration-300">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Top Tabs */}
-                    <div className="flex flex-wrap justify-center gap-3">
-                        {categories.map((item) => (
-                            <button
-                                key={item}
-                                onClick={() => handleCategoryChange(item)}
-                                className={`rounded-full border px-5 py-2 text-sm font-medium transition-all duration-300
-                ${activeCategory === item
-                                        ? "bg-[#C12172] text-white border-pink-600 shadow-sm shadow-pink-500/20"
-                                        : "bg-white dark:bg-[#18181f] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-white/10 hover:border-pink-500"
-                                    }
-              `}
-                            >
-                                {item}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Divider */}
-                    <div className="mt-10 border-t border-gray-300 dark:border-white/10" />
-
-                    {/* Duration Tabs */}
-                    {durationTabsByCategory[activeCategory] && (
-                        <div className="flex justify-center gap-3 mt-8">
-                            {durationTabsByCategory[activeCategory].map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveDuration(tab)}
-                                    className={`rounded-full px-5 py-2 text-sm font-semibold transition-all duration-300
-                  ${activeDuration === tab
-                                            ? "bg-[#C12172] text-white shadow-sm shadow-pink-500/20"
-                                            : "bg-white dark:bg-[#18181f] text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-white/10"
-                                        }
-                `}
-                                >
-                                    {tab}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7 mt-12">
-                        {currentPlans.map((plan, index) => (
-                            <div
-                                key={index}
-                                className={`relative rounded-3xl border bg-white dark:bg-[#18181f]
-              border-gray-200 dark:border-white/10
-              p-8 transition-all duration-300 hover:-translate-y-2
-              hover:shadow-2xl hover:shadow-pink-500/10
-              ${plan.badge
-                                        ? "ring-2 ring-pink-500 scale-[1.02]"
-                                        : ""
-                                    }`}
-                            >
-                                {/* Badge */}
-                                {plan.badge && (
-                                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                                        <span className="rounded-full bg-pink-600 text-white text-xs font-semibold px-4 py-1 shadow-lg">
-                                            {plan.badge}
-                                        </span>
-                                    </div>
-                                )}
-
-                                {/* Top Text */}
-                                <div className="text-center">
-                                    <h3 className="mt-8 text-3xl font-bold text-pink-700 dark:text-pink-500">
-                                        {plan.name}
-                                    </h3>
-
-                                    <p className="mt-6 text-xs tracking-[0.2em] uppercase text-gray-500 dark:text-gray-400">
-                                        Data
-                                    </p>
-
-                                    <h2 className="mt-2 text-5xl font-extrabold text-pink-700 dark:text-pink-500 break-words">
-                                        {plan.data}
-                                    </h2>
-
-                                    <p className="mt-2 text-2xl font-semibold text-gray-800 dark:text-white">
-                                        {resolvePrice(plan)}
-                                    </p>
-                                </div>
-
-                                {/* Features */}
-                                <div className="mt-8 space-y-4">
-                                    {plan.features.map((feature, i) => (
-                                        <div
-                                            key={i}
-                                            className="flex items-start gap-3 border-b border-gray-200 dark:border-white/10 pb-3"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="3"
-                                                className="w-4 h-4 text-pink-600 mt-1 flex-shrink-0"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M5 13l4 4L19 7"
-                                                />
-                                            </svg>
-
-                                            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                                                {feature}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Button */}
-                                <button
-                                    onClick={() => handleBuyNow(plan)}
-                                    className="mt-8 w-full rounded-full bg-[#C12172] hover:bg-pink-700
-                text-white font-semibold py-3 transition-all duration-300
-                shadow-xs shadow-pink-500/20"
-                                >
-                                    Buy Now
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/*  */}
-            <section className="w-full bg-[#f6f6f7] dark:bg-[#0f1117] py-16 transition-colors duration-300">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Heading */}
-        <div className="text-center mb-12">
-          <h2
-            className="
-            text-3xl
-            sm:text-4xl
-            lg:text-5xl
-            font-bold
-            text-[#1f3557]
-            dark:text-white
-            leading-tight
-          "
-          >
-            ZT International Calling Rates Per Minute
-          </h2>
-        </div>
-
-        {/* Accordion */}
-        <div className="space-y-5">
-          {zonesData.map((zone) => {
-            const isOpen = openZone === zone.id;
-
-            return (
-              <div
-                key={zone.id}
-                className="
-                  rounded-3xl
-                  border
-                  border-[#d8dee8]
-                  dark:border-white/10
-                  bg-white
-                  dark:bg-[#181c25]
-                  overflow-hidden
-                  transition-all
-                  duration-300
-                "
-              >
-                {/* Header */}
-                <button
-                  onClick={() => toggleZone(zone.id)}
-                  className="
-                    w-full
-                    flex
-                    flex-col
-                    md:flex-row
-                    md:items-center
-                    justify-between
-                    gap-4
-                    px-6
-                    md:px-8
-                    py-6
-                    text-left
-                  "
-                >
-                  {/* Zone */}
-                  <div
-                    className="
-                      text-2xl
-                      font-bold
-                      text-[#1f3557]
-                      dark:text-white
-                    "
-                  >
-                    Zone {zone.id}
-                  </div>
-
-                  {/* Price */}
-                  <div
-                    className="
-                      text-lg
-                      font-semibold
-                      text-[#ec0b7b]
-                      dark:text-pink-500
-                    "
-                  >
-                    {zone.title} @ {zone.price}
-                  </div>
-
-                  {/* Toggle */}
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-2
-                      text-[#7b2ea8]
-                      dark:text-purple-400
-                      font-semibold
-                    "
-                  >
-                    <span>View Countries</span>
-
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className={`w-5 h-5 transition-transform duration-300 ${
-                        isOpen ? "rotate-180" : ""
-                      }`}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </button>
-
-                {/* Content */}
-                <div
-                  className={`
-                    grid
-                    transition-all
-                    duration-500
-                    ease-in-out
-                    ${
-                      isOpen
-                        ? "grid-rows-[1fr] opacity-100"
-                        : "grid-rows-[0fr] opacity-0"
-                    }
-                  `}
-                >
-                  <div className="overflow-hidden">
-                    <div
-                      className="
-                        px-6
-                        md:px-8
-                        pb-8
-                      "
-                    >
-                      <div
-                        className="
-                          flex
-                          flex-wrap
-                          gap-3
-                        "
-                      >
-                        {zone.countries.map((country, index) => (
-                          <div
-                            key={index}
-                            className="
-                              px-4
-                              py-2.5
-                              rounded-xl
-                              border
-                              border-pink-500
-                              text-pink-600
-                              dark:text-pink-400
-                              dark:border-pink-400/40
-                              bg-pink-50
-                              dark:bg-pink-500/10
-                              text-sm
-                              sm:text-base
-                              font-medium
-                              transition-all
-                              duration-300
-                              hover:bg-pink-500
-                              hover:text-white
-                              cursor-default
-                            "
-                          >
-                            {country}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-                </div>
-            </section>
-
-            {/* SIM Type Popup */}
-            {pendingPlan && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                    role="dialog"
-                    aria-modal="true"
-                >
-                    {/* Backdrop */}
-                    <div
-                        onClick={() => setPendingPlan(null)}
-                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            {/* ─── Plans ─────────────────────────────────────────────── */}
+            <section id="plans" className="scroll-mt-28 bg-[#f8f8fb] py-16 lg:py-20">
+                <div className="mx-auto max-w-[1340px] px-6 lg:px-12">
+                    <SectionHeading
+                        eyebrow="Our plans"
+                        title="Find the right SIM-only plan"
+                        intro="Filter by contract length and data. Results update as you choose."
                     />
 
-                    {/* Modal */}
-                    <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-[#18181f] border border-gray-200 dark:border-white/10 p-8 shadow-2xl">
-                        {/* Close */}
-                        <button
-                            onClick={() => setPendingPlan(null)}
-                            aria-label="Close"
-                            className="absolute right-5 top-5 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                className="w-6 h-6"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
+                    {/* Filters */}
+                    <div className="mt-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                        <div>
+                            {durationTabs && (
+                                <>
+                                    <p className="text-sm font-semibold text-[#1c1a33]">Contract length</p>
+                                    <div className="mt-2.5 flex flex-wrap gap-2">
+                                        {durationTabs.map((tab) => (
+                                            <button
+                                                key={tab}
+                                                type="button"
+                                                aria-pressed={activeDuration === tab}
+                                                onClick={() => setActiveDuration(tab)}
+                                                className={pill(activeDuration === tab)}
+                                            >
+                                                {tab}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                        <div className="w-full md:w-[320px]">
+                            <label htmlFor="data-filter" className="text-sm font-semibold text-[#1c1a33]">
+                                Data allowance
+                            </label>
+                            <div className="relative mt-2.5">
+                                <select
+                                    id="data-filter"
+                                    value={dataFilter}
+                                    onChange={(e) => setDataFilter(e.target.value)}
+                                    className="w-full appearance-none rounded-xl border border-[#e3e5ec] bg-white px-4 py-3 pr-10 text-[15px] text-[#1c1a33] outline-none focus:border-[#a3227f]"
+                                >
+                                    <option value="all">All allowances</option>
+                                    {dataOptions.map((d) => (
+                                        <option key={d} value={d}>{d}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6275]" aria-hidden="true" />
+                            </div>
+                        </div>
+                    </div>
 
-                        {/* Heading */}
-                        <div className="text-center">
-                            <h3 className="text-2xl font-bold text-pink-700 dark:text-pink-500">
-                                {pendingPlan.name}
-                            </h3>
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                {pendingPlan.data} • {pendingPlan.price}
-                            </p>
-                            <p className="mt-6 text-base font-semibold text-gray-800 dark:text-white">
-                                Choose your SIM type
+                    <div className="mt-4 flex items-center justify-between text-sm">
+                        <p className="text-[#5f6275]" aria-live="polite">
+                            Showing {visiblePlans.length} plan{visiblePlans.length === 1 ? "" : "s"}
+                            {durationTabs ? ` · ${termLabel(activeDuration)}` : ""}
+                        </p>
+                        <button type="button" onClick={resetFilters} className="font-bold text-[#a3227f] hover:underline">
+                            Reset
+                        </button>
+                    </div>
+
+                    {/* Cards */}
+                    <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        {visiblePlans.map((plan) => {
+                            const { amount } = priceParts(plan);
+                            const detailsOpen = openDetails === plan.name;
+                            const inCompare = compare.includes(plan.name);
+                            return (
+                                <article
+                                    key={plan.name}
+                                    className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_14px_40px_rgba(15,27,61,0.08)]"
+                                >
+                                    <header className="flex items-start justify-between gap-3 bg-gradient-to-r from-[#a3227f] to-[#7a2a8f] px-5 py-4 text-white">
+                                        <div>
+                                            <h3 className={`${HEADING} text-lg font-semibold`}>{plan.name}</h3>
+                                            <p className="mt-0.5 text-xs text-white/85">{planTaglines[plan.name]}</p>
+                                        </div>
+                                        {plan.name === FEATURED_PLAN && (
+                                            <span className="mt-1 shrink-0 rounded-full bg-white px-2.5 py-0.5 text-[11px] font-bold text-[#a3227f]">
+                                                Featured
+                                            </span>
+                                        )}
+                                    </header>
+
+                                    <div className="flex flex-1 flex-col px-5 pt-5">
+                                        <p className="flex items-baseline gap-2">
+                                            <span className={`${HEADING} text-3xl font-bold text-[#1c1a33]`}>{plan.data}</span>
+                                            <span className="text-sm text-[#5f6275]">data</span>
+                                        </p>
+                                        <p className="mt-3 flex items-baseline gap-2">
+                                            <span className={`${HEADING} text-xl font-bold text-[#a3227f]`}>{amount}</span>
+                                            <span className="text-sm text-[#5f6275]">{termText(plan)}</span>
+                                        </p>
+
+                                        <span className="mt-3 self-start rounded-full bg-[#fff4e0] px-2.5 py-1 text-xs font-semibold text-[#8a5a00]">
+                                            Price from approved tariff feed
+                                        </span>
+
+                                        <ul className="mt-4 space-y-2.5 pb-5">
+                                            {CARD_HIGHLIGHTS.map((f) => (
+                                                <li key={f} className="flex items-start gap-2.5 text-[15px] text-[#1c1a33]">
+                                                    <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-[#a3227f]" strokeWidth={3} aria-hidden="true" />
+                                                    {f}
+                                                </li>
+                                            ))}
+                                        </ul>
+
+                                        <div className="mt-auto border-t border-[#eceef3]">
+                                            <button
+                                                type="button"
+                                                onClick={() => setOpenDetails(detailsOpen ? null : plan.name)}
+                                                aria-expanded={detailsOpen}
+                                                className="flex w-full items-center justify-between py-4 text-sm font-bold text-[#a3227f]"
+                                            >
+                                                View plan details
+                                                <Plus className={`h-4 w-4 transition-transform ${detailsOpen ? "rotate-45" : ""}`} aria-hidden="true" />
+                                            </button>
+                                            {detailsOpen && (
+                                                <ul className="space-y-2 pb-4">
+                                                    {plan.features.map((f) => (
+                                                        <li key={f} className="flex items-start gap-2.5 text-sm text-[#5f6275]">
+                                                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#a3227f]" strokeWidth={3} aria-hidden="true" />
+                                                            {f}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+
+                                        <label className="flex cursor-pointer items-center gap-2.5 py-2 text-sm font-semibold text-[#1c1a33]">
+                                            <input
+                                                type="checkbox"
+                                                checked={inCompare}
+                                                onChange={() => toggleCompare(plan.name)}
+                                                className="h-[18px] w-[18px] accent-[#a3227f]"
+                                            />
+                                            Add to compare
+                                        </label>
+
+                                        <div className="grid grid-cols-2 gap-3 pb-5 pt-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleBuyNow(plan)}
+                                                className="rounded-full bg-gradient-to-r from-[#a3227f] to-[#7a2a8f] py-3 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(163,34,127,0.3)] transition-transform hover:-translate-y-0.5"
+                                            >
+                                                Ask about it
+                                            </button>
+                                            <a
+                                                href="/contact"
+                                                className="flex items-center justify-center rounded-full border-2 border-[#a3227f] py-3 text-sm font-semibold text-[#a3227f] transition-colors hover:bg-[#fbe6f1]"
+                                            >
+                                                Get advice
+                                            </a>
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+
+            <WhatsIncluded />
+            <KeepYourNumber />
+
+            {/* ─── Roaming & international ───────────────────────────── */}
+            <section className="bg-white">
+                <div className="relative aspect-[1200/442] max-h-[520px] min-h-[300px] w-full overflow-hidden">
+                    <Image
+                        src="/Images/ee-mobile-plans/ee-roaming-world-map.webp"
+                        alt="Two people pointing at a digital world map"
+                        fill
+                        sizes="100vw"
+                        className="object-cover"
+                    />
+                    <div className="absolute inset-0 mx-auto flex max-w-[1340px] items-end px-6 pb-10 lg:px-12">
+                        <div className="max-w-[560px]">
+                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#1f3f7a] sm:text-sm">Roaming & international</p>
+                            <h2 className={`${HEADING} mt-1 text-2xl font-bold text-[#7a2a8f] sm:text-3xl`}>Using your plan abroad</h2>
+                            <p className="mt-2 text-sm leading-relaxed text-[#2a2440] sm:text-base">
+                                Roaming terms differ by plan. Check each plan’s details for where it works and what it costs.
                             </p>
                         </div>
+                    </div>
+                </div>
 
-                        {/* Options */}
-                        <div className="mt-6 grid grid-cols-2 gap-4">
-                            {simTypes.map((type) => (
-                                <button
-                                    key={type}
-                                    onClick={() => confirmPurchase(type)}
-                                    className="group rounded-2xl border border-gray-200 dark:border-white/10
-                  bg-[#faf6f9] dark:bg-[#0f0f14] p-5 text-center
-                  hover:border-pink-500 hover:bg-pink-50 dark:hover:bg-pink-500/10
-                  transition-all duration-300"
-                                >
-                                    <span className="block text-lg font-bold text-gray-800 dark:text-white group-hover:text-pink-700 dark:group-hover:text-pink-500">
-                                        {type}
-                                    </span>
-                                    <span className="mt-1 block text-xs text-gray-500 dark:text-gray-400">
-                                        {type === "eSIM"
-                                            ? "Instant digital activation"
-                                            : "Physical SIM by post"}
-                                    </span>
-                                </button>
-                            ))}
+            </section>
+
+            <HowItWorks />
+            <HelpChoosing />
+            <Faqs />
+
+            {/* ─── SIM type popup (Buy now → choose SIM → cart → checkout) ─── */}
+            {pendingPlan && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Choose your SIM type">
+                    <div onClick={() => setPendingPlan(null)} className="absolute inset-0 bg-[#0b0d3b]/60 backdrop-blur-sm" />
+                    <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+                        <div className="bg-gradient-to-r from-[#a3227f] to-[#7a2a8f] px-6 py-5 text-white">
+                            <button
+                                type="button"
+                                onClick={() => setPendingPlan(null)}
+                                aria-label="Close"
+                                className="absolute right-4 top-4 text-white/80 hover:text-white"
+                            >
+                                <X className="h-6 w-6" aria-hidden="true" />
+                            </button>
+                            <h3 className={`${HEADING} text-xl font-bold`}>{pendingPlan.name}</h3>
+                            <p className="mt-1 text-sm text-white/85">
+                                {pendingPlan.data} data · {pendingPlan.price}
+                            </p>
+                        </div>
+                        <div className="p-6">
+                            <p className={`${HEADING} text-base font-semibold`}>Choose your SIM type</p>
+                            <div className="mt-4 grid grid-cols-2 gap-4">
+                                {simTypes.map((type) => (
+                                    <button
+                                        key={type}
+                                        type="button"
+                                        onClick={() => confirmPurchase(type)}
+                                        className="group rounded-xl border border-[#e3e5ec] bg-[#f8f8fb] p-5 text-center transition-colors hover:border-[#a3227f] hover:bg-[#fbe6f1]"
+                                    >
+                                        <span className="block text-lg font-bold text-[#1c1a33] group-hover:text-[#a3227f]">{type}</span>
+                                        <span className="mt-1 block text-xs text-[#5f6275]">
+                                            {type === "eSIM" ? "Instant digital activation" : "Physical SIM by post"}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     )
 }
