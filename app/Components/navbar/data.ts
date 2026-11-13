@@ -20,7 +20,7 @@ export const NAV_REGION = { label: "United Kingdom" } as const;
 
 export const NAV_AUDIENCE = [
   { label: "Personal", href: "/", active: true },
-  { label: "Business", href: "#", active: false },
+  { label: "Business", href: "/business-solutions", active: false },
   { label: "Partners", href: "/become-a-reseller", active: false },
 ] as const;
 
@@ -53,12 +53,22 @@ export const NAV_MAIN: readonly NavMainItem[] = [
   {
     id: "landlines",
     label: "Landlines & Voice",
-    href: "#",
+    href: "/landlines",
     dropdown: LANDLINES_MENU,
   },
-  { id: "business", label: "Business", href: "#", dropdown: BUSINESS_MENU },
+  {
+    id: "business",
+    label: "Business",
+    href: "/business-solutions",
+    dropdown: BUSINESS_MENU,
+  },
   { id: "iot", label: "IoT & Connectivity", href: "#", dropdown: IOT_MENU },
-  { id: "devices", label: "Devices", href: "#", dropdown: DEVICES_MENU },
+  {
+    id: "devices",
+    label: "Devices",
+    href: "/phone-equipment",
+    dropdown: DEVICES_MENU,
+  },
   { id: "support", label: "Support", href: "/faqs", dropdown: SUPPORT_MENU },
   {
     id: "about",
