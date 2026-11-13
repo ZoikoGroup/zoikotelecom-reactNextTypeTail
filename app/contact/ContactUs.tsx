@@ -1,29 +1,54 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import ContactForm from "./ContactForm";
 import Link from "next/link";
+import { ArrowRight, Clock, Headset, Mail, MapPin, Phone } from "lucide-react";
+
+// Opening hours: Mon–Fri, 09:00–18:00 UK time.
+function isOpenNowInUK(date = new Date()): boolean {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  const weekday = get("weekday");
+  const minutes = Number(get("hour")) * 60 + Number(get("minute"));
+  const isWeekday = !["Sat", "Sun"].includes(weekday);
+  return isWeekday && minutes >= 9 * 60 && minutes < 18 * 60;
+}
+
+/** Live "Open now / Closed now" pill — computed on the client only to avoid hydration mismatch. */
+function OpeningStatus() {
+  const [open, setOpen] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const update = () => setOpen(isOpenNowInUK());
+    update();
+    const id = window.setInterval(update, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  if (open === null) return <span className="mt-1 block h-[18px]" aria-hidden="true" />;
+
+  return open ? (
+    <span className="mt-1 flex items-center gap-1.5 whitespace-nowrap text-[12.5px] font-semibold sm:text-[13px] text-emerald-600">
+      <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
+      Open now · we&apos;re ready to help
+    </span>
+  ) : (
+    <span className="mt-1 flex items-center gap-1.5 whitespace-nowrap text-[12.5px] font-semibold sm:text-[13px] text-[#B5530C]">
+      <span className="h-2 w-2 rounded-full bg-[#B5530C]" aria-hidden="true" />
+      Closed now · leave an enquiry any time
+    </span>
+  );
+}
 
 export default function ContactSection() {
-
-  // CONTACT INFO CARDS
-  const contactCards = [
-    {
-      title: "CALL US",
-      value: "+44 207 164 6399",
-      icon: "/image/ion_call.png",
-    },
-    {
-      title: "EMAIL US",
-      value: "info@zoikotelecom.com",
-      icon: "/image/tabler_mail-filled.png",
-    },
-    {
-      title: "WORKING HOURS",
-      value: "Mon - Fri, 9:00 - 18:00",
-      icon: "/image/lsicon_time-one-filled.png",
-    },
-  ];
 
   // OFFICE LOCATIONS
   const offices = [
@@ -61,82 +86,135 @@ export default function ContactSection() {
     <>
       {/* ================= CONTACT SECTION ================= */}
 
-      <section className="w-full relative overflow-hidden dark:bg-gray-900 dark:text-white">
-
-        {/* BACKGROUND IMAGE */}
-        <div className="absolute inset-0">
+      <section
+        aria-labelledby="contact-heading"
+        className="relative w-full overflow-hidden bg-[#0B0C4A] text-white"
+      >
+        {/* HERO IMAGE — banner on small screens, full background on xl+ */}
+        <div className="relative h-[230px] w-full sm:h-[340px] md:h-[400px] lg:absolute lg:inset-x-0 lg:top-0 lg:h-[780px]">
           <Image
-            src="/image/portrait-of-classy-team.png"
-            alt="contact"
+            src="/Images/Contact/contact-hero-support-agent.webp"
+            alt="Smiling Zoiko Telecom support agent wearing a headset, with the London skyline at twilight"
             fill
             priority
-            className="object-cover"
+            sizes="100vw"
+            className="object-cover object-[left_center]"
+          />
+          {/* Fade into the navy page background */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-[#0B0C4A] lg:h-40" aria-hidden="true" />
+          {/* On smaller laptops the copy overlaps the photo — darken the left side for readability */}
+          <div
+            className="absolute inset-0 hidden bg-gradient-to-r from-[#0B0C4A]/70 via-[#0B0C4A]/25 to-transparent lg:block xl:hidden"
+            aria-hidden="true"
           />
         </div>
 
         {/* CONTENT */}
-        <div className="relative z-10 max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10 py-14 md:py-8">
+        <div className="relative z-10 mx-auto max-w-[1488px] px-4 pb-14 sm:px-6 lg:px-10 lg:pb-20 lg:pt-8">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_460px] lg:gap-8 xl:grid-cols-[minmax(0,1fr)_480px] xl:gap-10 2xl:grid-cols-[minmax(0,1fr)_570px]">
+            {/* LEFT SIDE — left padding keeps the copy clear of the agent in the photo */}
+            <div className="-mt-6 sm:-mt-10 lg:mt-0 lg:flex lg:flex-col lg:justify-center lg:pl-[clamp(40px,calc(100vw-960px),340px)]">
+             {/* Container so the heading can size itself to the column width */}
+             <div className="@container">
+              <p className="flex items-center gap-3 text-[13px] font-bold uppercase tracking-[0.12em] text-white sm:text-[15px]">
+                <span className="h-6 w-[3px] rounded-full bg-[#EC1C8C]" aria-hidden="true" />
+                We&apos;re here to help
+              </p>
 
-          <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start justify-between">
-
-            {/* LEFT SIDE */}
-            <div className="w-full max-w-[520px]">
-
-              {/* HEADING */}
-              <h1 className="text-white dark:text-white text-[38px] md:text-[48px] font-extrabold leading-[52px] md:leading-[67px]">
-                Get in Touch
+              {/* Always exactly two lines, as in the design */}
+              <h1
+                id="contact-heading"
+                className="mt-3 text-[clamp(34px,12cqw,64px)] font-bold leading-[1.05] tracking-[-0.025em]"
+              >
+                <span className="block whitespace-nowrap">Let&apos;s get</span>
+                <span className="block whitespace-nowrap">
+                  you <span className="text-[#F0218F]">connected</span>.
+                </span>
               </h1>
 
-              {/* DESCRIPTION */}
-              <p className="text-white/90 dark:text-white text-[16px] md:text-[18px] leading-[30px] mt-3 max-w-[486px]">
-                We're here to help with any questions about our telecom
-                solutions. Reach out to our team and we'll respond within
-                24 hours.
+              <p className="mt-5 max-w-[400px] text-[16px] leading-[1.65] text-white/90 sm:text-[17px]">
+                Questions about mobile, broadband, landlines or business connectivity? Our team is here to help.
               </p>
 
               {/* CONTACT CARDS */}
-              <div className="mt-10 flex flex-col gap-4">
-
-                {contactCards.map((item, index) => (
-                  <div
-                    key={index}
-                    className="w-full max-w-[520px] min-h-[96px] bg-white dark:bg-gray-900 border border-[#C12172] rounded-2xl px-5 py-5 flex items-center gap-5"
+              <ul className="mt-7 flex w-full max-w-[400px] flex-col gap-3.5">
+                <li>
+                  <a
+                    href="tel:+442071646399"
+                    className="group flex items-center gap-4 rounded-2xl bg-white/95 px-4 py-3.5 text-[#141640] sm:px-5 shadow-lg shadow-black/10 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#EC1C8C]/40"
                   >
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FCE7F2] text-[#D81B7E]">
+                      <Phone className="h-[22px] w-[22px]" aria-hidden="true" />
+                    </span>
+                    <span>
+                      <span className="block text-[15px] font-medium leading-snug">Call us</span>
+                      <span className="block whitespace-nowrap text-[18px] font-bold leading-tight 2xl:text-[20px]">+44 207 164 6399</span>
+                    </span>
+                  </a>
+                </li>
 
-                    {/* ICON BOX */}
-                    <div className="w-[56px] h-[56px] rounded-2xl bg-gradient-to-r from-[#C12172] to-[#782984] flex items-center justify-center flex-shrink-0">
+                <li>
+                  <a
+                    href="mailto:info@zoikotelecom.com"
+                    className="group flex items-center gap-4 rounded-2xl bg-white/95 px-4 py-3.5 text-[#141640] sm:px-5 shadow-lg shadow-black/10 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#EC1C8C]/40"
+                  >
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FCE7F2] text-[#D81B7E]">
+                      <Mail className="h-[22px] w-[22px]" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[15px] font-medium leading-snug">Email us</span>
+                      <span className="block whitespace-nowrap text-[18px] font-bold leading-tight 2xl:text-[20px]">info@zoikotelecom.com</span>
+                    </span>
+                  </a>
+                </li>
 
-                      <Image
-                        src={item.icon}
-                        alt={item.title}
-                        width={24}
-                        height={24}
-                        className="object-contain"
-                      />
+                <li className="flex items-center gap-4 rounded-2xl bg-white/95 px-4 py-3.5 text-[#141640] sm:px-5 shadow-lg shadow-black/10">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FCE7F2] text-[#D81B7E]">
+                    <Clock className="h-[22px] w-[22px]" aria-hidden="true" />
+                  </span>
+                  {/* Exactly three lines: title / hours / live status */}
+                  <span className="min-w-0">
+                    <span className="block text-[15px] font-medium leading-snug">Opening hours</span>
+                    <span className="block whitespace-nowrap text-[15px] leading-snug sm:text-[16px]">
+                      <strong className="font-bold">Mon – Fri: 09:00 – 18:00</strong> (UK time)
+                    </span>
+                    <OpeningStatus />
+                  </span>
+                </li>
+              </ul>
 
-                    </div>
+              {/* HELP CENTRE */}
+              <Link
+                href="/faqs"
+                className="group mt-8 inline-flex items-center gap-3 border-b-2 border-[#EC1C8C] pb-2 text-[19px] font-bold text-white sm:text-[21px]"
+              >
+                <Headset className="h-7 w-7" strokeWidth={1.8} aria-hidden="true" />
+                Visit our Help Centre
+                <ArrowRight
+                  className="h-5 w-5 text-[#F0218F] transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </Link>
 
-                    {/* TEXT */}
-                    <div>
-
-                      <h4 className="text-[#718096] dark:text-white text-[13px] font-medium uppercase tracking-[0.5px] leading-[22px]">
-                        {item.title}
-                      </h4>
-
-                      <p className="text-[#2D3748] dark:text-white text-[16px] md:text-[18px] font-semibold leading-[27px] mt-1">
-                        {item.value}
-                      </p>
-
-                    </div>
-                  </div>
-                ))}
-
+              {/* HEADQUARTERS */}
+              <div className="mt-7 flex max-w-[440px] items-start gap-4 border-t border-white/15 pt-6">
+                <MapPin className="mt-0.5 h-6 w-6 shrink-0" aria-hidden="true" />
+                <address className="not-italic">
+                  <span className="block text-[18px] font-bold">UK Headquarters</span>
+                  <span className="mt-1 block text-[16px] leading-relaxed text-white/90">
+                    167–169 Great Portland Street, 5th Floor,
+                    <br />
+                    London W1W 5PF, United Kingdom
+                  </span>
+                </address>
               </div>
+             </div>
             </div>
 
             {/* RIGHT SIDE FORM */}
-            <ContactForm />
-
+            <div className="lg:h-full">
+              <ContactForm />
+            </div>
           </div>
         </div>
       </section>
