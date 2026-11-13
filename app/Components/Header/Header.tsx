@@ -13,36 +13,104 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-const forYouLinks = [
-  {
-    href: "/business-solutions",
-    title: "Business Solutions",
-    desc: "Smart telecom services for businesses",
-    active: true,
-  },
-  {
-    href: "/accessories",
-    title: "Accessories",
-    desc: "Explore latest telecom accessories",
-  },
-  {
-    href: "/phone-equipment",
-    title: "Phone & Equipment",
-    desc: "Premium devices and equipment",
-  },
-  {
-    href: "/landline-business",
-    title: "Landline Business",
-    desc: "Reliable communication solutions",
-  },
-];
-
 interface DropdownItem {
   href: string;
   title: string;
   desc: string;
-  active?: boolean;
 }
+
+type NavItem =
+  | { kind: "link"; href: string; label: string }
+  | { kind: "dropdown"; id: string; label: string; heading: string; items: DropdownItem[] };
+
+const navItems: NavItem[] = [
+  { kind: "link", href: "/ee-mobile-plans", label: "EE Mobile" },
+  {
+    kind: "dropdown",
+    id: "broadband",
+    label: "Broadband",
+    heading: "Broadband & Fibre",
+    items: [
+      {
+        href: "/bt-broadband",
+        title: "BT Broadband",
+        desc: "High-speed BT broadband deals",
+      },
+      {
+        href: "/fibre-packages",
+        title: "Fibre Packages",
+        desc: "Affordable full fibre plans",
+      },
+      {
+        href: "/broadband",
+        title: "Check Availability",
+        desc: "See what's available at your address",
+      },
+    ],
+  },
+  { kind: "link", href: "/landlines", label: "Landlines" },
+  {
+    kind: "dropdown",
+    id: "business",
+    label: "Business",
+    heading: "For You",
+    items: [
+      {
+        href: "/business-solutions",
+        title: "Business Solutions",
+        desc: "Smart telecom services for businesses",
+      },
+      {
+        href: "/accessories",
+        title: "Accessories",
+        desc: "Explore latest telecom accessories",
+      },
+      {
+        href: "/phone-equipment",
+        title: "Phone & Equipment",
+        desc: "Premium devices and equipment",
+      },
+      {
+        href: "/landline-business",
+        title: "Landline Business",
+        desc: "Reliable communication solutions",
+      },
+    ],
+  },
+  {
+    kind: "dropdown",
+    id: "company",
+    label: "Company",
+    heading: "About Zoiko",
+    items: [
+      {
+        href: "/about-us",
+        title: "About Us",
+        desc: "Who we are and what we do",
+      },
+      {
+        href: "/why-zoiko",
+        title: "Why Zoiko",
+        desc: "Why customers choose us",
+      },
+      {
+        href: "/blogs-news",
+        title: "Blogs & News",
+        desc: "Latest updates and insights",
+      },
+      {
+        href: "/faqs",
+        title: "FAQs",
+        desc: "Answers to common questions",
+      },
+      {
+        href: "/become-a-reseller",
+        title: "Become a Reseller",
+        desc: "Partner with Zoiko Telecom",
+      },
+    ],
+  },
+];
 
 function DropdownLink({
   item,
@@ -69,7 +137,7 @@ function DropdownLink({
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -122,7 +190,7 @@ export default function Header() {
 
   const closeAll = () => {
     setMenuOpen(false);
-    setDropdownOpen(false);
+    setOpenDropdown(null);
     setUserMenuOpen(false);
   };
 
@@ -171,32 +239,36 @@ export default function Header() {
               lg:border-0 lg:p-0 lg:shadow-none dark:lg:bg-transparent xl:gap-11
             `}
           >
-            {[
-              { href: "/ee-mobile-plans", label: "EE Mobile" },
-              { href: "/bt-broadband", label: "BT Broadband" },
-              { href: "/landlines", label: "Landlines" },
-            ].map((item) => (
-              <li
-                key={item.href}
-                className="w-full border-b border-[#f5f5f5] dark:border-neutral-800 lg:w-auto lg:border-0"
-              >
-                <Link
-                  href={item.href}
-                  onClick={closeAll}
-                  className="block py-3.5 text-base font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:py-0"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              if (item.kind === "link") {
+                return (
+                  <li
+                    key={item.href}
+                    className="w-full border-b border-[#f5f5f5] dark:border-neutral-800 lg:w-auto lg:border-0"
+                  >
+                    <Link
+                      href={item.href}
+                      onClick={closeAll}
+                      className="block py-3.5 text-base font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:py-0"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              }
 
-            {/* Business Dropdown */}
-            <li className="group relative w-full border-b border-[#f5f5f5] dark:border-neutral-800 lg:w-auto lg:border-0">
+              const dropdownOpen = openDropdown === item.id;
+              return (
+            <li
+              key={item.id}
+              className="group relative w-full border-b border-[#f5f5f5] dark:border-neutral-800 lg:w-auto lg:border-0"
+            >
               <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                onClick={() => setOpenDropdown(dropdownOpen ? null : item.id)}
+                aria-expanded={dropdownOpen}
                 className="flex w-full items-center justify-between py-3.5 text-left text-base font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:w-auto lg:justify-start lg:gap-2 lg:py-0"
               >
-                Business
+                {item.label}
                 <FaChevronDown
                   className={`text-xs transition-transform duration-300 ${
                     dropdownOpen ? "rotate-180" : ""
@@ -225,30 +297,22 @@ export default function Header() {
                 <span className="absolute -top-2 left-1/2 hidden h-4 w-4 -translate-x-1/2 rotate-45 border-l border-t border-[#eee] bg-white dark:border-neutral-700 dark:bg-neutral-800 lg:block" />
 
                 <div className="px-[18px] pb-1.5 pt-4 text-[11px] font-bold uppercase tracking-[0.08em] text-[#aaa] dark:text-neutral-500">
-                  For You
+                  {item.heading}
                 </div>
 
                 <div className="px-2.5">
-                  {forYouLinks.map((item) => (
+                  {item.items.map((link) => (
                     <DropdownLink
-                      key={item.href}
-                      item={item}
+                      key={link.href}
+                      item={link}
                       onClick={closeAll}
                     />
                   ))}
                 </div>
               </div>
             </li>
-
-            <li className="w-full border-b border-[#f5f5f5] dark:border-neutral-800 lg:w-auto lg:border-0">
-              <Link
-                href="/about-us"
-                onClick={closeAll}
-                className="block py-3.5 text-base font-medium text-[#111] hover:text-[#C12172] dark:text-neutral-100 dark:hover:text-[#e94196] lg:py-0"
-              >
-                About Us
-              </Link>
-            </li>
+              );
+            })}
 
             {/* Mobile Contact Button Link inside menu list */}
             <li className="mt-3 w-full lg:hidden">
