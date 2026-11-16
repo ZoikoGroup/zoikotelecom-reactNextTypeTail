@@ -35,13 +35,13 @@ export const MOBILE_MENU: NavDropdown = {
     {
       label: "Switch & Save",
       description: "Bring your number to Zoiko",
-      href: "#",
+      href: "/switch-and-save",
       icon: "switch",
     },
     {
       label: "eSIM",
       description: "Get connected without a physical SIM",
-      href: "#",
+      href: "/esim",
       icon: "cpu",
     },
     {
@@ -59,7 +59,7 @@ export const MOBILE_MENU: NavDropdown = {
     {
       label: "Roaming & International",
       description: "Use your phone abroad and call overseas",
-      href: "#",
+      href: "/roaming-international",
       icon: "globe",
     },
   ],
