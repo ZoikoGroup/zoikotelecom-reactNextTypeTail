@@ -1,0 +1,10 @@
+export { default as UltrafastHero } from "./UltrafastHero";
+export { default as SpeedBands } from "./SpeedBands";
+export { default as CategoryVsTechnology } from "./CategoryVsTechnology";
+export { default as SpeedExplained } from "./SpeedExplained";
+export { default as HouseholdBroadbandGuide } from "./HouseholdBroadbandGuide";
+export { default as ExploringUltrafastPlans } from "./ExploringUltrafastPlans";
+export { default as AvailabilitySwitchingInstallation } from "./AvailabilitySwitchingInstallation";
+export { default as UltrafastFaqs } from "./UltrafastFaqs";
+export { default as UltrafastCta } from "./UltrafastCta";
+export { default as MoreBroadbandGuides } from "./MoreBroadbandGuides";

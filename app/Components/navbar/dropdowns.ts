@@ -78,13 +78,13 @@ export const BROADBAND_MENU: NavDropdown = {
     {
       label: "Home Broadband",
       description: "Everyday broadband for your home",
-      href: "#",
+      href: "/home-broadband",
       icon: "wifi",
     },
     {
       label: "Ultrafast Broadband",
       description: "Our fastest home speeds",
-      href: "#",
+      href: "/ultrafast-broadband",
       icon: "gauge",
     },
     {
