@@ -1,0 +1,10 @@
+export { default as SpeedHelpHero } from "./SpeedHelpHero";
+export { default as WhereToBegin } from "./WhereToBegin";
+export { default as ThreeStepsBeforeYouTest } from "./ThreeStepsBeforeYouTest";
+export { default as TestYourSpeed } from "./TestYourSpeed";
+export { default as WhatEachResultMeans } from "./WhatEachResultMeans";
+export { default as WiredVsWifi } from "./WiredVsWifi";
+export { default as WhatToTryNext } from "./WhatToTryNext";
+export { default as ContactingUsAboutSpeed } from "./ContactingUsAboutSpeed";
+export { default as SpeedTestFaqs } from "./SpeedTestFaqs";
+export { default as StillFeelsSlowCta } from "./StillFeelsSlowCta";

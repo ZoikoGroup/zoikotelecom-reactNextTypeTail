@@ -1,0 +1,9 @@
+export { default as WholeHomeWifiHero } from "./WholeHomeWifiHero";
+export { default as WhereAreYouHavingTrouble } from "./WhereAreYouHavingTrouble";
+export { default as WhereYouPutYourRouterMatters } from "./WhereYouPutYourRouterMatters";
+export { default as YourBroadbandLineVsYourWifi } from "./YourBroadbandLineVsYourWifi";
+export { default as WhyIsThatRoomWeaker } from "./WhyIsThatRoomWeaker";
+export { default as RouterMeshExtenderOrCable } from "./RouterMeshExtenderOrCable";
+export { default as WhatToHaveReadyWhenYouContactUs } from "./WhatToHaveReadyWhenYouContactUs";
+export { default as WifiFaqs } from "./WifiFaqs";
+export { default as NeedAHandWithWifiCta } from "./NeedAHandWithWifiCta";
