@@ -77,11 +77,11 @@ export const FOOTER_TOP_SECTIONS: readonly NavSection[] = [
     href: "/bt-broadband",
     links: [
       { label: "Broadband Plans", href: "/bt-broadband" },
-      { label: "Full Fibre", href: "/fibre-packages" },
+      { label: "Full Fibre", href: "/full-fibre" },
       { label: "Ultrafast Broadband", href: "/ultrafast-broadband" },
       { label: "Home Broadband", href: "/home-broadband" },
       { label: "Business Fibre", href: "#" },
-      { label: "Check Availability", href: "/broadband" },
+      { label: "Check Availability", href: "/check-availability" },
     ],
   },
   {

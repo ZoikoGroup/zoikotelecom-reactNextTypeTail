@@ -1,0 +1,9 @@
+export { default as BundlesHero } from "./BundlesHero";
+export { default as YourStartingPoint } from "./YourStartingPoint";
+export { default as WhatToCompareInEach } from "./WhatToCompareInEach";
+export { default as ExploringABundleStepByStep } from "./ExploringABundleStepByStep";
+export { default as ContractDates } from "./ContractDates";
+export { default as SwitchingBroadbandAndMobile } from "./SwitchingBroadbandAndMobile";
+export { default as ComparingTheTotalCost } from "./ComparingTheTotalCost";
+export { default as BundleFaqs } from "./BundleFaqs";
+export { default as NeedHelpComparingCta } from "./NeedHelpComparingCta";
