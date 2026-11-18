@@ -145,7 +145,7 @@ export const LANDLINES_MENU: NavDropdown = {
     {
       label: "Call Features",
       description: "Voicemail, call divert and more",
-      href: "#",
+      href: "/call-features",
       icon: "forward",
     },
     {
@@ -163,7 +163,7 @@ export const LANDLINES_MENU: NavDropdown = {
     {
       label: "Voice Bundles",
       description: "Minutes and features together",
-      href: "#",
+      href: "/voice-bundles",
       icon: "tag",
     },
   ],
@@ -182,7 +182,7 @@ export const BUSINESS_MENU: NavDropdown = {
     {
       label: "Business Mobile",
       description: "Mobile plans for teams of any size",
-      href: "#",
+      href: "/business-mobile",
       icon: "briefcase",
     },
     {
@@ -206,7 +206,7 @@ export const BUSINESS_MENU: NavDropdown = {
     {
       label: "Business Broadband & Fibre",
       description: "Reliable connectivity for your workplace",
-      href: "#",
+      href: "/broadband-fibre",
       icon: "wifi",
     },
     {

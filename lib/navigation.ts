@@ -74,7 +74,7 @@ export const FOOTER_TOP_SECTIONS: readonly NavSection[] = [
     id: "broadband",
     title: "Broadband & Fibre",
     icon: "wifi",
-    href: "/bt-broadband",
+    href: "/broadband-fibre",
     links: [
       { label: "Broadband Plans", href: "/bt-broadband" },
       { label: "Full Fibre", href: "/full-fibre" },
@@ -94,7 +94,7 @@ export const FOOTER_TOP_SECTIONS: readonly NavSection[] = [
       { label: "Business Voice", href: "/landlines-business-voice" },
       { label: "SIP & VoIP", href: "#" },
       { label: "Virtual Numbers", href: "/landlines-virtual-numbers" },
-      { label: "Call Features", href: "#" },
+      { label: "Call Features", href: "/call-features" },
       { label: "International Calling", href: "/landlines-international-calls" },
     ],
   },
