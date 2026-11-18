@@ -1,0 +1,10 @@
+export { default as VirtualNumbersHero } from "./VirtualNumbersHero";
+export { default as ChooseHowCustomersReachYou } from "./ChooseHowCustomersReachYou";
+export { default as OneNumberRightPlace } from "./OneNumberRightPlace";
+export { default as CanYourNumberMove } from "./CanYourNumberMove";
+export { default as WhatMakesUpThePrice } from "./WhatMakesUpThePrice";
+export { default as ThingsToKnowBeforeYouChoose } from "./ThingsToKnowBeforeYouChoose";
+export { default as DiscussNumberOptions } from "./DiscussNumberOptions";
+export { default as VirtualNumberFaqs } from "./VirtualNumberFaqs";
+export { default as TalkAboutVirtualNumbersCta } from "./TalkAboutVirtualNumbersCta";
+export { default as MoreVoiceServices } from "./MoreVoiceServices";

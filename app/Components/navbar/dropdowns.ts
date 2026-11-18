@@ -29,7 +29,7 @@ export const MOBILE_MENU: NavDropdown = {
     {
       label: "Multi-line Plans",
       description: "One account for the whole household",
-      href: "#",
+      href: "/multi-line-plans",
       icon: "users",
     },
     {
@@ -96,7 +96,7 @@ export const BROADBAND_MENU: NavDropdown = {
     {
       label: "Check Availability",
       description: "See what's available at your address",
-      href: "/check-availabilty",
+      href: "/broadband-check-availability",
       icon: "pin",
     },
     {
@@ -133,13 +133,13 @@ export const LANDLINES_MENU: NavDropdown = {
     {
       label: "Home Phone",
       description: "A reliable landline for your home",
-      href: "#",
+      href: "/landlines-home-phone",
       icon: "phone",
     },
     {
       label: "Virtual Numbers",
       description: "Local and non-geographic numbers",
-      href: "#",
+      href: "/landlines-virtual-numbers",
       icon: "hash",
     },
     {
@@ -151,13 +151,13 @@ export const LANDLINES_MENU: NavDropdown = {
     {
       label: "Business Voice (VoIP)",
       description: "Internet calling for your team",
-      href: "/landline-business",
+      href: "/landlines-business-voice",
       icon: "cloud",
     },
     {
       label: "International Calls",
       description: "Call friends and family abroad",
-      href: "#",
+      href: "/landlines-international-calls",
       icon: "globe",
     },
     {

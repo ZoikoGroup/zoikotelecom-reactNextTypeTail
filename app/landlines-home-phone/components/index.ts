@@ -1,0 +1,16 @@
+export { default as HomePhoneHero } from "./HomePhoneHero";
+export { default as WhatsChanging } from "./WhatsChanging";
+export { default as HowItConnects } from "./HowItConnects";
+export { default as WhatItReliesOn } from "./WhatItReliesOn";
+export { default as PowerCutsAndEmergencyCalls } from "./PowerCutsAndEmergencyCalls";
+export { default as TelecareBanner } from "./TelecareBanner";
+export { default as AccessibleSupport } from "./AccessibleSupport";
+export { default as KeepingYourNumber } from "./KeepingYourNumber";
+export { default as QuestionsToAsk } from "./QuestionsToAsk";
+export { default as PlansAndPrices } from "./PlansAndPrices";
+export { default as ContractInformation } from "./ContractInformation";
+export { default as WhatInstallationInvolves } from "./WhatInstallationInvolves";
+export { default as HelpForExistingCustomers } from "./HelpForExistingCustomers";
+export { default as WhatWeCheckFirst } from "./WhatWeCheckFirst";
+export { default as HomePhoneFaqs } from "./HomePhoneFaqs";
+export { default as NeedHelpChoosingCta } from "./NeedHelpChoosingCta";
