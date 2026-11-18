@@ -64,7 +64,7 @@ export const FOOTER_TOP_SECTIONS: readonly NavSection[] = [
     links: [
       { label: "Mobile Plans", href: "/ee-mobile-plans" },
       { label: "Phone & SIM Plans", href: "#" },
-      { label: "Multi-line Plans", href: "#" },
+      { label: "Multi-line Plans", href: "/multi-line-plans" },
       { label: "Roaming & International", href: "/roaming-international" },
       { label: "eSIM", href: "/esim" },
       { label: "Student & Youth Plans", href: "#" },
@@ -81,7 +81,7 @@ export const FOOTER_TOP_SECTIONS: readonly NavSection[] = [
       { label: "Ultrafast Broadband", href: "/ultrafast-broadband" },
       { label: "Home Broadband", href: "/home-broadband" },
       { label: "Business Fibre", href: "#" },
-      { label: "Check Availability", href: "/check-availability" },
+      { label: "Check Availability", href: "/broadband-check-availability" },
     ],
   },
   {
@@ -90,12 +90,12 @@ export const FOOTER_TOP_SECTIONS: readonly NavSection[] = [
     icon: "phone",
     href: "/landlines",
     links: [
-      { label: "Home Phone", href: "#" },
-      { label: "Business Voice", href: "/landline-business" },
+      { label: "Home Phone", href: "/landlines-home-phone" },
+      { label: "Business Voice", href: "/landlines-business-voice" },
       { label: "SIP & VoIP", href: "#" },
-      { label: "Virtual Numbers", href: "#" },
+      { label: "Virtual Numbers", href: "/landlines-virtual-numbers" },
       { label: "Call Features", href: "#" },
-      { label: "International Calling", href: "#" },
+      { label: "International Calling", href: "/landlines-international-calls" },
     ],
   },
   {
