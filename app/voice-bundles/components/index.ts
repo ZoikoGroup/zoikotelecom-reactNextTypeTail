@@ -1,0 +1,15 @@
+export { default as VoiceBundlesHero } from "./VoiceBundlesHero";
+export { default as VoiceBundleMeanings } from "./VoiceBundleMeanings";
+export { default as IncludedCallsBreakdown } from "./IncludedCallsBreakdown";
+export { default as CallAllowancesTypes } from "./CallAllowancesTypes";
+export { default as BusinessQuizSection } from "./BusinessQuizSection";
+export { default as BusinessPlansSection } from "./BusinessPlansSection";
+export { default as MonthlyBillBreakdown } from "./MonthlyBillBreakdown";
+export { default as ContractEssentials } from "./ContractEssentials";
+export { default as SetupChecklist } from "./SetupChecklist";
+export { default as NumberPortingSteps } from "./NumberPortingSteps";
+export { default as VoiceSafeguards } from "./VoiceSafeguards";
+export { default as CustomerSupportAndContact } from "./CustomerSupportAndContact";
+export { default as VoiceBundleFaqs } from "./VoiceBundleFaqs";
+export { default as RelatedServices } from "./RelatedServices";
+export { default as VoiceBundlesFooterCta } from "./VoiceBundlesFooterCta";
