@@ -23,7 +23,7 @@ export const MOBILE_MENU: NavDropdown = {
     {
       label: "SIM Only Plans",
       description: "Flexible plans on your own phone",
-      href: "#",
+      href: "/sim-only-plans",
       icon: "sim",
     },
     {
