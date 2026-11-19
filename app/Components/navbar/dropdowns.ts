@@ -188,13 +188,13 @@ export const BUSINESS_MENU: NavDropdown = {
     {
       label: "Business Voice & UCaaS",
       description: "Calls, meetings and messaging in one",
-      href: "#",
+      href: "/voice-bundles",
       icon: "phone",
     },
     {
       label: "Managed Services",
       description: "We look after your connectivity",
-      href: "#",
+      href: "/managed-services",
       icon: "server",
     },
     {
@@ -218,7 +218,7 @@ export const BUSINESS_MENU: NavDropdown = {
     {
       label: "Security & Compliance",
       description: "Protect your people and data",
-      href: "#",
+      href: "/security-compliance",
       icon: "shield",
     },
   ],
