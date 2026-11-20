@@ -51,7 +51,7 @@ export default function BlackFridayFaqs() {
             Sale
           </p>
           <p className="text-sm font-extrabold uppercase leading-4">
-            27–30 Nov
+            20–30 Nov
           </p>
         </div>
       </div>

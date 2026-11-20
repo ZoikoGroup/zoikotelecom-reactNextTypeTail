@@ -24,7 +24,7 @@ const TAGS = [
   {
     id: "sale",
     top: "Sale",
-    bottom: "27–30 Nov",
+    bottom: "20–30 Nov",
     position: "right-6 lg:right-[7%]",
     stem: "h-6",
   },
@@ -70,7 +70,7 @@ export default function BlackFridayCta() {
 
       <div className="relative mx-auto flex max-w-[820px] flex-col items-center text-center">
         <span className="inline-block rounded-full bg-gradient-to-r from-[#c4237f] to-[#8a2fb3] px-5 py-1.5 text-sm font-bold uppercase tracking-[0.08em]">
-          Black Friday 27 Nov · Cyber Monday 30 Nov
+          Black Friday 20 Nov · Cyber Monday 30 Nov
         </span>
 
         <h2 className="mt-6 text-4xl font-extrabold uppercase leading-[1.1] tracking-tight sm:text-5xl lg:text-[52px]">
