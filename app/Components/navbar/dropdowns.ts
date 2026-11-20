@@ -249,7 +249,7 @@ export const IOT_MENU: NavDropdown = {
     {
       label: "IoT Data Plans",
       description: "Data plans built for devices",
-      href: "#",
+      href: "/iot-&-connectivity-data-plans",
       icon: "cpu",
     },
     {
@@ -261,7 +261,7 @@ export const IOT_MENU: NavDropdown = {
     {
       label: "Remote Monitoring",
       description: "Track assets and equipment remotely",
-      href: "#",
+      href: "/iot-&-connectivity-remote-monitoring",
       icon: "activity",
     },
     {
