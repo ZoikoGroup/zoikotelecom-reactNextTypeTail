@@ -53,7 +53,7 @@ export const MOBILE_MENU: NavDropdown = {
     {
       label: "Student & Youth Plans",
       description: "Plans for students and younger users",
-      href: "#",
+      href: "/student-youth-plans",
       icon: "star",
     },
     {
