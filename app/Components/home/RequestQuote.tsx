@@ -51,7 +51,7 @@ export default function RequestQuote() {
           {/* Left Column */}
           <div className="text-white">
             <span className="inline-block rounded-full bg-[#120b16] px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.12em] sm:px-4 sm:text-sm">
-              Black Friday · 27–30 Nov
+              Black Friday · 20–30 Nov
             </span>
             <h2 className="mt-4 max-w-[420px] text-3xl font-extrabold leading-tight tracking-tight sm:mt-5 sm:text-4xl lg:text-5xl">
               Request a business quote

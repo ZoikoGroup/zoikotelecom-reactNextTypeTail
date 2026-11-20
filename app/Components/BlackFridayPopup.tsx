@@ -164,7 +164,7 @@ export default function BlackFridayPopup({
               />
             </svg>
             <span className="text-[20px] font-extrabold tracking-tight">
-              27–30 NOVEMBER 2026
+              20–30 NOVEMBER 2026
             </span>
           </div>
 

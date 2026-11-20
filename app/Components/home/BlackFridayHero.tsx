@@ -39,7 +39,7 @@ const QUOTE_ROWS = [
 
 const MARQUEE_ITEMS = [
   "BLACK FRIDAY",
-  "27–30 NOVEMBER 2026",
+  "20–30 NOVEMBER 2026",
   "DIGITAL PHONE LINES FOR UK BUSINESSES",
   "BT BROADBAND",
   "EE eSIM PLANS",
@@ -240,7 +240,7 @@ export default function BlackFridayHero() {
                   Black Friday
                 </p>
                 <p className="text-sm font-extrabold text-[#c4237f] sm:text-base sm:leading-5">
-                  27 – 30 Nov
+                  20 – 30 Nov
                 </p>
               </div>
             </div>
