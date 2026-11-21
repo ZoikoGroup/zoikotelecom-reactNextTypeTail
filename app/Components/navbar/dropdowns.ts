@@ -310,7 +310,7 @@ export const DEVICES_MENU: NavDropdown = {
     {
       label: "Accessories",
       description: "Cases, chargers and audio",
-      href: "/accessories",
+      href: "/devices-accessories",
       icon: "headphones",
     },
     {
