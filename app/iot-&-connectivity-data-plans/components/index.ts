@@ -1,0 +1,13 @@
+export { default as DataPlansHero } from "./DataPlansHero";
+export { default as UsefulForStrip } from "./UsefulForStrip";
+export { default as FourDataFactors } from "./FourDataFactors";
+export { default as TrafficPatterns } from "./TrafficPatterns";
+export { default as DataEstimateCalculator } from "./DataEstimateCalculator";
+export { default as AllowanceModels } from "./AllowanceModels";
+export { default as CommercialTerms } from "./CommercialTerms";
+export { default as CoverageRoamingSecurity } from "./CoverageRoamingSecurity";
+export { default as DeviceLifecycle } from "./DeviceLifecycle";
+export { default as ReadinessChecklists } from "./ReadinessChecklists";
+export { default as IotDataEnquiryForm } from "./IotDataEnquiryForm";
+export { default as DataPlanFaqs } from "./DataPlanFaqs";
+export { default as DataPlansCta } from "./DataPlansCta";

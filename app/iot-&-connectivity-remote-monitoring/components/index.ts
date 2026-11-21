@@ -1,0 +1,16 @@
+export { default as RemoteMonitoringHero } from "./RemoteMonitoringHero";
+export { default as MonitoringHighlights } from "./MonitoringHighlights";
+export { default as FourPartsOfMonitoring } from "./FourPartsOfMonitoring";
+export { default as MonitoringUseCases } from "./MonitoringUseCases";
+export { default as HowAReadingTravels } from "./HowAReadingTravels";
+export { default as DataFreshness } from "./DataFreshness";
+export { default as ConnectivityHealth } from "./ConnectivityHealth";
+export { default as ResponseScope } from "./ResponseScope";
+export { default as OfflineAndRetry } from "./OfflineAndRetry";
+export { default as SecurityAndPrivacy } from "./SecurityAndPrivacy";
+export { default as FeasibilitySteps } from "./FeasibilitySteps";
+export { default as StartingPoint } from "./StartingPoint";
+export { default as MonitoringEnquiryForm } from "./MonitoringEnquiryForm";
+export { default as RemoteMonitoringFaqs } from "./RemoteMonitoringFaqs";
+export { default as RelatedServices } from "./RelatedServices";
+export { default as RemoteMonitoringCta } from "./RemoteMonitoringCta";
