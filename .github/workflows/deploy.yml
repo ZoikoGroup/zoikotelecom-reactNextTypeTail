@@ -32,14 +32,23 @@ jobs:
             rm -rf node_modules || sudo rm -rf node_modules
             npm ci --no-audit --no-fund
 
-            # Stop any leftover `next build` in THIS app folder (e.g. from a deploy whose
-            # SSH session timed out). It holds .next/lock and blocks the new build.
+            # Stop any leftover Next.js build in THIS app folder (e.g. from a deploy whose
+            # SSH session timed out); it holds .next/lock and blocks the new build.
+            # Only Node processes are stopped: this script's own shell also has the
+            # search text in its command line, so shells must never match.
             APP_DIR="$(pwd -P)"
-            for pid in $(pgrep -f "next build" || true); do
-              if [ "$(sudo readlink -f /proc/$pid/cwd 2>/dev/null)" = "$APP_DIR" ]; then
-                echo "Stopping stale next build (pid $pid)"
-                sudo kill "$pid" 2>/dev/null || true
-              fi
+            for pid in $(pgrep -f "[n]ext/dist/bin/next build|[n]ext build" || true); do
+              [ "$pid" = "$$" ] && continue
+              exe="$(sudo readlink -f /proc/$pid/exe 2>/dev/null || true)"
+              cwd="$(sudo readlink -f /proc/$pid/cwd 2>/dev/null || true)"
+              case "$exe" in
+                */node)
+                  if [ "$cwd" = "$APP_DIR" ]; then
+                    echo "Stopping stale Next.js build (pid $pid)"
+                    sudo kill "$pid" 2>/dev/null || true
+                  fi
+                  ;;
+              esac
             done
             sleep 3
             rm -f .next/lock 2>/dev/null || sudo rm -f .next/lock
