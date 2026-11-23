@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import SearchModal from "../search/SearchModal";
 import { NAV_MAIN } from "./data";
 import MainNav from "./MainNav";
 import MegaMenu from "./MegaMenu";
@@ -11,6 +12,8 @@ import { useMegaMenu } from "./useMegaMenu";
 export default function Navbar() {
   const { openId, open, scheduleClose, cancelClose, closeNow } = useMegaMenu();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
   const menu = NAV_MAIN.find((item) => item.id === openId)?.dropdown;
 
   const navigate = () => {
@@ -36,6 +39,24 @@ export default function Navbar() {
     };
   }, [mobileOpen]);
 
+  const openSearch = () => {
+    closeNow();
+    setMobileOpen(false);
+    setSearchOpen(true);
+  };
+
+  // Ctrl+K / Cmd+K opens search from anywhere on the site.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <header
       className="sticky top-0 z-50 w-full bg-white"
@@ -48,6 +69,7 @@ export default function Navbar() {
         onNavigate={navigate}
         mobileOpen={mobileOpen}
         onToggleMobile={() => setMobileOpen((o) => !o)}
+        onOpenSearch={openSearch}
       />
       {menu && (
         <MegaMenu
@@ -58,6 +80,7 @@ export default function Navbar() {
         />
       )}
       {mobileOpen && <MobileMenu onNavigate={navigate} />}
+      <SearchModal open={searchOpen} onClose={closeSearch} />
     </header>
   );
 }

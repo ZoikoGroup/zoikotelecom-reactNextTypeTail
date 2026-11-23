@@ -9,6 +9,7 @@ type MainNavProps = {
   onNavigate: () => void;
   mobileOpen: boolean;
   onToggleMobile: () => void;
+  onOpenSearch: () => void;
 };
 
 export default function MainNav({
@@ -17,6 +18,7 @@ export default function MainNav({
   onNavigate,
   mobileOpen,
   onToggleMobile,
+  onOpenSearch,
 }: MainNavProps) {
   return (
     <div className="border-b border-[#eceef3]">
@@ -71,7 +73,13 @@ export default function MainNav({
         </ul>
 
         <div className="flex items-center gap-5 text-[#0f1b3d]">
-          <Link href="#" aria-label="Search">
+          <button
+            type="button"
+            onClick={onOpenSearch}
+            aria-label="Search (Ctrl+K)"
+            aria-haspopup="dialog"
+            className="rounded-full p-1 hover:text-[#c4237f]"
+          >
             <svg
               viewBox="0 0 24 24"
               className="h-5 w-5"
@@ -84,7 +92,7 @@ export default function MainNav({
               <circle cx="11" cy="11" r="7" />
               <path d="m20 20-3.5-3.5" />
             </svg>
-          </Link>
+          </button>
           <Link href="#" aria-label="Basket" className="relative">
             <ShoppingCart className="h-5 w-5" aria-hidden="true" />
             <span className="absolute -right-2.5 -top-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#c4237f] text-sm font-bold leading-none text-white">

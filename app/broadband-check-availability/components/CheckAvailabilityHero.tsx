@@ -35,7 +35,11 @@ const CHIPS = [
   },
 ] as const;
 
-export default function CheckAvailabilityHero() {
+export default function CheckAvailabilityHero({
+  postcode = "",
+}: {
+  postcode?: string;
+}) {
   return (
     <section className="relative w-full overflow-hidden bg-gradient-to-br from-[#0b0a2e] via-[#1a1155] to-[#2a1670] text-white">
       <div
@@ -84,6 +88,7 @@ export default function CheckAvailabilityHero() {
             <input
               id="check-postcode"
               name="postcode"
+              defaultValue={postcode}
               placeholder="Enter your postcode"
               autoComplete="postal-code"
               className="min-w-0 flex-1 bg-transparent text-sm text-[#1b1740] outline-none placeholder:text-[#8a90a6]"
