@@ -23,7 +23,7 @@ export const MOBILE_MENU: NavDropdown = {
     {
       label: "SIM Only Plans",
       description: "Flexible plans on your own phone",
-      href: "#",
+      href: "/sim-only-plans",
       icon: "sim",
     },
     {
@@ -53,7 +53,7 @@ export const MOBILE_MENU: NavDropdown = {
     {
       label: "Student & Youth Plans",
       description: "Plans for students and younger users",
-      href: "#",
+      href: "/student-youth-plans",
       icon: "star",
     },
     {
@@ -292,7 +292,7 @@ export const DEVICES_MENU: NavDropdown = {
     {
       label: "Mobile Hotspots & Routers",
       description: "Take your connection with you",
-      href: "#",
+      href: "/mobile-hotspots-routers",
       icon: "router",
     },
     {

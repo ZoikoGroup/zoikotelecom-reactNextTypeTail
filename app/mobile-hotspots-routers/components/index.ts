@@ -1,0 +1,12 @@
+export { default as HotspotsHero } from "./HotspotsHero";
+export { default as SetupExplorer } from "./SetupExplorer";
+export { default as HowTheyConnect } from "./HowTheyConnect";
+export { default as CompareTypes } from "./CompareTypes";
+export { default as WillItFit } from "./WillItFit";
+export { default as SecurityChecklist } from "./SecurityChecklist";
+export { default as CostsBreakdown } from "./CostsBreakdown";
+export { default as GettingStarted } from "./GettingStarted";
+export { default as HotspotEnquiryForm } from "./HotspotEnquiryForm";
+export { default as HotspotFaqs } from "./HotspotFaqs";
+export { default as RelatedPages } from "./RelatedPages";
+export { default as HotspotsCta } from "./HotspotsCta";
