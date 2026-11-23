@@ -237,13 +237,13 @@ export const IOT_MENU: NavDropdown = {
     {
       label: "IoT Connectivity (SIM, eSIM)",
       description: "Connect devices at scale",
-      href: "#",
+      href: "/sim-esim",
       icon: "network",
     },
     {
       label: "Smart Buildings & Sites",
       description: "Connected sensors and systems",
-      href: "#",
+      href: "/smart-building-sites",
       icon: "building",
     },
     {
