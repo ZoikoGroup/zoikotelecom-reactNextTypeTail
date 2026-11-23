@@ -4,7 +4,16 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// Create the Stripe client lazily so `next build` does not require the secret key.
+let stripe: Stripe | null = null;
+function getStripe() {
+  if (!stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+    stripe = new Stripe(key);
+  }
+  return stripe;
+}
 
 export async function POST(req: Request) {
   try {
@@ -35,7 +44,7 @@ export async function POST(req: Request) {
     /* ------------------------------
        CREATE PAYMENT INTENT
     ------------------------------ */
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: Math.round(amount * 100),
       currency: "gbp",
 
