@@ -4,6 +4,12 @@ on:
   push:
     branches: [ main ]
 
+# Never run two deploys on the VM at the same time: queue them instead.
+# (Overlapping runs fight over node_modules and the .next build lock.)
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,8 +30,20 @@ jobs:
             # A stale/partially-written node_modules makes `npm ci` fail with ENOTEMPTY.
             # Remove it first (sudo fallback in case files were created by root).
             rm -rf node_modules || sudo rm -rf node_modules
-            npm cache verify || true
             npm ci --no-audit --no-fund
+
+            # Stop any leftover `next build` in THIS app folder (e.g. from a deploy whose
+            # SSH session timed out). It holds .next/lock and blocks the new build.
+            APP_DIR="$(pwd -P)"
+            for pid in $(pgrep -f "next build" || true); do
+              if [ "$(sudo readlink -f /proc/$pid/cwd 2>/dev/null)" = "$APP_DIR" ]; then
+                echo "Stopping stale next build (pid $pid)"
+                sudo kill "$pid" 2>/dev/null || true
+              fi
+            done
+            sleep 3
+            rm -f .next/lock 2>/dev/null || sudo rm -f .next/lock
+
             npm run build
 
             # Restart the app, or register it with PM2 if the process does not exist yet
