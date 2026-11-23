@@ -24,7 +24,7 @@ const PAGES = [
   {
     title: "Hotspots & Routers",
     text: "Mobile internet explained",
-    href: "#",
+    href: "/mobile-hotspots-routers",
     image: "related-hotspots-routers.webp",
     alt: "Map, camera and travel gear laid out on a table",
   },

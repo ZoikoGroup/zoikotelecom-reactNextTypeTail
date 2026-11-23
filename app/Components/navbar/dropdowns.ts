@@ -292,7 +292,7 @@ export const DEVICES_MENU: NavDropdown = {
     {
       label: "Mobile Hotspots & Routers",
       description: "Take your connection with you",
-      href: "#",
+      href: "/mobile-hotspots-routers",
       icon: "router",
     },
     {
