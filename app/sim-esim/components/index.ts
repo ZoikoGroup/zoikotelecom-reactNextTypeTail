@@ -1,0 +1,12 @@
+export { default as IotConnectivityHero } from "./IotConnectivityHero";
+export { default as SimVsEsim } from "./SimVsEsim";
+export { default as ArchitectureSection } from "./ArchitectureSection";
+export { default as DeploymentRequirementsSection } from "./DeploymentRequirementsSection";
+export { default as DataEstimateSection } from "./DataEstimateSection";
+export { default as UseCasesSection } from "./UseCasesSection";
+export { default as ThingsToKnowSection } from "./ThingsToKnowSection";
+export { default as ProjectEnquirySection } from "./ProjectEnquirySection";
+export { default as CustomerReviewSection } from "./CustomerReviewSection";
+export { default as IotFaqSection } from "./IotFaqSection";
+export { default as RelatedServicesSection } from "./RelatedServicesSection";
+export { default as IotDeploymentCtaSection } from "./IotDeploymentCtaSection";
