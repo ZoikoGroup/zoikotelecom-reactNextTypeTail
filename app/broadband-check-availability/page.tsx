@@ -11,10 +11,21 @@ import {
   VerifiedAnswerCta,
 } from "./components";
 
-export default function CheckAvailabilityPage() {
+type CheckAvailabilityPageProps = {
+  searchParams: Promise<{ postcode?: string | string[] }>;
+};
+
+export default async function CheckAvailabilityPage({
+  searchParams,
+}: CheckAvailabilityPageProps) {
+  const { postcode } = await searchParams;
+  const initialPostcode = (Array.isArray(postcode) ? postcode[0] : postcode ?? "")
+    .trim()
+    .slice(0, 10);
+
   return (
     <main>
-      <CheckAvailabilityHero />
+      <CheckAvailabilityHero postcode={initialPostcode} />
       <PostcodeAddressAndNetwork />
       <WhatMightBeAvailable />
       <WhatAnAvailabilityAnswerCanLookLike />
