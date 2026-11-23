@@ -14,12 +14,27 @@ jobs:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          command_timeout: 30m
           script: |
+            # Stop on the first failing command so a broken install/build never gets restarted
+            set -e
             cd ${{ secrets.GCP_APP_PATH }}
             git pull origin main
-            npm ci
+
+            # A stale/partially-written node_modules makes `npm ci` fail with ENOTEMPTY.
+            # Remove it first (sudo fallback in case files were created by root).
+            rm -rf node_modules || sudo rm -rf node_modules
+            npm cache verify || true
+            npm ci --no-audit --no-fund
             npm run build
-            sudo pm2 restart zoikotelecom
+
+            # Restart the app, or register it with PM2 if the process does not exist yet
+            if sudo pm2 describe zoikotelecom > /dev/null 2>&1; then
+              sudo pm2 restart zoikotelecom --update-env
+            else
+              sudo pm2 start npm --name zoikotelecom -- start
+            fi
+            sudo pm2 save
 
       - name: Purge Cloudflare cache
         run: |
