@@ -1,0 +1,10 @@
+export { default as DeviceProtectionHero } from "./DeviceProtectionHero";
+export { default as SituationExplorer } from "./SituationExplorer";
+export { default as FourKindsSection } from "./FourKindsSection";
+export { default as EightQuestionsSection } from "./EightQuestionsSection";
+export { default as CoverageTableSection } from "./CoverageTableSection";
+export { default as ClaimsAndOptionsSection } from "./ClaimsAndOptionsSection";
+export { default as ProtectionEnquiryForm } from "./ProtectionEnquiryForm";
+export { default as ProtectionFaqs } from "./ProtectionFaqs";
+export { default as RelatedPages } from "./RelatedPages";
+export { default as ProtectionCta } from "./ProtectionCta";
