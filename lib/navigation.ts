@@ -150,8 +150,8 @@ export const FOOTER_BOTTOM_SECTIONS: readonly NavSection[] = [
     icon: "headphones",
     href: "/faqs",
     links: [
-      { label: "Help Centre", href: "/faqs" },
-      { label: "Billing & Payments", href: "#" },
+      { label: "Help Centre", href: "/help-center-faqs" },
+      { label: "Billing & Payments", href: "/support-billing-payments" },
       { label: "Manage My Account", href: "/dashboard" },
       { label: "Service Status", href: "#" },
       { label: "Technical Support", href: "#" },

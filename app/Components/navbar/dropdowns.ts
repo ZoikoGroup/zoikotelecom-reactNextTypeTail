@@ -335,7 +335,7 @@ export const SUPPORT_MENU: NavDropdown = {
     {
       label: "Help Centre & FAQs",
       description: "Answers to common questions",
-      href: "/faqs",
+      href: "/help-center-faqs",
       icon: "help",
     },
     {
