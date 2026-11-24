@@ -316,7 +316,7 @@ export const DEVICES_MENU: NavDropdown = {
     {
       label: "Device Protection",
       description: "Cover for loss, theft and damage",
-      href: "#",
+      href: "/device-protection",
       icon: "shield",
     },
   ],
