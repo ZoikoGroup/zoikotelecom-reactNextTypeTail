@@ -384,13 +384,13 @@ export const ABOUT_MENU: NavDropdown = {
     {
       label: "Our Story",
       description: "How Zoiko Telecom began",
-      href: "/about-us",
+      href: "/about-our-story",
       icon: "book",
     },
     {
       label: "Leadership & Board",
       description: "The people who lead Zoiko",
-      href: "#",
+      href: "/leadership-board",
       icon: "users",
     },
     {
@@ -414,7 +414,7 @@ export const ABOUT_MENU: NavDropdown = {
     {
       label: "Our Purpose & Values",
       description: "What we stand for",
-      href: "#",
+      href: "/about-our-purpose-values",
       icon: "target",
     },
     {
