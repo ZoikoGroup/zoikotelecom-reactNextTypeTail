@@ -1,0 +1,10 @@
+export { default as AccountHero } from "./AccountHero";
+export { default as NeverAskBanner } from "./NeverAskBanner";
+export { default as ChooseTaskSection } from "./ChooseTaskSection";
+export { default as SignInSafelySection } from "./SignInSafelySection";
+export { default as RecoverAccessSection } from "./RecoverAccessSection";
+export { default as DetailsServicesSection } from "./DetailsServicesSection";
+export { default as AccountAccessSection } from "./AccountAccessSection";
+export { default as DashboardHelpSection } from "./DashboardHelpSection";
+export { default as AccountFaqs } from "./AccountFaqs";
+export { default as AccountHelpCta } from "./AccountHelpCta";

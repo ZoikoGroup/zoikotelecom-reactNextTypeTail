@@ -359,7 +359,7 @@ export const SUPPORT_MENU: NavDropdown = {
     {
       label: "Troubleshoot a Service",
       description: "Fix common issues step by step",
-      href: "#",
+      href: "/support-troubleshoot-a-service",
       icon: "pencil",
     },
     {
