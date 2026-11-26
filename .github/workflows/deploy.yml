@@ -44,11 +44,12 @@ jobs:
 
             # ---------- 1. Build in a separate folder ----------
             if [ ! -e "$BUILD_DIR/.git" ]; then
+              # The deploy user cannot write to the app's parent folder, so create the
+              # (empty) build folder with sudo and hand it over; git accepts an empty folder.
               sudo rm -rf "$BUILD_DIR"
               git worktree prune
               sudo mkdir -p "$BUILD_DIR"
               sudo chown "$(id -u):$(id -g)" "$BUILD_DIR"
-              rmdir "$BUILD_DIR"
               git worktree add --detach "$BUILD_DIR" "$SHA"
             else
               git -C "$BUILD_DIR" checkout --detach --force "$SHA"
@@ -115,8 +116,8 @@ jobs:
             sudo rm -rf .next.previous node_modules.previous
             if [ -d .next ]; then sudo mv .next .next.previous; fi
             if [ -d node_modules ]; then sudo mv node_modules node_modules.previous; fi
-            mv "$BUILD_DIR/.next" .next
-            mv "$BUILD_DIR/node_modules" node_modules
+            sudo mv "$BUILD_DIR/.next" .next
+            sudo mv "$BUILD_DIR/node_modules" node_modules
 
             start_app() {
               if sudo pm2 describe "$APP_NAME" > /dev/null 2>&1; then
