@@ -150,6 +150,9 @@ export const FOOTER_BOTTOM_SECTIONS: readonly NavSection[] = [
     icon: "headphones",
     href: "/faqs",
     links: [
+      { label: "Help Centre", href: "/help-center-faqs" },
+      { label: "Billing & Payments", href: "/support-billing-payments" },
+      { label: "Manage My Account", href: "/dashboard" },
       { label: "Help Centre", href: "/faqs" },
       { label: "Billing & Payments", href: "#" },
       { label: "Manage My Account", href: "/support-manage-my-account" },
@@ -165,9 +168,9 @@ export const FOOTER_BOTTOM_SECTIONS: readonly NavSection[] = [
     icon: "info",
     href: "/about-us",
     links: [
-      { label: "Our Company", href: "/about-us" },
+      { label: "Our Company", href: "/about-our-story" },
       { label: "Why Zoiko", href: "/why-zoiko" },
-      { label: "Leadership & Governance", href: "#" },
+      { label: "Leadership & Governance", href: "/leadership-board" },
       { label: "Sustainability (ESG)", href: "/esg-policy" },
       { label: "Careers", href: "#" },
       { label: "Our Network", href: "#" },
