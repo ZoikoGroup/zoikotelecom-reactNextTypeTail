@@ -20,48 +20,149 @@ jobs:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
-          command_timeout: 30m
+          command_timeout: 45m
           script: |
-            # Stop on the first failing command so a broken install/build never gets restarted
+            # How this deploy works
+            # 1. Build in a SEPARATE folder, so the live site keeps serving the old
+            #    build untouched while the (slow) build runs.
+            # 2. Stop the app and anything else on the app port. An old server outside
+            #    PM2 kept the port, so PM2's copy crash-looped and the site served a
+            #    stale build whose CSS/JS files had been replaced.
+            # 3. Swap the new build in and start it with PM2.
+            # 4. Health check: the site must serve THIS build, its CSS/JS must load and
+            #    PM2 must not be restarting it. Otherwise roll back and fail the deploy.
             set -e
             cd ${{ secrets.GCP_APP_PATH }}
-            git pull origin main
-
-            # A stale/partially-written node_modules makes `npm ci` fail with ENOTEMPTY.
-            # Remove it first (sudo fallback in case files were created by root).
-            rm -rf node_modules || sudo rm -rf node_modules
-            npm ci --no-audit --no-fund
-
-            # Stop any leftover Next.js build in THIS app folder (e.g. from a deploy whose
-            # SSH session timed out); it holds .next/lock and blocks the new build.
-            # Only Node processes are stopped: this script's own shell also has the
-            # search text in its command line, so shells must never match.
             APP_DIR="$(pwd -P)"
-            for pid in $(pgrep -f "[n]ext/dist/bin/next build|[n]ext build" || true); do
+            BUILD_DIR="${APP_DIR}-build"
+            APP_NAME=zoikotelecom
+            PORT=3000
+
+            git pull origin main
+            SHA="$(git rev-parse HEAD)"
+            echo "Deploying $SHA"
+
+            # ---------- 1. Build in a separate folder ----------
+            if [ ! -e "$BUILD_DIR/.git" ]; then
+              sudo rm -rf "$BUILD_DIR"
+              git worktree prune
+              sudo mkdir -p "$BUILD_DIR"
+              sudo chown "$(id -u):$(id -g)" "$BUILD_DIR"
+              rmdir "$BUILD_DIR"
+              git worktree add --detach "$BUILD_DIR" "$SHA"
+            else
+              git -C "$BUILD_DIR" checkout --detach --force "$SHA"
+            fi
+            # Env files are not in git but are needed at build time (NEXT_PUBLIC_*).
+            for f in "$APP_DIR"/.env*; do
+              if [ -f "$f" ]; then cp -f "$f" "$BUILD_DIR"/; fi
+            done
+
+            cd "$BUILD_DIR"
+            # Stop a leftover Next.js build in the build folder (e.g. from a deploy whose
+            # SSH session timed out). Only node processes: this script's own shell has
+            # the search text in its command line and must never match.
+            for pid in $(pgrep -f "[n]ext build" || true); do
               [ "$pid" = "$$" ] && continue
               exe="$(sudo readlink -f /proc/$pid/exe 2>/dev/null || true)"
               cwd="$(sudo readlink -f /proc/$pid/cwd 2>/dev/null || true)"
               case "$exe" in
                 */node)
-                  if [ "$cwd" = "$APP_DIR" ]; then
+                  if [ "$cwd" = "$BUILD_DIR" ]; then
                     echo "Stopping stale Next.js build (pid $pid)"
                     sudo kill "$pid" 2>/dev/null || true
                   fi
                   ;;
               esac
             done
-            sleep 3
-            rm -f .next/lock 2>/dev/null || sudo rm -f .next/lock
 
+            sudo rm -rf node_modules .next
+            npm ci --no-audit --no-fund
             npm run build
+            NEW_BUILD_ID="$(cat .next/BUILD_ID)"
+            echo "Build $NEW_BUILD_ID finished (the live site was untouched during the build)"
 
-            # Restart the app, or register it with PM2 if the process does not exist yet
-            if sudo pm2 describe zoikotelecom > /dev/null 2>&1; then
-              sudo pm2 restart zoikotelecom --update-env
-            else
-              sudo pm2 start npm --name zoikotelecom -- start
+            # ---------- 2. Stop the app and free the port ----------
+            cd "$APP_DIR"
+            port_pids() {
+              sudo ss -ltnpH "sport = :$PORT" 2>/dev/null | grep -o 'pid=[0-9]*' | cut -d= -f2 | sort -u
+            }
+
+            sudo pm2 stop "$APP_NAME" > /dev/null 2>&1 || true
+            # An old copy under the deploy user's own PM2 would respawn itself.
+            pm2 delete "$APP_NAME" > /dev/null 2>&1 || true
+
+            for attempt in 1 2 3; do
+              PIDS="$(port_pids)"
+              [ -z "$PIDS" ] && break
+              echo "Port $PORT still held by an old server (attempt $attempt):"
+              for pid in $PIDS; do ps -o user=,pid=,ppid=,args= -p "$pid" || true; done
+              sudo kill $PIDS 2>/dev/null || true
+              sleep 3
+              PIDS="$(port_pids)"
+              if [ -n "$PIDS" ]; then sudo kill -9 $PIDS 2>/dev/null || true; fi
+              sleep 2
+            done
+            if [ -n "$(port_pids)" ]; then
+              echo "ERROR: something keeps restarting a server on port $PORT (not root's PM2)."
+              echo "Find it with: sudo ss -ltnp 'sport = :$PORT'  and  pm2 ls  (as each user)."
+              echo "Nothing was swapped; the old build is still in place."
+              sudo pm2 restart "$APP_NAME" > /dev/null 2>&1 || true
+              exit 1
             fi
-            sudo pm2 save
+
+            # ---------- 3. Swap the new build in and start ----------
+            sudo rm -rf .next.previous node_modules.previous
+            if [ -d .next ]; then sudo mv .next .next.previous; fi
+            if [ -d node_modules ]; then sudo mv node_modules node_modules.previous; fi
+            mv "$BUILD_DIR/.next" .next
+            mv "$BUILD_DIR/node_modules" node_modules
+
+            start_app() {
+              if sudo pm2 describe "$APP_NAME" > /dev/null 2>&1; then
+                sudo pm2 restart "$APP_NAME" --update-env
+              else
+                sudo pm2 start npm --name "$APP_NAME" --cwd "$APP_DIR" -- start
+              fi
+              sudo pm2 reset "$APP_NAME" > /dev/null 2>&1 || true
+            }
+            start_app
+
+            # ---------- 4. Health check (with rollback) ----------
+            healthy() {
+              html=""
+              for i in $(seq 1 30); do
+                html="$(curl -fsS "http://127.0.0.1:$PORT/" 2>/dev/null || true)"
+                [ -n "$html" ] && break
+                sleep 2
+              done
+              if [ -z "$html" ]; then echo "Health check: no response on port $PORT"; return 1; fi
+              if ! echo "$html" | grep -q "$1"; then echo "Health check: site is not serving build $1"; return 1; fi
+              for asset in $(echo "$html" | grep -oE '/_next/static/[^"]+\.(css|js)' | sort -u); do
+                code="$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT$asset")"
+                if [ "$code" != 200 ]; then echo "Health check: $asset returned $code"; return 1; fi
+              done
+              sleep 10
+              restarts="$(sudo pm2 jlist | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const p=JSON.parse(s).find(x=>x.name==='$APP_NAME');console.log(p?p.pm2_env.restart_time:-1)})")"
+              if [ "$restarts" != 0 ]; then echo "Health check: app restarted $restarts times (crash loop)"; return 1; fi
+              return 0
+            }
+
+            if healthy "$NEW_BUILD_ID"; then
+              sudo pm2 save
+              sudo rm -rf .next.previous node_modules.previous
+              echo "Deploy OK: serving build $NEW_BUILD_ID"
+            else
+              echo "Deploy FAILED the health check; rolling back to the previous build"
+              sudo pm2 logs "$APP_NAME" --lines 40 --nostream || true
+              if [ -d .next.previous ]; then
+                sudo rm -rf .next node_modules
+                sudo mv .next.previous .next
+                sudo mv node_modules.previous node_modules
+                start_app
+              fi
+              exit 1
+            fi
 
       - name: Purge Cloudflare cache
         run: |
