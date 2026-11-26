@@ -152,7 +152,8 @@ export const FOOTER_BOTTOM_SECTIONS: readonly NavSection[] = [
     links: [
       { label: "Help Centre", href: "/faqs" },
       { label: "Billing & Payments", href: "#" },
-      { label: "Manage My Account", href: "/dashboard" },
+      { label: "Manage My Account", href: "/support-manage-my-account" },
+      { label: "Troubleshoot a Service", href: "/support-troubleshoot-a-service" },
       { label: "Service Status", href: "#" },
       { label: "Technical Support", href: "#" },
       { label: "Contact Support", href: "/contact" },
