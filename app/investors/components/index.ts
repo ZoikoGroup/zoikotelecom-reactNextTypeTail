@@ -1,0 +1,10 @@
+export { default as InvestorsHero } from "./InvestorsHero";
+export { default as RegisterJumpNav } from "./RegisterJumpNav";
+export { default as CompanyIdentitySection } from "./CompanyIdentitySection";
+export { default as PublicFilingsSection } from "./PublicFilingsSection";
+export { default as ReadingFilingsSection } from "./ReadingFilingsSection";
+export { default as ScopeExclusionsSection } from "./ScopeExclusionsSection";
+export { default as RegisterContactSection } from "./RegisterContactSection";
+export { default as MoreAboutZoikoSection } from "./MoreAboutZoikoSection";
+export { default as InvestorFaqSection } from "./InvestorFaqSection";
+export { default as CompanyRecordsCta } from "./CompanyRecordsCta";

@@ -402,7 +402,7 @@ export const ABOUT_MENU: NavDropdown = {
     {
       label: "Investors",
       description: "Information for investors",
-      href: "#",
+      href: "/investors",
       icon: "chart",
     },
     {
@@ -420,13 +420,13 @@ export const ABOUT_MENU: NavDropdown = {
     {
       label: "Sustainability (ESG)",
       description: "Our environmental and social commitments",
-      href: "/esg-policy",
+      href: "/sustainability-esg",
       icon: "leaf",
     },
     {
       label: "Careers at Zoiko",
       description: "Join our team",
-      href: "#",
+      href: "/careers-at-zoiko",
       icon: "briefcase",
     },
   ],
