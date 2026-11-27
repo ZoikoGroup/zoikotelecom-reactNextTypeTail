@@ -1,7 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, Menu, ShoppingCart, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { NAV_LOGO, NAV_MAIN } from "./data";
+
+const getCartCount = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem("cart") ?? "[]");
+    if (!Array.isArray(stored)) return 0;
+    return stored.reduce((count: number, item: { quantity?: unknown; qty?: unknown }) => {
+      const quantity = Number(item.quantity ?? item.qty ?? 1);
+      return count + (Number.isFinite(quantity) && quantity > 0 ? quantity : 1);
+    }, 0);
+  } catch {
+    return 0;
+  }
+};
 
 type MainNavProps = {
   openId: string | null;
@@ -20,6 +34,19 @@ export default function MainNav({
   onToggleMobile,
   onOpenSearch,
 }: MainNavProps) {
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCartCount = () => setCartCount(getCartCount());
+    updateCartCount();
+    window.addEventListener("cart-updated", updateCartCount);
+    window.addEventListener("storage", updateCartCount);
+    return () => {
+      window.removeEventListener("cart-updated", updateCartCount);
+      window.removeEventListener("storage", updateCartCount);
+    };
+  }, []);
+
   return (
     <div className="border-b border-[#eceef3]">
       <nav
@@ -93,10 +120,15 @@ export default function MainNav({
               <path d="m20 20-3.5-3.5" />
             </svg>
           </button>
-          <Link href="#" aria-label="Basket" className="relative">
+          <Link
+            href="/checkout"
+            onClick={onNavigate}
+            aria-label={`Basket, ${cartCount} item${cartCount === 1 ? "" : "s"}`}
+            className="relative"
+          >
             <ShoppingCart className="h-5 w-5" aria-hidden="true" />
             <span className="absolute -right-2.5 -top-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#c4237f] text-sm font-bold leading-none text-white">
-              0
+              {cartCount > 99 ? "99+" : cartCount}
             </span>
           </Link>
           <button

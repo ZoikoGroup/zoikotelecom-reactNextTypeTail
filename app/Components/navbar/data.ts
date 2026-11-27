@@ -72,7 +72,7 @@ export const NAV_MAIN: readonly NavMainItem[] = [
   { id: "support", label: "Support", href: "/faqs", dropdown: SUPPORT_MENU },
   {
     id: "about",
-    label: "About Zoiko",
+    label: "Company",
     href: "/about-us",
     dropdown: ABOUT_MENU,
   },
