@@ -95,7 +95,7 @@ export const FOOTER_TOP_SECTIONS: readonly NavSection[] = [
       { label: "SIP & VoIP", href: "#" },
       { label: "Virtual Numbers", href: "/landlines-virtual-numbers" },
       { label: "Call Features", href: "/call-features" },
-      { label: "International Calling", href: "/landlines-international-calls" },
+      { label: "International Calling", href: "/international-calling" },
     ],
   },
   {
@@ -109,7 +109,7 @@ export const FOOTER_TOP_SECTIONS: readonly NavSection[] = [
       { label: "Mobile for Business", href: "/mobile-for-business" },
       { label: "Unified Communications", href: "/unified-communications" },
       { label: "IT & Network Services", href: "/it-network-serivices" },
-      { label: "Sector Solutions", href: "#" },
+      { label: "Sector Solutions", href: "/sector-solutions" },
     ],
   },
   {

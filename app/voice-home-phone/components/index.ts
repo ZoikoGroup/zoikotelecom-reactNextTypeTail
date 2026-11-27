@@ -1,0 +1,9 @@
+export { default as HomePhonePage } from "./HomePhonePage";
+export { default as BeforeAnythingElsePowerConnectivityBanner } from "./BeforeAnythingElsePowerConnectivityBanner";
+export { default as WhatIsADigitalHomePhoneSection } from "./WhatIsADigitalHomePhoneSection";
+export { default as ThreeQuestionsBeforeYouSwitchSection } from "./ThreeQuestionsBeforeYouSwitchSection";
+export { default as FourWaysToStartSection } from "./FourWaysToStartSection";
+export { default as KeepingYourNumberSection } from "./KeepingYourNumberSection";
+export { default as EquipmentAndExtraHelpSection } from "./EquipmentAndExtraHelpSection";
+export { default as HomePhoneFaqsSection } from "./HomePhoneFaqsSection";
+export { default as QuestionsAboutCallSettingsCta } from "./QuestionsAboutCallSettingsCta";
