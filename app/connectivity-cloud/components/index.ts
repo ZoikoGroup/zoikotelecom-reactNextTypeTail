@@ -1,0 +1,9 @@
+export { default as ConnectivityCloudHero } from "./ConnectivityCloudHero";
+export { default as FourNeedsSection } from "./FourNeedsSection";
+export { default as ConnectivityVsCloudSection } from "./ConnectivityVsCloudSection";
+export { default as YourLocationsSection } from "./YourLocationsSection";
+export { default as CloudRequirementsSection } from "./CloudRequirementsSection";
+export { default as BeforeYouEnquireSection } from "./BeforeYouEnquireSection";
+export { default as MoreForBusinessSection } from "./MoreForBusinessSection";
+export { default as ConnectivityAndCloudFaqsSection } from "./ConnectivityAndCloudFaqsSection";
+export { default as ConnectivityCloudCta } from "./ConnectivityCloudCta";
