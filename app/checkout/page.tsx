@@ -393,6 +393,8 @@ const Modal = ({
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
+const CHECKOUT_STEPS = ["Your Details", "Delivery", "Payment", "Confirmation"] as const;
+
 export default function CheckoutPage() {
   const stripeFormRef = useRef<StripePaymentFormRef>(null);
   const [showOrderErrorPopup, setShowOrderErrorPopup] = useState(false);
@@ -1060,42 +1062,28 @@ export default function CheckoutPage() {
 
               <ol
                 aria-label="Checkout progress"
-                className="flex w-full items-center justify-between gap-2 sm:gap-4 xl:max-w-[610px]"
+                className="flex w-full items-center justify-between gap-2 sm:gap-4 xl:max-w-[500px]"
               >
-                {["Basket", "Your Details", "Delivery", "Payment", "Confirmation"].map(
-                  (step, index) => (
-                    <li
-                      key={step}
-                      aria-current={index === 0 ? "step" : undefined}
-                      className={`flex min-w-0 flex-1 flex-col items-center gap-1 text-center text-[11px] font-semibold sm:text-xs ${
-                        index === 0 ? "text-[#c4237f]" : "text-gray-500"
-                      }`}
-                    >
-                      <span className="relative flex w-full items-center justify-center">
-                        {index > 0 && (
-                          <span className="absolute right-1/2 top-1/2 h-px w-full -translate-y-1/2 bg-gray-300" />
-                        )}
-                        {index < 4 && (
-                          <span className="absolute left-1/2 top-1/2 h-px w-full -translate-y-1/2 bg-gray-300" />
-                        )}
-                        <span
-                          className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full border ${
-                            index === 0
-                              ? "border-[#c4237f] bg-[#c4237f] text-white"
-                              : "border-gray-300 bg-white"
-                          }`}
-                        >
-                          {index === 0 ? (
-                            <ShoppingCart className="h-4 w-4" aria-hidden="true" />
-                          ) : (
-                            index + 1
-                          )}
-                        </span>
+                {/* The basket is not a checkout step: the flow starts at "Your Details". */}
+                {CHECKOUT_STEPS.map((step, index) => (
+                  <li
+                    key={step}
+                    className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center text-[11px] font-semibold text-gray-500 sm:text-xs"
+                  >
+                    <span className="relative flex w-full items-center justify-center">
+                      {index > 0 && (
+                        <span className="absolute right-1/2 top-1/2 h-px w-full -translate-y-1/2 bg-gray-300" />
+                      )}
+                      {index < CHECKOUT_STEPS.length - 1 && (
+                        <span className="absolute left-1/2 top-1/2 h-px w-full -translate-y-1/2 bg-gray-300" />
+                      )}
+                      <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white">
+                        {index + 1}
                       </span>
-                      <span className="whitespace-nowrap">{step}</span>
-                    </li>
-                  ),
-                )}
+                    </span>
+                    <span className="whitespace-nowrap">{step}</span>
+                  </li>
+                ))}
               </ol>
             </div>
 
