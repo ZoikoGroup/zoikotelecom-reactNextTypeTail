@@ -51,7 +51,7 @@ export default function MainNav({
     <div className="border-b border-[#eceef3]">
       <nav
         aria-label="Main"
-        className="mx-auto flex h-[70px] max-w-[1300px] items-center justify-between gap-4 px-6 lg:px-10"
+        className="mx-auto flex h-[70px] max-w-[1440px] items-center justify-between gap-4 px-6 lg:px-10 xl:gap-6"
       >
         <Link href={NAV_LOGO.href} className="shrink-0" onClick={onNavigate}>
           <Image
@@ -60,11 +60,11 @@ export default function MainNav({
             width={140}
             height={60}
             priority
-            className="h-auto w-[110px] lg:w-[125px]"
+            className="h-auto w-[110px] 2xl:w-[125px]"
           />
         </Link>
 
-        <ul className="hidden flex-1 items-center justify-center gap-0.5 xl:flex">
+        <ul className="hidden min-w-0 flex-1 items-center justify-between xl:flex">
           {NAV_MAIN.map((item) => {
             const isOpen = openId === item.id;
             return (
@@ -80,16 +80,16 @@ export default function MainNav({
                   aria-expanded={item.dropdown ? isOpen : undefined}
                   className={
                     isOpen
-                      ? "flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#c4237f] px-5 py-2.5 text-[15px] font-bold text-white"
-                      : "flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2.5 text-[15px] font-bold text-[#0f1b3d] hover:text-[#c4237f]"
+                      ? "flex items-center gap-1 whitespace-nowrap rounded-full bg-[#c4237f] px-2.5 py-2.5 text-[14px] font-bold text-white 2xl:px-3.5 2xl:text-[15px]"
+                      : "flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-2.5 text-[14px] font-bold text-[#0f1b3d] hover:text-[#c4237f] 2xl:px-3.5 2xl:text-[15px]"
                   }
                 >
                   {item.label}
                   <ChevronDown
                     className={
                       isOpen
-                        ? "h-4 w-4 rotate-180 transition-transform"
-                        : "h-4 w-4 transition-transform"
+                        ? "h-4 w-4 shrink-0 rotate-180 transition-transform"
+                        : "h-4 w-4 shrink-0 transition-transform"
                     }
                     aria-hidden="true"
                   />
@@ -99,7 +99,7 @@ export default function MainNav({
           })}
         </ul>
 
-        <div className="flex items-center gap-5 text-[#0f1b3d]">
+        <div className="flex shrink-0 items-center gap-5 text-[#0f1b3d]">
           <button
             type="button"
             onClick={onOpenSearch}

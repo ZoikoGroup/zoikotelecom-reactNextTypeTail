@@ -33,7 +33,7 @@ function UnionJack() {
 export default function TopBar() {
   return (
     <div className="bg-[#0f1b3d] text-white">
-      <div className="mx-auto flex h-[41px] max-w-[1300px] items-center justify-between px-6 lg:px-10">
+      <div className="mx-auto flex h-[48px] max-w-[1440px] items-center justify-between px-6 lg:px-10">
         <div className="flex h-full items-center gap-6">
           <span className="flex items-center gap-2 border-r border-white/20 pr-6 text-sm font-semibold">
             <UnionJack />
@@ -94,7 +94,7 @@ export default function TopBar() {
           </ul>
           <Link
             href={NAV_ACCOUNT.href}
-            className="flex items-center gap-2 rounded-full border border-white/70 px-4 py-1.5 text-sm font-bold"
+            className="flex items-center gap-2 rounded-full border border-white/70 px-4 py-1 text-sm font-bold hover:bg-white/10"
           >
             <User className="h-4 w-4" aria-hidden="true" />
             {NAV_ACCOUNT.label}
