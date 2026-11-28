@@ -132,7 +132,7 @@ export default function Configure() {
       localStorage.setItem("cart", JSON.stringify([rawItem]));
     }
 
-    router.push("/checkout");
+    router.push("/cart");
   };
 
   return (

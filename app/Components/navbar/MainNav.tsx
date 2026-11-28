@@ -121,7 +121,7 @@ export default function MainNav({
             </svg>
           </button>
           <Link
-            href="/checkout"
+            href="/cart"
             onClick={onNavigate}
             aria-label={`Basket, ${cartCount} item${cartCount === 1 ? "" : "s"}`}
             className="relative"

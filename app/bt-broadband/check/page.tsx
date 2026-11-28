@@ -221,7 +221,7 @@ function PlanCard({
     };
 
     addToCart(plan);
-    window.location.href = "/checkout";
+    window.location.href = "/cart";
   };
 
   return (
