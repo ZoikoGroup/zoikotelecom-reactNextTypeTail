@@ -133,7 +133,7 @@ export const LANDLINES_MENU: NavDropdown = {
     {
       label: "Home Phone",
       description: "A reliable landline for your home",
-      href: "/landlines-home-phone",
+      href: "/voice-home-phone",
       icon: "phone",
     },
     {
@@ -145,13 +145,13 @@ export const LANDLINES_MENU: NavDropdown = {
     {
       label: "Call Features",
       description: "Voicemail, call divert and more",
-      href: "/call-features",
+      href: "/voice-call-features",
       icon: "forward",
     },
     {
       label: "Business Voice (VoIP)",
       description: "Internet calling for your team",
-      href: "/landlines-business-voice",
+      href: "/international-calling",
       icon: "cloud",
     },
     {
@@ -200,7 +200,7 @@ export const BUSINESS_MENU: NavDropdown = {
     {
       label: "Sector Solutions",
       description: "Solutions shaped around your industry",
-      href: "#",
+      href: "/sector-solutions",
       icon: "building",
     },
     {

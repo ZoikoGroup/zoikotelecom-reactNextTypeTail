@@ -1,4 +1,20 @@
 "use client";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowRight,
+  Leaf,
+  LockKeyhole,
+  Package,
+  RefreshCw,
+  ShieldCheck,
+  ShoppingCart,
+  Smartphone,
+  Tag,
+  Trash2,
+  Truck,
+  Wifi,
+} from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -385,6 +401,7 @@ export default function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState("");
   const [showThankYou, setShowThankYou] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [showCheckout, setShowCheckout] = useState(false);
   const [showShipping, setShowShipping] = useState(false);
   const [coupon, setCoupon] = useState("");
   const [loading, setLoading] = useState(false);
@@ -561,11 +578,6 @@ export default function CheckoutPage() {
             email: user.email || prev.email,
           }));
         }
-      } else {
-        // Not logged in — surface the requirement immediately rather than
-        // waiting until the customer tries to pay.
-        setLoginPromptReason("order");
-        setShowLoginPopup(true);
       }
     } catch {
       setCart([]);
@@ -697,10 +709,81 @@ export default function CheckoutPage() {
 
   const total = Math.max(subtotal - (discountAmount || 0), 0);
 
+  const handleProceedToCheckout = () => {
+    if (!isLoggedIn) {
+      setLoginPromptReason("order");
+      setShowLoginPopup(true);
+      return;
+    }
+    setShowCheckout(true);
+  };
+
+  const itemCount = cart.reduce((count, item) => count + item.quantity, 0);
+  const monthlyItems = cart.filter(
+    (item) =>
+      item._raw.billingPeriod !== "one-off" &&
+      !item.isAccessories &&
+      !item.isPhoneEquipment,
+  );
+  const upfrontItems = cart.filter(
+    (item) =>
+      item._raw.billingPeriod === "one-off" ||
+      item.isAccessories ||
+      item.isPhoneEquipment,
+  );
+  const monthlyTotal = monthlyItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  const upfrontTotal = upfrontItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
+  const loginModal = (
+    <Modal
+      show={showLoginPopup}
+      onClose={() => setShowLoginPopup(false)}
+      title="Login Required"
+    >
+      <div className="text-center">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+          <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+        </div>
+        <p className="mb-5 text-sm text-gray-600">
+          {loginPromptReason === "order"
+            ? "You need to log in before you can place an order. Your basket will be waiting for you when you come back."
+            : "You need to be logged in to apply a coupon code."}
+        </p>
+        <a
+          href={`/login?redirect=${encodeURIComponent(
+            typeof window !== "undefined" ? window.location.href : "/checkout",
+          )}`}
+          className="mb-2 block w-full rounded-lg bg-red-500 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-600"
+        >
+          Go to Login
+        </a>
+        <button
+          onClick={() => setShowLoginPopup(false)}
+          className="text-sm text-gray-400 transition-colors hover:text-gray-600"
+        >
+          Cancel
+        </button>
+      </div>
+    </Modal>
+  );
+
   // ── Create Stripe payment intent ──────────────────────────────────────────
 
   useEffect(() => {
-    if (total > 0 && cart.length > 0) {
+    if (showCheckout && total > 0 && cart.length > 0) {
       fetch("/api/create-payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -722,7 +805,8 @@ export default function CheckoutPage() {
   }, [total,
   subtotal,
   discountAmount,
-  cart,]);
+  cart,
+  showCheckout]);
 
     // ── field validators ──────────────────────────────
   const validateZip = (zip: string) => {
@@ -937,21 +1021,381 @@ export default function CheckoutPage() {
   // ── Empty Cart ────────────────────────────────────────────────────────────
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen dark:bg-gray-900 bg-gray-50 flex flex-col items-center justify-center px-4 py-16 text-center">
-        <div className="w-40 h-40 bg-red-50 dark:bg-red-900 rounded-full flex items-center justify-center mb-6">
-          <svg className="w-20 h-20 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
+      <main className="flex min-h-[65vh] flex-col items-center justify-center bg-[#f5f7fc] px-4 py-16 text-center">
+        <div className="mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-pink-50 text-[#c4237f]">
+          <ShoppingCart className="h-14 w-14" aria-hidden="true" />
         </div>
-        <h2 className="text-2xl font-bold dark:text-white text-gray-900 mb-2">Your cart is empty</h2>
-        <p className="text-gray-500 dark:text-gray-400 mb-8">Looks like you haven't added anything yet.</p>
-        
-      </div>
+        <h1 className="mb-2 text-2xl font-bold text-[#101b3d]">Your basket is empty</h1>
+        <p className="mb-8 text-gray-500">Looks like you haven&apos;t added anything yet.</p>
+        <Link
+          href="/"
+          className="rounded-xl bg-[#c4237f] px-6 py-3 font-semibold text-white transition hover:bg-[#a81b6b]"
+        >
+          Continue shopping
+        </Link>
+      </main>
+    );
+  }
+
+  if (!showCheckout) {
+    return (
+      <>
+        <main className="min-h-screen bg-[#f5f7fc] px-4 py-7 text-[#101b3d] sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1300px]">
+            <div className="mb-6 flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
+              <div>
+                <div className="flex items-center gap-3">
+                  <ShoppingCart className="h-8 w-8 text-[#c4237f]" aria-hidden="true" />
+                  <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                    Your Shopping Basket{" "}
+                    <span className="text-base font-semibold text-gray-500">
+                      ({itemCount} {itemCount === 1 ? "item" : "items"})
+                    </span>
+                  </h1>
+                </div>
+                <p className="mt-2 text-sm text-gray-600 sm:ml-11">
+                  Review your items, manage your plan and choose how to check out.
+                </p>
+              </div>
+
+              <ol
+                aria-label="Checkout progress"
+                className="flex w-full items-center justify-between gap-2 sm:gap-4 xl:max-w-[610px]"
+              >
+                {["Basket", "Your Details", "Delivery", "Payment", "Confirmation"].map(
+                  (step, index) => (
+                    <li
+                      key={step}
+                      aria-current={index === 0 ? "step" : undefined}
+                      className={`flex min-w-0 flex-1 flex-col items-center gap-1 text-center text-[11px] font-semibold sm:text-xs ${
+                        index === 0 ? "text-[#c4237f]" : "text-gray-500"
+                      }`}
+                    >
+                      <span className="relative flex w-full items-center justify-center">
+                        {index > 0 && (
+                          <span className="absolute right-1/2 top-1/2 h-px w-full -translate-y-1/2 bg-gray-300" />
+                        )}
+                        {index < 4 && (
+                          <span className="absolute left-1/2 top-1/2 h-px w-full -translate-y-1/2 bg-gray-300" />
+                        )}
+                        <span
+                          className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full border ${
+                            index === 0
+                              ? "border-[#c4237f] bg-[#c4237f] text-white"
+                              : "border-gray-300 bg-white"
+                          }`}
+                        >
+                          {index === 0 ? (
+                            <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+                          ) : (
+                            index + 1
+                          )}
+                        </span>
+                      </span>
+                      <span className="whitespace-nowrap">{step}</span>
+                    </li>
+                  ),
+                )}
+              </ol>
+            </div>
+
+            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px] xl:gap-8">
+              <section aria-label="Basket items" className="space-y-3">
+                {cart.map((item, index) => {
+                  const ProductIcon = item.isBroadband
+                    ? Wifi
+                    : item.isEEMobile
+                      ? Smartphone
+                      : Package;
+                  const category = item.isBroadband
+                    ? "Broadband"
+                    : item.isEEMobile
+                      ? "Mobile Plan"
+                      : item.isAccessories || item.isPhoneEquipment
+                        ? "Device"
+                        : item._raw.category || "Service";
+                  const image =
+                    typeof item._raw.image === "string"
+                      ? item._raw.image.trim()
+                      : "";
+                  const details =
+                    item.description ||
+                    [item.dataAllowance, item.speed]
+                      .filter(Boolean)
+                      .join(" · ") ||
+                    "Your selected Zoiko service";
+
+                  return (
+                    <article
+                      key={`${item.id}-${index}`}
+                      className="grid gap-4 rounded-2xl border border-[#e1e5ef] bg-white p-4 shadow-sm sm:grid-cols-[132px_minmax(0,1fr)_110px] sm:items-center sm:p-5"
+                    >
+                      <div className="relative flex h-28 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-[#f6eafa] to-[#eaf1ff]">
+                        <ProductIcon
+                          className="h-12 w-12 text-[#7b2983]"
+                          aria-hidden="true"
+                        />
+                        {image && (
+                          <Image
+                            src={image}
+                            alt={item.title}
+                            width={132}
+                            height={112}
+                            unoptimized
+                            className="absolute inset-0 h-full w-full object-contain"
+                          />
+                        )}
+                      </div>
+
+                      <div className="min-w-0">
+                        <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-[#fce8f3] px-2.5 py-1 text-xs font-bold text-[#a51f6b]">
+                          <ProductIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                          {category}
+                        </span>
+                        <h2 className="text-lg font-bold leading-tight">{item.title}</h2>
+                        <p className="mt-1 text-sm text-gray-600">{details}</p>
+                        {item.validity && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {item.validity.toLowerCase().includes("month")
+                              ? `${item.validity} contract`
+                              : `${item.validity}-month contract`}
+                          </p>
+                        )}
+                        {item.serviceAddress && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            Service address: {item.serviceAddress}
+                          </p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemove(index)}
+                          disabled={loading}
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#0f1b3d] hover:text-[#c4237f] disabled:opacity-50"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                          Remove
+                        </button>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
+                        {(item.isAccessories || item.isPhoneEquipment) && (
+                          <label className="sr-only" htmlFor={`basket-quantity-${index}`}>
+                            Quantity for {item.title}
+                          </label>
+                        )}
+                        {(item.isAccessories || item.isPhoneEquipment) ? (
+                          <select
+                            id={`basket-quantity-${index}`}
+                            value={item.quantity}
+                            disabled={loading}
+                            onChange={(event) =>
+                              handleQuantityChange(index, Number(event.target.value))
+                            }
+                            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-[#101b3d] disabled:opacity-50"
+                          >
+                            {Array.from(
+                              { length: Math.max(10, item.quantity) },
+                              (_, quantityIndex) => (
+                              <option key={quantityIndex + 1} value={quantityIndex + 1}>
+                                {quantityIndex + 1}
+                              </option>
+                              ),
+                            )}
+                          </select>
+                        ) : (
+                          <span className="text-xs text-gray-500">
+                            Qty: {item.quantity}
+                          </span>
+                        )}
+                        <div className="text-right">
+                          <p className="text-xl font-extrabold">
+                            £{(item.price * item.quantity).toFixed(2)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {item._raw.billingPeriod === "one-off" ||
+                            item.isAccessories ||
+                            item.isPhoneEquipment
+                              ? "one-off"
+                              : "per month"}
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+
+                <Link
+                  href="/"
+                  className="inline-flex items-center gap-2 px-1 py-2 text-sm font-semibold text-[#a51f6b] hover:underline"
+                >
+                  Continue shopping <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </section>
+
+              <aside className="rounded-2xl border border-[#e1e5ef] bg-white p-5 shadow-sm sm:p-6">
+                <h2 className="mb-5 text-xl font-extrabold">Order Summary</h2>
+
+                <div className="space-y-2 border-b border-gray-200 pb-4">
+                  <h3 className="text-sm font-bold">Monthly costs</h3>
+                  {monthlyItems.map((item, index) => (
+                    <div
+                      key={`monthly-${item.id}-${index}`}
+                      className="flex justify-between gap-3 text-sm"
+                    >
+                      <span className="min-w-0 truncate text-gray-700">
+                        {item.title}
+                        {item.quantity > 1 ? ` × ${item.quantity}` : ""}
+                      </span>
+                      <span className="shrink-0 font-medium">
+                        £{(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                  {monthlyItems.length === 0 && (
+                    <p className="text-sm text-gray-500">No monthly items</p>
+                  )}
+                  <div className="flex justify-between border-t border-gray-100 pt-2 text-sm font-bold">
+                    <span>Total monthly</span>
+                    <span>£{monthlyTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 border-b border-gray-200 py-4">
+                  <h3 className="text-sm font-bold">Upfront costs</h3>
+                  {upfrontItems.map((item, index) => (
+                    <div
+                      key={`upfront-${item.id}-${index}`}
+                      className="flex justify-between gap-3 text-sm"
+                    >
+                      <span className="min-w-0 truncate text-gray-700">
+                        {item.title}
+                        {item.quantity > 1 ? ` × ${item.quantity}` : ""}
+                      </span>
+                      <span className="shrink-0 font-medium">
+                        £{(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                  {upfrontItems.length === 0 && (
+                    <p className="flex justify-between text-sm text-gray-700">
+                      <span>Delivery</span>
+                      <span className="font-semibold text-green-700">Free</span>
+                    </p>
+                  )}
+                  {discountAmount > 0 && (
+                    <p className="flex justify-between text-sm text-green-700">
+                      <span>Discount</span>
+                      <span>−£{discountAmount.toFixed(2)}</span>
+                    </p>
+                  )}
+                  <div className="flex justify-between border-t border-gray-100 pt-2 text-sm font-bold">
+                    <span>Total due today</span>
+                    <span className="text-[#b21772]">£{total.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className="py-4">
+                  <label htmlFor="basket-coupon" className="sr-only">
+                    Promotion code
+                  </label>
+                  <div className="flex gap-2">
+                    <div className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-gray-300 px-3">
+                      <Tag className="h-4 w-4 shrink-0 text-gray-500" aria-hidden="true" />
+                      <input
+                        id="basket-coupon"
+                        type="text"
+                        value={coupon}
+                        onChange={(event) => setCoupon(event.target.value)}
+                        placeholder="Enter a promotion code"
+                        disabled={loading}
+                        className="min-w-0 flex-1 py-2 text-sm outline-none"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={loading}
+                      className="rounded-lg border border-[#7b2983] px-3 text-sm font-bold text-[#5b2276] hover:bg-purple-50 disabled:opacity-50"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  {couponMessage && (
+                    <p
+                      role="status"
+                      className={`mt-2 text-xs ${
+                        discountData ? "text-green-700" : "text-red-600"
+                      }`}
+                    >
+                      {couponMessage}
+                    </p>
+                  )}
+                  {discountData && (
+                    <button
+                      type="button"
+                      onClick={handleCancelCoupon}
+                      disabled={loading}
+                      className="mt-2 text-xs font-semibold text-[#a51f6b] hover:underline"
+                    >
+                      Remove promotion
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleProceedToCheckout}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#c4237f] to-[#8f168d] px-4 py-3.5 font-bold text-white shadow-sm transition hover:brightness-95"
+                >
+                  <LockKeyhole className="h-4 w-4" aria-hidden="true" />
+                  Proceed to Checkout
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+                <div className="mt-3 flex items-center justify-center gap-2 text-xs text-gray-600">
+                  <ShieldCheck className="h-4 w-4 text-[#5b2276]" aria-hidden="true" />
+                  Secure checkout
+                </div>
+                <div
+                  aria-label="Secure payment"
+                  className="mt-3 flex flex-wrap justify-center gap-2 text-[10px] font-bold text-[#0f1b3d]"
+                >
+                  {["VISA", "Mastercard", "AMEX", "Apple Pay", "Google Pay"].map(
+                    (method) => (
+                      <span
+                        key={method}
+                        className="rounded border border-gray-200 px-2 py-1"
+                      >
+                        {method}
+                      </span>
+                    ),
+                  )}
+                </div>
+              </aside>
+            </div>
+
+            <div className="mt-8 grid gap-4 rounded-2xl bg-white px-5 py-5 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { icon: Truck, title: "Fast, reliable delivery", detail: "To your door, nationwide" },
+                { icon: RefreshCw, title: "Easy returns", detail: "30-day peace of mind" },
+                { icon: ShieldCheck, title: "Secure payments", detail: "Your details are protected" },
+                { icon: Leaf, title: "A greener choice", detail: "Responsible and sustainable" },
+              ].map(({ icon: BenefitIcon, title, detail }) => (
+                <div key={title} className="flex items-center gap-3">
+                  <BenefitIcon
+                    className="h-8 w-8 shrink-0 text-[#9b1d83]"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <p className="text-xs font-bold">{title}</p>
+                    <p className="text-[11px] text-gray-500">{detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+        {loginModal}
+      </>
     );
   }
 
