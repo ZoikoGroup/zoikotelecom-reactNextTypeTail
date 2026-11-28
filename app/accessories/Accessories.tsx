@@ -378,7 +378,7 @@ export default function Accessories() {
                       hover:scale-[1.01]
                     "
                       onClick={() =>{ handleBuyNow(product)
-                        router.push("/checkout");
+                        router.push("/cart");
                       }}
                     >
                       Buy Now

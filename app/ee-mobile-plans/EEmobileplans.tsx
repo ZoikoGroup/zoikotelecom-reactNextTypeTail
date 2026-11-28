@@ -401,7 +401,7 @@ export default function EEmobileplans() {
         setPendingPlan(null);
         window.dispatchEvent(new Event("cart-updated"));
         // Send the user to checkout. Change the path if your checkout route differs.
-        router.push("/checkout");
+        router.push("/cart");
     };
 
     // ─── UI-only state (filters, details, compare checkbox) ─────────────────

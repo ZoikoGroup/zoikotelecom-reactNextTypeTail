@@ -496,7 +496,7 @@ export default function PhoneEquipment() {
                             "
                       onClick={() => {
                         handleBuyNow(product);
-                        router.push("/checkout");
+                        router.push("/cart");
                       }}
                     >
                       Buy Now

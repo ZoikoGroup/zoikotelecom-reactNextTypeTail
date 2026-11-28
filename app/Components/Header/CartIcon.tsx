@@ -58,7 +58,7 @@ const CartIcon = () => {
   return (
     <button
       type="button"
-      onClick={() => router.push("/checkout")}
+      onClick={() => router.push("/cart")}
       aria-label={
         cartCount > 0
           ? `Cart, ${cartCount} item${cartCount > 1 ? "s" : ""}`
